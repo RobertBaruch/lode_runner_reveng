@@ -157,15 +157,14 @@ Take note of the orange and blue pixels. All the patterns noted in the rules abo
 \section{The sprites}
 Lode Runner defines 104 sprites, each being 11 rows, with two bytes per row. The first bytes of
 all 104 sprites are in the table first, then the second bytes, then the third bytes, and so on.
-
-\input{sprite_tables.tex}
+Later we will see that only the leftmost 10 pixels out of the 14-pixel description is used.
 
 \nwenddocs{}\nwbegincode{4}\sublabel{NW1Xx3lK-1W8AJS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}}\moddef{tables~{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}}\endmoddef\nwstartdeflinemarkup\nwprevnextdefs{\relax}{NW1Xx3lK-1W8AJS-2}\nwenddeflinemarkup
     ORG     $AD00
 \nwlinkedidentc{SPRITE_DATA}{NW1Xx3lK-1W8AJS-1}:
     INCLUDE "sprite_data.asm"
 \nwindexdefn{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}{NW1Xx3lK-1W8AJS-1}\eatline
-\nwalsodefined{\\{NW1Xx3lK-1W8AJS-2}\\{NW1Xx3lK-1W8AJS-3}\\{NW1Xx3lK-1W8AJS-4}\\{NW1Xx3lK-1W8AJS-5}\\{NW1Xx3lK-1W8AJS-6}}\nwnotused{tables}\nwidentdefs{\\{{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}}}\nwendcode{}\nwbegindocs{5}\nwdocspar
+\nwalsodefined{\\{NW1Xx3lK-1W8AJS-2}\\{NW1Xx3lK-1W8AJS-3}\\{NW1Xx3lK-1W8AJS-4}\\{NW1Xx3lK-1W8AJS-5}\\{NW1Xx3lK-1W8AJS-6}\\{NW1Xx3lK-1W8AJS-7}}\nwnotused{tables}\nwidentdefs{\\{{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}}}\nwendcode{}\nwbegindocs{5}\nwdocspar
 \section{Shifting sprites}
 This is all very good if we're going to draw sprites exactly on 7-pixel
 boundaries, but what if we want to draw them starting at other columns?
@@ -178,7 +177,7 @@ a shifted sprite.
     ORG     $DF
 \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-1}      DS      33
 \nwindexdefn{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}{NW1Xx3lK-10jlgu-1}\eatline
-\nwalsodefined{\\{NW1Xx3lK-10jlgu-2}\\{NW1Xx3lK-10jlgu-3}}\nwnotused{defines}\nwidentdefs{\\{{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}}}\nwendcode{}\nwbegindocs{7}\nwdocspar
+\nwalsodefined{\\{NW1Xx3lK-10jlgu-2}\\{NW1Xx3lK-10jlgu-3}\\{NW1Xx3lK-10jlgu-4}}\nwnotused{defines}\nwidentdefs{\\{{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}}}\nwendcode{}\nwbegindocs{7}\nwdocspar
 Lode Runner also contains tables which show how to shift any arbitrary
 7-pixel pattern right by any amount from zero to six pixels.
 
@@ -392,7 +391,7 @@ modifies its own instructions with those addresses.
     BNE     .loop                           ; loop while \nwlinkedidentc{ROW_COUNT}{NW1Xx3lK-10jlgu-2} > 0
     RTS
 \nwindexdefn{\nwixident{COMPUTE{\_}SHIFTED{\_}SPRITE}}{COMPUTE:unSHIFTED:unSPRITE}{NW1Xx3lK-8jv1b-1}\eatline
-\nwalsodefined{\\{NW1Xx3lK-8jv1b-2}\\{NW1Xx3lK-8jv1b-3}}\nwnotused{routines}\nwidentdefs{\\{{\nwixident{COMPUTE{\_}SHIFTED{\_}SPRITE}}{COMPUTE:unSHIFTED:unSPRITE}}}\nwidentuses{\\{{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}}\\{{\nwixident{PIXEL{\_}SHIFT{\_}PAGES}}{PIXEL:unSHIFT:unPAGES}}\\{{\nwixident{ROW{\_}COUNT}}{ROW:unCOUNT}}\\{{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}}\\{{\nwixident{SPRITE{\_}NUM}}{SPRITE:unNUM}}\\{{\nwixident{TMP{\_}PTR}}{TMP:unPTR}}}\nwindexuse{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{PIXEL{\_}SHIFT{\_}PAGES}}{PIXEL:unSHIFT:unPAGES}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{ROW{\_}COUNT}}{ROW:unCOUNT}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{SPRITE{\_}NUM}}{SPRITE:unNUM}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{TMP{\_}PTR}}{TMP:unPTR}{NW1Xx3lK-8jv1b-1}\nwendcode{}\nwbegindocs{17}\nwdocspar
+\nwalsodefined{\\{NW1Xx3lK-8jv1b-2}\\{NW1Xx3lK-8jv1b-3}\\{NW1Xx3lK-8jv1b-4}}\nwnotused{routines}\nwidentdefs{\\{{\nwixident{COMPUTE{\_}SHIFTED{\_}SPRITE}}{COMPUTE:unSHIFTED:unSPRITE}}}\nwidentuses{\\{{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}}\\{{\nwixident{PIXEL{\_}SHIFT{\_}PAGES}}{PIXEL:unSHIFT:unPAGES}}\\{{\nwixident{ROW{\_}COUNT}}{ROW:unCOUNT}}\\{{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}}\\{{\nwixident{SPRITE{\_}NUM}}{SPRITE:unNUM}}\\{{\nwixident{TMP{\_}PTR}}{TMP:unPTR}}}\nwindexuse{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{PIXEL{\_}SHIFT{\_}PAGES}}{PIXEL:unSHIFT:unPAGES}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{ROW{\_}COUNT}}{ROW:unCOUNT}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{SPRITE{\_}NUM}}{SPRITE:unNUM}{NW1Xx3lK-8jv1b-1}\nwindexuse{\nwixident{TMP{\_}PTR}}{TMP:unPTR}{NW1Xx3lK-8jv1b-1}\nwendcode{}\nwbegindocs{17}\nwdocspar
 \section{Memory mapped graphics}
 
 The Apple II maps the area from {\Tt{}{\$}2000-{\$}3FFF\nwendquote} to high-res graphics page 1 (HGR1),
@@ -410,7 +409,7 @@ a table and a routine to use that table.
     INCLUDE "row_to_offset_hi_table.asm"
 \nwindexdefn{\nwixident{ROW{\_}TO{\_}OFFSET{\_}LO}}{ROW:unTO:unOFFSET:unLO}{NW1Xx3lK-1W8AJS-5}\nwindexdefn{\nwixident{ROW{\_}TO{\_}OFFSET{\_}HI}}{ROW:unTO:unOFFSET:unHI}{NW1Xx3lK-1W8AJS-5}\eatline
 \nwidentdefs{\\{{\nwixident{ROW{\_}TO{\_}OFFSET{\_}HI}}{ROW:unTO:unOFFSET:unHI}}\\{{\nwixident{ROW{\_}TO{\_}OFFSET{\_}LO}}{ROW:unTO:unOFFSET:unLO}}}\nwendcode{}\nwbegindocs{19}\nwdocspar
-\nwenddocs{}\nwbegincode{20}\sublabel{NW1Xx3lK-10jlgu-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-3}}}\moddef{defines~{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-10jlgu-2}{\relax}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{20}\sublabel{NW1Xx3lK-10jlgu-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-3}}}\moddef{defines~{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-10jlgu-2}{NW1Xx3lK-10jlgu-4}\nwenddeflinemarkup
     ORG     $0C
 \nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-3}    DS      2
     ORG     $1F
@@ -434,39 +433,179 @@ a table and a routine to use that table.
 \nwidentdefs{\\{{\nwixident{ROW{\_}TO{\_}ADDR}}{ROW:unTO:unADDR}}}\nwidentuses{\\{{\nwixident{HGR{\_}PAGE}}{HGR:unPAGE}}\\{{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}}\\{{\nwixident{ROW{\_}TO{\_}OFFSET{\_}HI}}{ROW:unTO:unOFFSET:unHI}}\\{{\nwixident{ROW{\_}TO{\_}OFFSET{\_}LO}}{ROW:unTO:unOFFSET:unLO}}}\nwindexuse{\nwixident{HGR{\_}PAGE}}{HGR:unPAGE}{NW1Xx3lK-8jv1b-2}\nwindexuse{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}{NW1Xx3lK-8jv1b-2}\nwindexuse{\nwixident{ROW{\_}TO{\_}OFFSET{\_}HI}}{ROW:unTO:unOFFSET:unHI}{NW1Xx3lK-8jv1b-2}\nwindexuse{\nwixident{ROW{\_}TO{\_}OFFSET{\_}LO}}{ROW:unTO:unOFFSET:unLO}{NW1Xx3lK-8jv1b-2}\nwendcode{}\nwbegindocs{23}\nwdocspar
 Lode Runner's screens are organized into 28 sprites across by 17 sprites
 down. To convert between sprite coordinates and screen coordinates, we
-use tables and lookup routines.
+use tables and lookup routines. Each sprite is 10 pixels across by 11 pixels down.
 
-\nwenddocs{}\nwbegincode{24}\sublabel{NW1Xx3lK-1W8AJS-6}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-6}}}\moddef{tables~{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-1W8AJS-5}{\relax}\nwenddeflinemarkup
-    ORG     $1C51
+\nwenddocs{}\nwbegincode{24}\sublabel{NW1Xx3lK-1W8AJS-6}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-6}}}\moddef{tables~{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-1W8AJS-5}{NW1Xx3lK-1W8AJS-7}\nwenddeflinemarkup
+    ORG     $1C35
+\nwlinkedidentc{ROW_TABLE2}{NW1Xx3lK-1W8AJS-6}:
+    ; 28 rows of 5 pixels each
+    HEX     00 05 0a 0f 14 19 1e 23 28 2d 32 37 3c 41 46 4b
+    HEX     50 55 5a 5f 64 69 6e 73 78 7d 82 87
 \nwlinkedidentc{ROW_TABLE}{NW1Xx3lK-1W8AJS-6}:
-    HEX     00 0B 16 21 2C 37 42 4D
-    HEX     58 63 6E 79 84 8F 9A A5
+    ; 17 rows of 11 pixels each
+    HEX     00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5
     HEX     B5
 \nwlinkedidentc{COL_TABLE}{NW1Xx3lK-1W8AJS-6}:
-    HEX     00 01 02 04 05 07 08 0A
-    HEX     0B 0C 0E 0F 11 12 14 15
-    HEX     16 18 19 1B 1C 1E 1F 20
-    HEX     22 23 25 26
-\nwindexdefn{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}{NW1Xx3lK-1W8AJS-6}\nwindexdefn{\nwixident{COL{\_}TABLE}}{COL:unTABLE}{NW1Xx3lK-1W8AJS-6}\eatline
-\nwidentdefs{\\{{\nwixident{COL{\_}TABLE}}{COL:unTABLE}}\\{{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}}}\nwendcode{}\nwbegindocs{25}\nwdocspar
-\nwenddocs{}\nwbegincode{26}\sublabel{NW1Xx3lK-8jv1b-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-3}}}\moddef{routines~{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-8jv1b-2}{\relax}\nwenddeflinemarkup
+    ; Byte number
+    HEX     00 01 02 04 05 07 08 0A 0B 0C 0E 0F 11 12 14 15
+    HEX     16 18 19 1B 1C 1E 1F 20 22 23 25 26
+\nwlinkedidentc{COL_SHIFT_TABLE}{NW1Xx3lK-1W8AJS-6}:
+    ; Right shift amount
+    HEX     00 03 06 02 05 01 04 00 03 06 02 05 01 04 00 03
+    HEX     06 02 05 01 04 00 03 06 02 05 01 04
+\nwindexdefn{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}{NW1Xx3lK-1W8AJS-6}\nwindexdefn{\nwixident{COL{\_}TABLE}}{COL:unTABLE}{NW1Xx3lK-1W8AJS-6}\nwindexdefn{\nwixident{ROW{\_}TABLE2}}{ROW:unTABLE2}{NW1Xx3lK-1W8AJS-6}\nwindexdefn{\nwixident{COL{\_}SHIFT{\_}TABLE}}{COL:unSHIFT:unTABLE}{NW1Xx3lK-1W8AJS-6}\eatline
+\nwidentdefs{\\{{\nwixident{COL{\_}SHIFT{\_}TABLE}}{COL:unSHIFT:unTABLE}}\\{{\nwixident{COL{\_}TABLE}}{COL:unTABLE}}\\{{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}}\\{{\nwixident{ROW{\_}TABLE2}}{ROW:unTABLE2}}}\nwendcode{}\nwbegindocs{25}\nwdocspar
+\nwenddocs{}\nwbegincode{26}\sublabel{NW1Xx3lK-8jv1b-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-3}}}\moddef{routines~{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-8jv1b-2}{NW1Xx3lK-8jv1b-4}\nwenddeflinemarkup
     ORG     $885D
-GET_ROWNUM_FOR:
+\nwlinkedidentc{GET_ROWNUM_FOR}{NW1Xx3lK-8jv1b-3}:
     SUBROUTINE
     ; Enter routine with Y set to sprite row. On
     ; return, Y will be set to screen row.
+    ; We can also set X to something, and on return
+    ; X is set to something based on \nwlinkedidentc{ROW_TABLE2}{NW1Xx3lK-1W8AJS-6}, but
+    ; so far I'm not sure what it's used for.
 
     LDA     \nwlinkedidentc{ROW_TABLE}{NW1Xx3lK-1W8AJS-6}, Y
     PHA
-    LDA     
+    LDA     \nwlinkedidentc{ROW_TABLE2}{NW1Xx3lK-1W8AJS-6}, X
+    TAX                         ; X = \nwlinkedidentc{ROW_TABLE2}{NW1Xx3lK-1W8AJS-6}[X]
+    PLA
+    TAY                         ; Y = \nwlinkedidentc{ROW_TABLE}{NW1Xx3lK-1W8AJS-6}[Y]
+    RTS
 
-\\chapter\{The whole thing\}
+\nwlinkedidentc{GET_COLNUM_FOR}{NW1Xx3lK-8jv1b-3}:
+    SUBROUTINE
+    ; Enter routine with X set to sprite number. On
+    ; return, A will be set to screen column byte number
+    ; and X will be set to an additional right shift amount.
+
+    LDA     \nwlinkedidentc{COL_TABLE}{NW1Xx3lK-1W8AJS-6}, X
+    PHA                         ; A = COL_TABLE2[X]
+    LDA     \nwlinkedidentc{COL_SHIFT_TABLE}{NW1Xx3lK-1W8AJS-6}, X
+    TAX                         ; X = \nwlinkedidentc{COL_SHIFT_TABLE}{NW1Xx3lK-1W8AJS-6}[X]
+    PLA
+    RTS
+\nwindexdefn{\nwixident{GET{\_}ROWNUM{\_}FOR}}{GET:unROWNUM:unFOR}{NW1Xx3lK-8jv1b-3}\nwindexdefn{\nwixident{GET{\_}COLNUM{\_}FOR}}{GET:unCOLNUM:unFOR}{NW1Xx3lK-8jv1b-3}\eatline
+\nwidentdefs{\\{{\nwixident{GET{\_}COLNUM{\_}FOR}}{GET:unCOLNUM:unFOR}}\\{{\nwixident{GET{\_}ROWNUM{\_}FOR}}{GET:unROWNUM:unFOR}}}\nwidentuses{\\{{\nwixident{COL{\_}SHIFT{\_}TABLE}}{COL:unSHIFT:unTABLE}}\\{{\nwixident{COL{\_}TABLE}}{COL:unTABLE}}\\{{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}}\\{{\nwixident{ROW{\_}TABLE2}}{ROW:unTABLE2}}}\nwindexuse{\nwixident{COL{\_}SHIFT{\_}TABLE}}{COL:unSHIFT:unTABLE}{NW1Xx3lK-8jv1b-3}\nwindexuse{\nwixident{COL{\_}TABLE}}{COL:unTABLE}{NW1Xx3lK-8jv1b-3}\nwindexuse{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}{NW1Xx3lK-8jv1b-3}\nwindexuse{\nwixident{ROW{\_}TABLE2}}{ROW:unTABLE2}{NW1Xx3lK-8jv1b-3}\nwendcode{}\nwbegindocs{27}\nwdocspar
+Now we can finally write the routines that draw a sprite on the screen.
+There are two entry points, one to draw on HGR1, and one for HGR2.
+
+\nwenddocs{}\nwbegincode{28}\sublabel{NW1Xx3lK-10jlgu-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-4}}}\moddef{defines~{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-10jlgu-3}{\relax}\nwenddeflinemarkup
+    ORG     $1B
+\nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-4}          DS      1
+\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-4}          DS      1
+    ORG     $50
+MASK0           DS      1
+MASK1           DS      1
+    ORG     $71
+\nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-4}   DS      1
+    ORG     $85
+\nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-4}     DS      1
+\nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-4}     DS      1
+\nwindexdefn{\nwixident{ROWNUM}}{ROWNUM}{NW1Xx3lK-10jlgu-4}\nwindexdefn{\nwixident{COLNUM}}{COLNUM}{NW1Xx3lK-10jlgu-4}\nwindexdefn{\nwixident{COL{\_}SHIFT{\_}AMT}}{COL:unSHIFT:unAMT}{NW1Xx3lK-10jlgu-4}\nwindexdefn{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-10jlgu-4}\nwindexdefn{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-10jlgu-4}\eatline
+\nwidentdefs{\\{{\nwixident{COL{\_}SHIFT{\_}AMT}}{COL:unSHIFT:unAMT}}\\{{\nwixident{COLNUM}}{COLNUM}}\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{ROWNUM}}{ROWNUM}}}\nwendcode{}\nwbegindocs{29}\nwdocspar
+\nwenddocs{}\nwbegincode{30}\sublabel{NW1Xx3lK-1W8AJS-7}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-7}}}\moddef{tables~{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-1W8AJS-6}{\relax}\nwenddeflinemarkup
+    ORG     $8328
+\nwlinkedidentc{PIXEL_MASK0}{NW1Xx3lK-1W8AJS-7}:
+    BYTE    %00000000
+    BYTE    %00000001
+    BYTE    %00000011
+    BYTE    %00000111
+    BYTE    %00001111
+    BYTE    %00011111
+    BYTE    %00111111
+\nwlinkedidentc{PIXEL_MASK1}{NW1Xx3lK-1W8AJS-7}:
+    BYTE    %11111000
+    BYTE    %11110000
+    BYTE    %11100000
+    BYTE    %11000000
+    BYTE    %10000000
+    BYTE    %11111110
+    BYTE    %11111100
+\nwindexdefn{\nwixident{PIXEL{\_}MASK0}}{PIXEL:unMASK0}{NW1Xx3lK-1W8AJS-7}\nwindexdefn{\nwixident{PIXEL{\_}MASK1}}{PIXEL:unMASK1}{NW1Xx3lK-1W8AJS-7}\eatline
+\nwidentdefs{\\{{\nwixident{PIXEL{\_}MASK0}}{PIXEL:unMASK0}}\\{{\nwixident{PIXEL{\_}MASK1}}{PIXEL:unMASK1}}}\nwendcode{}\nwbegindocs{31}\nwdocspar
+\nwenddocs{}\nwbegincode{32}\sublabel{NW1Xx3lK-8jv1b-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-4}}}\moddef{routines~{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW1Xx3lK-8jv1b-3}{\relax}\nwenddeflinemarkup
+    ORG     $82AA
+\nwlinkedidentc{DRAW_SPRITE_PAGE1}{NW1Xx3lK-8jv1b-4}:
+    SUBROUTINE
+    ; Enter routine with A set to sprite number to draw,
+    ; \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-4} set to the row to draw it at, and \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-4}
+    ; set to the column to draw it at.
+
+    STA     \nwlinkedidentc{SPRITE_NUM}{NW1Xx3lK-10jlgu-2}
+    LDA     #$20                ; Page number for HGR1
+    BNE     DRAW_SPRITE         ; Actually unconditional jump
+
+\nwlinkedidentc{DRAW_SPRITE_PAGE2}{NW1Xx3lK-8jv1b-4}:
+    SUBROUTINE
+    ; Enter routine with A set to sprite number to draw,
+    ; \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-4} set to the row to draw it at, and \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-4}
+    ; set to the column to draw it at.
+
+    STA     \nwlinkedidentc{SPRITE_NUM}{NW1Xx3lK-10jlgu-2}
+    LDA     #$40                ; Page number for HGR2
+    ; fallthrough
+
+DRAW_SPRITE:
+    STA     \nwlinkedidentc{HGR_PAGE}{NW1Xx3lK-10jlgu-3}
+    LDY     \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-4}
+    JSR     \nwlinkedidentc{GET_ROWNUM_FOR}{NW1Xx3lK-8jv1b-3}
+    STY     \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-4}              ; \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-4} = \nwlinkedidentc{ROW_TABLE}{NW1Xx3lK-1W8AJS-6}[\nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-4}]
+
+    LDX     \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-4}
+    JSR     \nwlinkedidentc{GET_COLNUM_FOR}{NW1Xx3lK-8jv1b-3}
+    STA     \nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-4}              ; \nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-4} = \nwlinkedidentc{COL_TABLE}{NW1Xx3lK-1W8AJS-6}[\nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-4}]
+    STX     \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-4}       ; \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-4} = \nwlinkedidentc{COL_SHIFT_TABLE}{NW1Xx3lK-1W8AJS-6}[\nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-4}]
+
+    LDA     \nwlinkedidentc{PIXEL_MASK0}{NW1Xx3lK-1W8AJS-7}, X
+    STA     MASK0               ; MASK0 = \nwlinkedidentc{PIXEL_MASK0}{NW1Xx3lK-1W8AJS-7}[\nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-4}]
+    LDA     \nwlinkedidentc{PIXEL_MASK1}{NW1Xx3lK-1W8AJS-7}, X
+    STA     MASK1               ; MASK1 = \nwlinkedidentc{PIXEL_MASK1}{NW1Xx3lK-1W8AJS-7}[\nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-4}]
+
+    JSR     \nwlinkedidentc{COMPUTE_SHIFTED_SPRITE}{NW1Xx3lK-8jv1b-1}
+
+    LDA     #$0B
+    STA     \nwlinkedidentc{ROW_COUNT}{NW1Xx3lK-10jlgu-2}
+    LDX     #$00
+    LDA     \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-4}
+    CMP     #$05
+    BCS     .need_3_bytes       ; if \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-4} >= 5, we need to alter three screen bytes.
+
+.loop1:
+    LDY     \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-4}
+    JSR     \nwlinkedidentc{ROW_TO_ADDR}{NW1Xx3lK-8jv1b-2}
+    LDY     \nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-4}
+    LDA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-3}), Y
+    AND     MASK0
+    ORA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-1}, X
+    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-3}), Y       ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-4}] = screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-4}] & MASK0 | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-1}[X]
+
+    INX                         ; X++
+    INY                         ; Y++
+    LDA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-3}), Y
+    AND     MASK1
+    ORA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-1}+1, X
+    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-3}), Y       ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-4}+1] = screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-4}+1] & MASK1 | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-1}[X+1]
+
+    INX
+    INX                         ; X += 2
+    INC     \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-4}              ; \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-4}++
+    DEC     \nwlinkedidentc{ROW_COUNT}{NW1Xx3lK-10jlgu-2}           ; \nwlinkedidentc{ROW_COUNT}{NW1Xx3lK-10jlgu-2}--
+    BNE     .loop1              ; loop while \nwlinkedidentc{ROW_COUNT}{NW1Xx3lK-10jlgu-2} > 0
+    RTS
+
+.need_3_bytes
+
+
+
+\nwindexdefn{\nwixident{DRAW{\_}SPRITE{\_}PAGE1}}{DRAW:unSPRITE:unPAGE1}{NW1Xx3lK-8jv1b-4}\nwindexdefn{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}{NW1Xx3lK-8jv1b-4}\eatline
+\nwidentdefs{\\{{\nwixident{DRAW{\_}SPRITE{\_}PAGE1}}{DRAW:unSPRITE:unPAGE1}}\\{{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}}}\nwidentuses{\\{{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}}\\{{\nwixident{COL{\_}SHIFT{\_}AMT}}{COL:unSHIFT:unAMT}}\\{{\nwixident{COL{\_}SHIFT{\_}TABLE}}{COL:unSHIFT:unTABLE}}\\{{\nwixident{COL{\_}TABLE}}{COL:unTABLE}}\\{{\nwixident{COLNUM}}{COLNUM}}\\{{\nwixident{COMPUTE{\_}SHIFTED{\_}SPRITE}}{COMPUTE:unSHIFTED:unSPRITE}}\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{GET{\_}COLNUM{\_}FOR}}{GET:unCOLNUM:unFOR}}\\{{\nwixident{GET{\_}ROWNUM{\_}FOR}}{GET:unROWNUM:unFOR}}\\{{\nwixident{HGR{\_}PAGE}}{HGR:unPAGE}}\\{{\nwixident{PIXEL{\_}MASK0}}{PIXEL:unMASK0}}\\{{\nwixident{PIXEL{\_}MASK1}}{PIXEL:unMASK1}}\\{{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}}\\{{\nwixident{ROW{\_}COUNT}}{ROW:unCOUNT}}\\{{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}}\\{{\nwixident{ROW{\_}TO{\_}ADDR}}{ROW:unTO:unADDR}}\\{{\nwixident{ROWNUM}}{ROWNUM}}\\{{\nwixident{SPRITE{\_}NUM}}{SPRITE:unNUM}}}\nwindexuse{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{COL{\_}SHIFT{\_}AMT}}{COL:unSHIFT:unAMT}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{COL{\_}SHIFT{\_}TABLE}}{COL:unSHIFT:unTABLE}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{COL{\_}TABLE}}{COL:unTABLE}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{COLNUM}}{COLNUM}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{COMPUTE{\_}SHIFTED{\_}SPRITE}}{COMPUTE:unSHIFTED:unSPRITE}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{GET{\_}COLNUM{\_}FOR}}{GET:unCOLNUM:unFOR}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{GET{\_}ROWNUM{\_}FOR}}{GET:unROWNUM:unFOR}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{HGR{\_}PAGE}}{HGR:unPAGE}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{PIXEL{\_}MASK0}}{PIXEL:unMASK0}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{PIXEL{\_}MASK1}}{PIXEL:unMASK1}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{ROW{\_}COUNT}}{ROW:unCOUNT}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{ROW{\_}TO{\_}ADDR}}{ROW:unTO:unADDR}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{ROWNUM}}{ROWNUM}{NW1Xx3lK-8jv1b-4}\nwindexuse{\nwixident{SPRITE{\_}NUM}}{SPRITE:unNUM}{NW1Xx3lK-8jv1b-4}\nwendcode{}\nwbegindocs{33}\nwdocspar
+\chapter{The whole thing}
 We then put together the entire assembly file:
 
-\nwidentuses{\\{{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}}}\nwindexuse{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}{NW1Xx3lK-8jv1b-3}\nwendcode{}\nwbegincode{27}\sublabel{NW1Xx3lK-1p0Y9w-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1p0Y9w-1}}}\moddef{*~{\nwtagstyle{}\subpageref{NW1Xx3lK-1p0Y9w-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{34}\sublabel{NW1Xx3lK-1p0Y9w-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1p0Y9w-1}}}\moddef{*~{\nwtagstyle{}\subpageref{NW1Xx3lK-1p0Y9w-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 \LA{}preamble~{\nwtagstyle{}\subpageref{NW1Xx3lK-1jwKhK-1}}\RA{}
-\LA{}row mapping~{\nwtagstyle{}\subpageref{nw@notdef}}\RA{}
-\nwnotused{*}\nwendcode{}\nwbegindocs{28}\nwdocspar
+\nwnotused{*}\nwendcode{}\nwbegindocs{35}\nwdocspar
 
 \chapter{Defined Chunks}\par\noindent
 \nowebchunks
@@ -475,27 +614,39 @@ We then put together the entire assembly file:
 \nwenddocs{}
 
 \nwixlogsorted{c}{{*}{NW1Xx3lK-1p0Y9w-1}{\nwixd{NW1Xx3lK-1p0Y9w-1}}}%
-\nwixlogsorted{c}{{defines}{NW1Xx3lK-10jlgu-1}{\nwixd{NW1Xx3lK-10jlgu-1}\nwixd{NW1Xx3lK-10jlgu-2}\nwixd{NW1Xx3lK-10jlgu-3}}}%
+\nwixlogsorted{c}{{defines}{NW1Xx3lK-10jlgu-1}{\nwixd{NW1Xx3lK-10jlgu-1}\nwixd{NW1Xx3lK-10jlgu-2}\nwixd{NW1Xx3lK-10jlgu-3}\nwixd{NW1Xx3lK-10jlgu-4}}}%
 \nwixlogsorted{c}{{preamble}{NW1Xx3lK-1jwKhK-1}{\nwixd{NW1Xx3lK-1jwKhK-1}\nwixu{NW1Xx3lK-1p0Y9w-1}}}%
-\nwixlogsorted{c}{{routines}{NW1Xx3lK-8jv1b-1}{\nwixd{NW1Xx3lK-8jv1b-1}\nwixd{NW1Xx3lK-8jv1b-2}\nwixd{NW1Xx3lK-8jv1b-3}}}%
-\nwixlogsorted{c}{{row mapping}{nw@notdef}{\nwixu{NW1Xx3lK-1p0Y9w-1}}}%
-\nwixlogsorted{c}{{tables}{NW1Xx3lK-1W8AJS-1}{\nwixd{NW1Xx3lK-1W8AJS-1}\nwixd{NW1Xx3lK-1W8AJS-2}\nwixd{NW1Xx3lK-1W8AJS-3}\nwixd{NW1Xx3lK-1W8AJS-4}\nwixd{NW1Xx3lK-1W8AJS-5}\nwixd{NW1Xx3lK-1W8AJS-6}}}%
+\nwixlogsorted{c}{{routines}{NW1Xx3lK-8jv1b-1}{\nwixd{NW1Xx3lK-8jv1b-1}\nwixd{NW1Xx3lK-8jv1b-2}\nwixd{NW1Xx3lK-8jv1b-3}\nwixd{NW1Xx3lK-8jv1b-4}}}%
+\nwixlogsorted{c}{{tables}{NW1Xx3lK-1W8AJS-1}{\nwixd{NW1Xx3lK-1W8AJS-1}\nwixd{NW1Xx3lK-1W8AJS-2}\nwixd{NW1Xx3lK-1W8AJS-3}\nwixd{NW1Xx3lK-1W8AJS-4}\nwixd{NW1Xx3lK-1W8AJS-5}\nwixd{NW1Xx3lK-1W8AJS-6}\nwixd{NW1Xx3lK-1W8AJS-7}}}%
 \nwixlogsorted{i}{{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}}%
+\nwixlogsorted{i}{{\nwixident{COL{\_}SHIFT{\_}AMT}}{COL:unSHIFT:unAMT}}%
+\nwixlogsorted{i}{{\nwixident{COL{\_}SHIFT{\_}TABLE}}{COL:unSHIFT:unTABLE}}%
 \nwixlogsorted{i}{{\nwixident{COL{\_}TABLE}}{COL:unTABLE}}%
+\nwixlogsorted{i}{{\nwixident{COLNUM}}{COLNUM}}%
 \nwixlogsorted{i}{{\nwixident{COMPUTE{\_}SHIFTED{\_}SPRITE}}{COMPUTE:unSHIFTED:unSPRITE}}%
+\nwixlogsorted{i}{{\nwixident{DRAW{\_}SPRITE{\_}PAGE1}}{DRAW:unSPRITE:unPAGE1}}%
+\nwixlogsorted{i}{{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}}%
+\nwixlogsorted{i}{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}%
+\nwixlogsorted{i}{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}%
+\nwixlogsorted{i}{{\nwixident{GET{\_}COLNUM{\_}FOR}}{GET:unCOLNUM:unFOR}}%
+\nwixlogsorted{i}{{\nwixident{GET{\_}ROWNUM{\_}FOR}}{GET:unROWNUM:unFOR}}%
 \nwixlogsorted{i}{{\nwixident{HGR{\_}PAGE}}{HGR:unPAGE}}%
+\nwixlogsorted{i}{{\nwixident{PIXEL{\_}MASK0}}{PIXEL:unMASK0}}%
+\nwixlogsorted{i}{{\nwixident{PIXEL{\_}MASK1}}{PIXEL:unMASK1}}%
 \nwixlogsorted{i}{{\nwixident{PIXEL{\_}PATTERN{\_}TABLE}}{PIXEL:unPATTERN:unTABLE}}%
 \nwixlogsorted{i}{{\nwixident{PIXEL{\_}SHIFT{\_}PAGES}}{PIXEL:unSHIFT:unPAGES}}%
 \nwixlogsorted{i}{{\nwixident{PIXEL{\_}SHIFT{\_}TABLE}}{PIXEL:unSHIFT:unTABLE}}%
 \nwixlogsorted{i}{{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}}%
 \nwixlogsorted{i}{{\nwixident{ROW{\_}COUNT}}{ROW:unCOUNT}}%
 \nwixlogsorted{i}{{\nwixident{ROW{\_}TABLE}}{ROW:unTABLE}}%
+\nwixlogsorted{i}{{\nwixident{ROW{\_}TABLE2}}{ROW:unTABLE2}}%
 \nwixlogsorted{i}{{\nwixident{ROW{\_}TO{\_}ADDR}}{ROW:unTO:unADDR}}%
 \nwixlogsorted{i}{{\nwixident{ROW{\_}TO{\_}OFFSET{\_}HI}}{ROW:unTO:unOFFSET:unHI}}%
 \nwixlogsorted{i}{{\nwixident{ROW{\_}TO{\_}OFFSET{\_}LO}}{ROW:unTO:unOFFSET:unLO}}%
+\nwixlogsorted{i}{{\nwixident{ROWNUM}}{ROWNUM}}%
 \nwixlogsorted{i}{{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}}%
 \nwixlogsorted{i}{{\nwixident{SPRITE{\_}NUM}}{SPRITE:unNUM}}%
 \nwixlogsorted{i}{{\nwixident{TMP{\_}PTR}}{TMP:unPTR}}%
-\nwbegindocs{29}\nwdocspar
+\nwbegindocs{36}\nwdocspar
 \end{document}
 \nwenddocs{}

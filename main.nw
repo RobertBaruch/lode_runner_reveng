@@ -157,8 +157,7 @@ Take note of the orange and blue pixels. All the patterns noted in the rules abo
 \section{The sprites}
 Lode Runner defines 104 sprites, each being 11 rows, with two bytes per row. The first bytes of
 all 104 sprites are in the table first, then the second bytes, then the third bytes, and so on.
-
-\input{sprite_tables.tex}
+Later we will see that only the leftmost 10 pixels out of the 14-pixel description is used.
 
 <<tables>>=
     ORG     $AD00
@@ -434,20 +433,27 @@ ROW_TO_ADDR:
 
 Lode Runner's screens are organized into 28 sprites across by 17 sprites
 down. To convert between sprite coordinates and screen coordinates, we
-use tables and lookup routines.
+use tables and lookup routines. Each sprite is 10 pixels across by 11 pixels down.
 
 <<tables>>=
-    ORG     $1C51
+    ORG     $1C35
+ROW_TABLE2:
+    ; 28 rows of 5 pixels each
+    HEX     00 05 0a 0f 14 19 1e 23 28 2d 32 37 3c 41 46 4b
+    HEX     50 55 5a 5f 64 69 6e 73 78 7d 82 87
 ROW_TABLE:
-    HEX     00 0B 16 21 2C 37 42 4D
-    HEX     58 63 6E 79 84 8F 9A A5
+    ; 17 rows of 11 pixels each
+    HEX     00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5
     HEX     B5
 COL_TABLE:
-    HEX     00 01 02 04 05 07 08 0A
-    HEX     0B 0C 0E 0F 11 12 14 15
-    HEX     16 18 19 1B 1C 1E 1F 20
-    HEX     22 23 25 26
-@ %def ROW_TABLE COL_TABLE
+    ; Byte number
+    HEX     00 01 02 04 05 07 08 0A 0B 0C 0E 0F 11 12 14 15
+    HEX     16 18 19 1B 1C 1E 1F 20 22 23 25 26
+COL_SHIFT_TABLE:
+    ; Right shift amount
+    HEX     00 03 06 02 05 01 04 00 03 06 02 05 01 04 00 03
+    HEX     06 02 05 01 04 00 03 06 02 05 01 04
+@ %def ROW_TABLE COL_TABLE ROW_TABLE2 COL_SHIFT_TABLE
 
 <<routines>>=
     ORG     $885D
@@ -455,17 +461,150 @@ GET_ROWNUM_FOR:
     SUBROUTINE
     ; Enter routine with Y set to sprite row. On
     ; return, Y will be set to screen row.
+    ; We can also set X to something, and on return
+    ; X is set to something based on ROW_TABLE2, but
+    ; so far I'm not sure what it's used for.
 
     LDA     ROW_TABLE, Y
     PHA
-    LDA     
+    LDA     ROW_TABLE2, X
+    TAX                         ; X = ROW_TABLE2[X]
+    PLA
+    TAY                         ; Y = ROW_TABLE[Y]
+    RTS
+
+GET_COLNUM_FOR:
+    SUBROUTINE
+    ; Enter routine with X set to sprite number. On
+    ; return, A will be set to screen column byte number
+    ; and X will be set to an additional right shift amount.
+
+    LDA     COL_TABLE, X
+    PHA                         ; A = COL_TABLE2[X]
+    LDA     COL_SHIFT_TABLE, X
+    TAX                         ; X = COL_SHIFT_TABLE[X]
+    PLA
+    RTS
+@ %def GET_ROWNUM_FOR GET_COLNUM_FOR
+
+Now we can finally write the routines that draw a sprite on the screen.
+There are two entry points, one to draw on HGR1, and one for HGR2.
+
+<<defines>>=
+    ORG     $1B
+ROWNUM          DS      1
+COLNUM          DS      1
+    ORG     $50
+MASK0           DS      1
+MASK1           DS      1
+    ORG     $71
+COL_SHIFT_AMT   DS      1
+    ORG     $85
+GAME_COLNUM     DS      1
+GAME_ROWNUM     DS      1
+@ %def ROWNUM COLNUM COL_SHIFT_AMT GAME_COLNUM GAME_ROWNUM
+
+<<tables>>=
+    ORG     $8328
+PIXEL_MASK0:
+    BYTE    %00000000
+    BYTE    %00000001
+    BYTE    %00000011
+    BYTE    %00000111
+    BYTE    %00001111
+    BYTE    %00011111
+    BYTE    %00111111
+PIXEL_MASK1:
+    BYTE    %11111000
+    BYTE    %11110000
+    BYTE    %11100000
+    BYTE    %11000000
+    BYTE    %10000000
+    BYTE    %11111110
+    BYTE    %11111100
+@ %def PIXEL_MASK0 PIXEL_MASK1
+
+<<routines>>=
+    ORG     $82AA
+DRAW_SPRITE_PAGE1:
+    SUBROUTINE
+    ; Enter routine with A set to sprite number to draw,
+    ; GAME_ROWNUM set to the row to draw it at, and GAME_COLNUM
+    ; set to the column to draw it at.
+
+    STA     SPRITE_NUM
+    LDA     #$20                ; Page number for HGR1
+    BNE     DRAW_SPRITE         ; Actually unconditional jump
+
+DRAW_SPRITE_PAGE2:
+    SUBROUTINE
+    ; Enter routine with A set to sprite number to draw,
+    ; GAME_ROWNUM set to the row to draw it at, and GAME_COLNUM
+    ; set to the column to draw it at.
+
+    STA     SPRITE_NUM
+    LDA     #$40                ; Page number for HGR2
+    ; fallthrough
+
+DRAW_SPRITE:
+    STA     HGR_PAGE
+    LDY     GAME_ROWNUM
+    JSR     GET_ROWNUM_FOR
+    STY     ROWNUM              ; ROWNUM = ROW_TABLE[GAME_ROWNUM]
+
+    LDX     GAME_COLNUM
+    JSR     GET_COLNUM_FOR
+    STA     COLNUM              ; COLNUM = COL_TABLE[GAME_COLNUM]
+    STX     COL_SHIFT_AMT       ; COL_SHIFT_AMT = COL_SHIFT_TABLE[GAME_COLNUM]
+
+    LDA     PIXEL_MASK0, X
+    STA     MASK0               ; MASK0 = PIXEL_MASK0[COL_SHIFT_AMT]
+    LDA     PIXEL_MASK1, X
+    STA     MASK1               ; MASK1 = PIXEL_MASK1[COL_SHIFT_AMT]
+
+    JSR     COMPUTE_SHIFTED_SPRITE
+
+    LDA     #$0B
+    STA     ROW_COUNT
+    LDX     #$00
+    LDA     COL_SHIFT_AMT
+    CMP     #$05
+    BCS     .need_3_bytes       ; if COL_SHIFT_AMT >= 5, we need to alter three screen bytes.
+
+.loop1:
+    LDY     ROWNUM
+    JSR     ROW_TO_ADDR
+    LDY     COLNUM
+    LDA     (ROW_ADDR), Y
+    AND     MASK0
+    ORA     BLOCK_DATA, X
+    STA     (ROW_ADDR), Y       ; screen[COLNUM] = screen[COLNUM] & MASK0 | BLOCK_DATA[X]
+
+    INX                         ; X++
+    INY                         ; Y++
+    LDA     (ROW_ADDR), Y
+    AND     MASK1
+    ORA     BLOCK_DATA+1, X
+    STA     (ROW_ADDR), Y       ; screen[COLNUM+1] = screen[COLNUM+1] & MASK1 | BLOCK_DATA[X+1]
+
+    INX
+    INX                         ; X += 2
+    INC     ROWNUM              ; ROWNUM++
+    DEC     ROW_COUNT           ; ROW_COUNT--
+    BNE     .loop1              ; loop while ROW_COUNT > 0
+    RTS
+
+.need_3_bytes
+
+
+
+@ %def DRAW_SPRITE_PAGE1 DRAW_SPRITE_PAGE2
 
 \chapter{The whole thing}
 We then put together the entire assembly file:
 
 <<*>>=
 <<preamble>>
-<<row mapping>>
 @
 
 \chapter{Defined Chunks}\par\noindent
