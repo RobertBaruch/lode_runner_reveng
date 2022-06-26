@@ -1,0 +1,476 @@
+\documentclass[10pt]{report}
+\usepackage{noweb}
+\usepackage{graphicx}
+
+\usepackage[table,dvipsnames]{xcolor}
+\definecolor{apple_white}{rgb}{0.9,0.9,0.9}
+\def \bk0 {\cellcolor{black}}
+\def \bl0 {\cellcolor{Cerulean}}
+\def \bw0 {\cellcolor{apple_white}}
+\def \bo0 {\cellcolor{orange}}
+
+\usepackage {booktabs}
+\usepackage {tikz}
+\usetikzlibrary {positioning, shapes.geometric, svg.path}
+
+\noweboptions {smallcode,longchunks}
+
+% Generate assembly file with:
+% notangle -Rpreamble main.nw > main.asm
+%
+% Generate tex file with:
+% noweave -delay -index main.nw > main.tex
+% pdflatex main.tex (run twice for two passes)
+% Indents in code only appears in the PDF output
+% under TeX Live 2019.
+%
+% See also: https://www.cs.tufts.edu/~nr/noweb/johnson-lj.pdf
+
+\begin{document}
+\pagestyle{noweb}
+
+@ \chapter{Lode Runner}
+
+\section{Introduction}
+For dasm, we'll first specify that we're targeting the 6502 processor:
+
+<<preamble>>=
+    PROCESSOR 6502
+@ That is all!
+
+\chapter{Apple II Graphics}
+Hi-res graphics on the Apple II is odd. Graphics are memory-mapped, not exactly
+consecutively, and bits don't always correspond to pixels. Color especially is
+odd, compared to today's luxurious 32-bit per pixel RGBA.
+
+\section{Pixels and their color}
+First we'll talk about pixels. Nominally, the resolution of the hi-res graphics screen
+is 280 pixels wide by 192 pixels tall. In the memory map, each row is represented
+by 40 bytes. The high bit of each byte is not used for pixel data, but is used to
+control color.
+
+Here are some rules for how these bytes are turned into pixels:
+\begin{itemize}
+  \item Pixels are drawn to the screen from byte data least significant bit first.
+        This means that for the first byte bit 0 is column 0, bit 1 is column 1,
+        and so on.
+  \item A pattern of [[11]] results in two white pixels at the [[1]] positions.
+  \item A pattern of [[010]] results at least in a colored pixel at the [[1]] position.
+  \item A pattern of [[101]] results at least in a colored pixel at the [[0]] position.
+  \item So, a pattern of [[01010]] results in at least three consecutive colored
+        pixels starting from the first [[1]] to the last [[1]]. The last [[0]] bit
+        would also be colored if followed by a [[1]].
+  \item Likewise, a pattern of [[11011]] results in two white pixels, a colored pixel,
+        and then two more white pixels.
+  \item The color of a [[010]] pixel depends on the column that the [[1]] falls on, and
+        also whether the high bit of its byte was set or not. 
+  \item The color of a [[11011]] pixel depends on the column that the [[0]] falls on, and
+        also whether the high bit of its byte was set or not.
+
+        \begin{center}
+        \begin{tabular}{@{}rcc@{}} \toprule
+        & Odd & Even \\ \cmidrule(r){2-3}
+        High bit clear & Green & Violet \\
+        High bit set & Orange & Blue \\ \bottomrule
+        \end{tabular}
+        \end{center}
+
+        The implication is that you can only select one pair of colors per byte.
+\end{itemize}
+
+An example would probably be good here. We will take one of the sprites from the game.
+
+\begin{center}
+\begin{tabular}{@{}rcc@{}} \toprule
+Bytes & Bits & Pixel Data \\ \cmidrule{1-3}
+[[00 00]] & [[0000000 0000000]] & [[00000000000000]] \\
+[[00 00]] & [[0000000 0000000]] & [[00000000000000]] \\
+[[00 00]] & [[0000000 0000000]] & [[00000000000000]] \\
+[[55 00]] & [[1010101 0000000]] & [[10101010000000]] \\
+[[41 00]] & [[1000001 0000000]] & [[10000010000000]] \\
+[[01 00]] & [[0000001 0000000]] & [[10000000000000]] \\
+[[55 00]] & [[1010101 0000000]] & [[10101010000000]] \\
+[[50 00]] & [[1010000 0000000]] & [[00001010000000]] \\
+[[50 00]] & [[1010000 0000000]] & [[00001010000000]] \\
+[[51 00]] & [[1010001 0000000]] & [[10001010000000]] \\
+[[55 00]] & [[1010101 0000000]] & [[10101010000000]] \\ \bottomrule
+\end{tabular}
+\end{center}
+
+The game automatically sets the high bit of each byte, so we know we're going to see
+orange and blue. Assuming that the following bits are all zero, and we place the
+sprite starting at column 0, we should see this:
+
+\begin{center}
+\begin{tabular}{@{}rcccccccccccccc@{}}
+ 0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 1 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 2 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 3 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 4 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 5 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 6 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 7 & \bk0 & \bk0 & \bk0 & \bk0 & \bl0 & \bl0 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 8 & \bk0 & \bk0 & \bk0 & \bk0 & \bl0 & \bl0 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+ 9 & \bl0 & \bk0 & \bk0 & \bk0 & \bl0 & \bl0 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+10 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+\end{tabular}
+\end{center}
+
+Here is a more complex sprite:
+
+\begin{center}
+\begin{tabular}{@{}rcc@{}} \toprule
+Bytes & Bits & Pixel Data \\ \cmidrule{1-3}
+[[40 00]] & [[1000000 0000000]] & [[00000010000000]] \\
+[[60 01]] & [[1100000 0000001]] & [[00000111000000]] \\
+[[60 01]] & [[1100000 0000001]] & [[00000111000000]] \\
+[[70 00]] & [[1110000 0000000]] & [[00001110000000]] \\
+[[6C 01]] & [[1101100 0000001]] & [[00110111000000]] \\
+[[36 06]] & [[0110110 0000110]] & [[01101100110000]] \\
+[[30 00]] & [[0110000 0000000]] & [[00001100000000]] \\
+[[70 00]] & [[1110000 0000000]] & [[00001110000000]] \\
+[[5E 01]] & [[1011110 0000001]] & [[01111011000000]] \\
+[[40 01]] & [[1000000 0000001]] & [[00000011000000]] \\
+[[40 01]] & [[1000000 0000001]] & [[00000011000000]] \\ \bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{@{}rcccccccccccccc@{}}
+0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bl0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+1 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bw0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+2 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bw0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+3 & \bk0 & \bk0 & \bk0 & \bk0 & \bw0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+4 & \bk0 & \bk0 & \bw0 & \bw0 & \bo0 & \bw0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+5 & \bk0 & \bw0 & \bw0 & \bl0 & \bw0 & \bw0 & \bk0 & \bk0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+6 & \bk0 & \bk0 & \bk0 & \bk0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+7 & \bk0 & \bk0 & \bk0 & \bk0 & \bw0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+8 & \bk0 & \bw0 & \bw0 & \bw0 & \bw0 & \bl0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+9 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+10 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bw0 & \bw0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 & \bk0 \\
+\end{tabular}
+\end{center}
+
+Take note of the orange and blue pixels. All the patterns noted in the rules above are used.
+
+\section{The sprites}
+Lode Runner defines 104 sprites, each being 11 rows, with two bytes per row. The first bytes of
+all 104 sprites are in the table first, then the second bytes, then the third bytes, and so on.
+
+\input{sprite_tables.tex}
+
+<<tables>>=
+    ORG     $AD00
+SPRITE_DATA:
+    INCLUDE "sprite_data.asm"
+@ %def SPRITE_DATA
+
+\section{Shifting sprites}
+This is all very good if we're going to draw sprites exactly on 7-pixel
+boundaries, but what if we want to draw them starting at other columns?
+In general, such a shifted sprite would straddle three bytes, and Lode
+Runner sets aside an area of memory at the end of zero page for 11 rows
+of three bytes that we'll write to when we want to compute the data for
+a shifted sprite.
+
+<<defines>>=
+    ORG     $DF
+BLOCK_DATA      DS      33
+@ %def BLOCK_DATA
+
+Lode Runner also contains tables which show how to shift any arbitrary
+7-pixel pattern right by any amount from zero to six pixels.
+
+For example, suppose we start with a pixel pattern of [[0110001]], and we want to
+shift that right by three bits. The 14-bit result would be [[0000110 0010000]].
+However, we have to break that up into bytes, reverse the bits (remember that
+each byte's bits are output as pixels least significant bit first), and set
+their high bits, so we end up with [[10110000 10000100]].
+
+Now, given a shift amount and a pixel pattern, we should be able to find the
+two-byte shifted pattern. Lode Runner accomplishes this with table lookups as follows:
+
+\vspace{1em}
+\begin{tikzpicture}
+  [basicbox/.style={draw,rectangle,inner sep=0pt,minimum width=1.5cm,minimum height=1.5cm,fill=blue!10},
+   pageoffsets/.style={basicbox,minimum height=1cm,text height=1.5ex,text depth=.25ex},
+   multilinebox/.style={basicbox,text width=1cm,align=center}]
+  \node (pixelshiftpages) at (0,0) [multilinebox] {pixel shift pages};
+  \node (start) at (-3,0) {};
+  \draw [->] (start) -- (pixelshiftpages) node [above,text width=1cm,align=center,midway] {shift amount};
+  \node (offsets0) [pageoffsets,anchor=north,below right=0 and 2 of pixelshiftpages.north east] {offsets};
+  \node (pages0) [pageoffsets,below=0 of offsets0.south] {pages};
+  \node (offsets1) [pageoffsets,below=0 of pages0.south,fill=blue!30] {offsets};
+  \node (pages1) [pageoffsets,below=0 of offsets1.south,fill=blue!30] {pages};
+  \node (offsets2) [pageoffsets,below=0 of pages1.south] {offsets};
+  \node (pages2) [pageoffsets,below=0 of offsets2.south] {pages};
+  \draw [->] (pixelshiftpages) -- (offsets1.north west) {};
+  \node (pixelpattern) [above left=1 and 0 of offsets0.north west] {pixel pattern};
+  \draw [->] (pixelpattern.south) |- (offsets1.west) {};
+  \draw [->] (pixelpattern.south) |- (pages1.west) {};
+  \node (patterntable) [multilinebox,minimum height=4cm,text width=1.2cm,anchor=north west,below right=0 and 2 of offsets0.north east] {pixel pattern table};
+  \node (join) [inner sep=0pt,below right=0 and 1 of offsets1.south east] {};
+  \draw (offsets1.east) -- (join);
+  \draw (pages1.east) -- (join);
+  \draw [->] (join) -- ([yshift=5mm]patterntable.west);
+\end{tikzpicture}
+\vspace{1em}
+
+The pixel pattern table is a table of every possible pattern of 7 consecutive pixels
+spread out over two bytes. This table is 512 entries, each entry being two bytes.
+A naive table would have redundancy. For example the pattern [[0000100]] starting
+at column 0 is exactly the same as the pattern [[0001000]] starting at column 1.
+This table eliminates that redundancy.
+
+<<tables>>=
+    ORG     $A900
+PIXEL_PATTERN_TABLE:
+    INCLUDE "pixel_pattern_table.asm"
+@ %def PIXEL_PATTERN_TABLE
+
+Now we just need tables which index into [[PIXEL_PATTERN_TABLE]] for every
+7-pixel pattern and shift value. This table works by having the page number
+for the shifted pixel pattern at index [[shift * 0x100 + 0x80 + pattern]]
+and the offset at index [[shift * 0x100 + pattern]].
+
+<<tables>>=
+    ORG     $A200
+PIXEL_SHIFT_TABLE:
+    INCLUDE "pixel_shift_table.asm"
+@ %def PIXEL_SHIFT_TABLE
+
+Rather than multiplying the shift value by [[0x100]], we instead define
+another table which holds the page numbers for the shift tables for each
+shift value.
+
+<<tables>>=
+    ORG     $84C1
+PIXEL_SHIFT_PAGES:
+    HEX     A2 A3 A4 A5 A6 A7 A8
+@ %def PIXEL_SHIFT_PAGES
+
+So we can get shifted pixels by indexing into all these tables.
+
+Now we can define a routine that will take a sprite number and a pixel shift
+amount, and write the shifted pixel data into the [[BLOCK_DATA]] area. The
+routine first shifts the first byte of the sprite into a two-byte area. Then
+it shifts the second byte of the sprite, and combines that two-byte result
+with the first. Thus, we shift two bytes of sprite data into a three-byte
+result.
+
+\begin{center}
+\begin{tikzpicture}
+  [basicbox/.style={draw,rectangle,inner sep=0pt,minimum width=1.5cm,minimum height=0.5cm,fill=blue!10}]
+  \node (spriterowbyte0) at (0,0) [basicbox] {};
+  \node (spriterowbyte1) [basicbox,right=0 of spriterowbyte0.east] {};
+  \node (spriterowlabel) [left=0.1 of spriterowbyte0.west] {sprite row};
+  \node (shifted0byte0) [basicbox,below left=1 and 0 of spriterowbyte0.south west] {};
+  \node (shifted0byte1) [basicbox,right=0 of shifted0byte0.east] {};
+  \node (shifted1byte0) [basicbox,below right=2 and 0 of spriterowbyte0.south west] {};
+  \node (shifted1byte1) [basicbox,right=0 of shifted1byte0.east] {};
+  \node (orlabel) [below=0 of shifted0byte1] {OR};
+  \draw [->] (spriterowbyte0.south) -- (shifted0byte0.north east)
+    node [left,text width=1cm,align=center,midway] {shift};
+  \draw [->] (spriterowbyte1.south) to [auto, bend left=45] node {shift} (shifted1byte0.north east);
+  \node (result0) [basicbox,below left=0.5 and 0 of shifted1byte0.south west] {};
+  \node (result1) [basicbox,right=0 of result0.east] {};
+  \node (result2) [basicbox,right=0 of result1.east] {};
+  \draw [->] (shifted0byte0) -- (result0) {};
+  \draw [->] (shifted1byte0) -- (result1) {};
+  \draw [->] (shifted1byte1) -- (result2) {};
+  \node (blocklabel) [right=0.1 of result2.east] {block data};
+\end{tikzpicture}
+\end{center}
+
+Rather than load addresses from the tables and store them, the routine
+modifies its own instructions with those addresses.
+
+<<defines>>=
+    ORG     $0A
+TMP_PTR         DS.W    1
+    ORG     $1D
+ROW_COUNT       DS      1
+SPRITE_NUM      DS      1
+@ %def TMP_PTR ROW_COUNT SPRITE_NUM
+
+<<routines>>=
+    ORG     $8438
+COMPUTE_SHIFTED_SPRITE:
+    SUBROUTINE
+    ; Enter routine with X set to pixel shift amount and
+    ; SPRITE_NUM containing the sprite number to read.
+
+.offset_table       EQU $A000               ; Target addresses in read
+.page_table         EQU $A080               ; instructions. The only truly
+.shift_ptr_byte0    EQU $A000               ; necessary value here is the
+.shift_ptr_byte1    EQU $A000               ; 0x80 in .shift_ptr_byte0.
+
+    LDA     #$0B                            ; 11 rows
+    STA     ROW_COUNT
+    LDA     #<SPRITE_DATA
+    STA     TMP_PTR
+    LDA     #>SPRITE_DATA
+    STA     TMP_PTR+1                       ; TMP_PTR = SPRITE_DATA
+    LDA     PIXEL_SHIFT_PAGES, X
+    STA     .rd_offset_table + 2
+    STA     .rd_page_table + 2
+    STA     .rd_offset_table2 + 2
+    STA     .rd_page_table2 + 2             ; Fix up pages in lookup instructions
+                                            ; based on shift amount (X).
+
+    LDX     #$00                            ; X is the offset into BLOCK_DATA.
+
+.loop:                                      ; === LOOP === (over all 11 rows)
+    LDY     SPRITE_NUM
+    LDA     (TMP_PTR), Y
+    TAY                                     ; Get sprite pixel data.
+
+.rd_offset_table:
+    LDA     .offset_table, Y                ; Load offset for shift amount.
+    STA     .rd_shift_ptr_byte0 + 1
+    CLC
+    ADC     #$01
+    STA     .rd_shift_ptr_byte1 + 1         ; Fix up instruction offsets with it.
+.rd_page_table:
+    LDA     .page_table, Y                  ; Load page for shift amount.
+    STA     .rd_shift_ptr_byte0 + 2
+    STA     .rd_shift_ptr_byte1 + 2         ; Fix up instruction page with it.
+
+.rd_shift_ptr_byte0:
+    LDA     .shift_ptr_byte0                ; Read shifted pixel data byte 0
+    STA     BLOCK_DATA, X                   ; and store in block data byte 0.
+.rd_shift_ptr_byte1:
+    LDA     .shift_ptr_byte1                ; Read shifted pixel data byte 1
+    STA     BLOCK_DATA+1, X                 ; and store in block data byte 1.
+
+    LDA     TMP_PTR
+    CLC
+    ADC     #$68
+    STA     TMP_PTR
+    LDA     TMP_PTR+1
+    ADC     #$00
+    STA     TMP_PTR+1                       ; TMP_PTR++
+
+    ; Now basically do the same thing with the second sprite byte
+
+    LDY     SPRITE_NUM
+    LDA     (TMP_PTR), Y
+    TAY                                     ; Get sprite pixel data.
+
+.rd_offset_table2:
+    LDA     .offset_table, Y                ; Load offset for shift amount.
+    STA     .rd_shift_ptr2_byte0 + 1
+    CLC
+    ADC     #$01
+    STA     .rd_shift_ptr2_byte1 + 1        ; Fix up instruction offsets with it.
+.rd_page_table2:
+    LDA     .page_table, Y                  ; Load page for shift amount.
+    STA     .rd_shift_ptr2_byte0 + 2
+    STA     .rd_shift_ptr2_byte1 + 2        ; Fix up instruction page with it.
+
+.rd_shift_ptr2_byte0:
+    LDA     .shift_ptr_byte0                ; Read shifted pixel data byte 0
+    ORA     BLOCK_DATA+1, X                 ; OR with previous block data byte 1
+    STA     BLOCK_DATA+1, X                 ; and store in block data byte 1.
+.rd_shift_ptr2_byte1:
+    LDA     .shift_ptr_byte1                ; Read shifted pixel data byte 1
+    STA     BLOCK_DATA+2, X                 ; and store in block data byte 2.
+
+    LDA     TMP_PTR
+    CLC
+    ADC     #$68
+    STA     TMP_PTR
+    LDA     TMP_PTR+1
+    ADC     #$00
+    STA     TMP_PTR+1                       ; TMP_PTR++
+
+    INX
+    INX
+    INX                                     ; X += 3
+    DEC     ROW_COUNT                       ; ROW_COUNT--
+    BNE     .loop                           ; loop while ROW_COUNT > 0
+    RTS
+@ %def COMPUTE_SHIFTED_SPRITE
+
+\section{Memory mapped graphics}
+
+The Apple II maps the area from [[$2000-$3FFF]] to high-res graphics page 1 (HGR1),
+and [[$4000-$5FFF]] to page 2 (HGR2). Within a row, consecutive bytes map to
+consecutive pixels. However, rows themselves are not consecutive in memory.
+
+To make it easy to convert a row number from 0 to 191 to a base address, Lode Runner has
+a table and a routine to use that table.
+
+<<tables>>=
+    ORG     $1A85
+ROW_TO_OFFSET_LO:
+    INCLUDE "row_to_offset_lo_table.asm"
+ROW_TO_OFFSET_HI:
+    INCLUDE "row_to_offset_hi_table.asm"
+@ %def ROW_TO_OFFSET_LO ROW_TO_OFFSET_HI
+
+<<defines>>=
+    ORG     $0C
+ROW_ADDR    DS      2
+    ORG     $1F
+HGR_PAGE    DS      1       ; 0x20 for HGR1, 0x40 for HGR2
+@ %def ROW_ADDR HGR_PAGE
+
+<<routines>>=
+    ORG     $7A31
+ROW_TO_ADDR:
+    SUBROUTINE
+    ; Enter routine with Y set to row. Base address
+    ; (for column 0) will be placed in ROW_ADDR.
+
+    LDA     ROW_TO_OFFSET_LO, Y
+    STA     ROW_ADDR
+    LDA     ROW_TO_OFFSET_HI, Y
+    ORA     HGR_PAGE
+    STA     ROW_ADDR+1
+    RTS
+@ %def ROW_TO_ADDR
+
+Lode Runner's screens are organized into 28 sprites across by 17 sprites
+down. To convert between sprite coordinates and screen coordinates, we
+use tables and lookup routines.
+
+<<tables>>=
+    ORG     $1C51
+ROW_TABLE:
+    HEX     00 0B 16 21 2C 37 42 4D
+    HEX     58 63 6E 79 84 8F 9A A5
+    HEX     B5
+COL_TABLE:
+    HEX     00 01 02 04 05 07 08 0A
+    HEX     0B 0C 0E 0F 11 12 14 15
+    HEX     16 18 19 1B 1C 1E 1F 20
+    HEX     22 23 25 26
+@ %def ROW_TABLE COL_TABLE
+
+<<routines>>=
+    ORG     $885D
+GET_ROWNUM_FOR:
+    SUBROUTINE
+    ; Enter routine with Y set to sprite row. On
+    ; return, Y will be set to screen row.
+
+    LDA     ROW_TABLE, Y
+    PHA
+    LDA     
+
+\chapter{The whole thing}
+We then put together the entire assembly file:
+
+<<*>>=
+<<preamble>>
+<<row mapping>>
+@
+
+\chapter{Defined Chunks}\par\noindent
+\nowebchunks
+\chapter{Index}\par\noindent
+\nowebindex
+@
+\end{document}
