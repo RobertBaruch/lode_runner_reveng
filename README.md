@@ -1,6 +1,13 @@
 # lode_runner_reveng
 Reverse engineering of Lode Runner for the Apple II series.
 
+NOTE: This is a work in progress. One issue is that `dasm` doesn't seem to want to assemble a file that has
+out-of-order ORG fragments. Eventually once I add all code blocks in the source document, I hope to order them
+properly in the root code block so that the generated binary exactly matches the binary I started with for
+reverse engineering.
+
+For now, you can track progress in the main.pdf file.
+
 ## Compilation
 
 This step should not be necessary, as the release provides the assembly files, the 6502 binary, and the PDF.
