@@ -34,8 +34,13 @@ Yes, you have to run `pdflatex` twice. The first run generates auxilliary inform
 
 ```sh
 $ notangle main.nw > main.asm
-$ dasm main.asm -f3 -omain.bin
+$ python3 reorder_asm.py main.asm > main2.asm
+$ dasm main2.asm -f3 -omain.bin
 ```
+
+`reorder_asm.py` reads the `main.asm` output, and reorders code blocks so that
+their ORG locations are increasing. This is necessary because `dasm` doesn't handle
+code blocks whose origins jump around.
 
 This work is licensed under a
 [Creative Commons Attribution-ShareAlike 4.0 International License][cc-by-sa].

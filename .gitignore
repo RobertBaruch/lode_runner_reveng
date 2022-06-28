@@ -1,3 +1,14 @@
+## Assembly
+*.lst
+a.out
+*.sym
+
+# Temporary file
+main2.asm
+
+# Python
+.mypy_cache
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
