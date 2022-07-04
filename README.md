@@ -33,9 +33,9 @@ $ pdflatex main.tex
 Yes, you have to run `pdflatex` twice. The first run generates auxilliary information about indexes that the second run can use to properly cross-reference things.
 
 ```sh
-$ notangle main.nw > main.asm
-$ python3 reorder_asm.py main.asm > main2.asm
-$ dasm main2.asm -f3 -omain.bin
+$ notangle main.nw > main2.asm
+$ python3 reorder_asm.py main2.asm > main.asm
+$ dasm main.asm -f3 -omain.bin
 ```
 
 `reorder_asm.py` reads the `main.asm` output, and reorders code blocks so that

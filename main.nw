@@ -1082,6 +1082,8 @@ We start by looping backwards over rows 15 through 0:
     ORG     $63B3
 DRAW_LEVEL_PAGE2:
     SUBROUTINE
+    ; Returns carry set if there was no player sprite in the level,
+    ; or carry clear if there was.
 
     LDY     15
     STY     GAME_ROWNUM
@@ -2087,12 +2089,265 @@ WIPE_BLOCK_OPEN_MASK:
 .8a42
 @
 
+\section{Level data}
+
+Now that we have the ability to draw a level from level data, we need a routine
+to get that level data. Recall that level data needs to be stored in pointers
+specified in the [[CURR_LEVEL_ROW_SPRITES_PTR_]] tables.
+
+\subsection{Getting the compressed level data}
+
+The level data is stored in the game in compressed form, so we first grab
+the data for the level and put it into the [[COMPRESSED_LEVEL_DATA]] buffer.
+
+<<load compressed level data>>=
+    ORG     $630E
+LOAD_COMPRESSED_LEVEL_DATA:
+    SUBROUTINE
+    ; Enter routine with A set to 1.
+
+    STA     $bf74
+    LDA     $A7
+    LSR
+    BEQ     .copy_level_data        ; If $A7 was 0 or 1, copy level data
+
+    LDA     $96
+    LSR
+    LSR
+    LSR
+    LSR
+    CLC
+    ADC     3
+    STA     $b7ec       ; = 3 + 16 * $96
+    LDA     $96
+    AND     #$0F
+    STA     $b7ed
+    LDA     #$00
+    STA     $b7f0
+    LDA     #$0D
+    STA     $b7f1
+    LDA     #$00
+    STA     $b7eb
+    LDY     #$E8
+    LDA     #$B7        ; AY = B7E8
+
+    JSR     $23         ; JMP ($24)
+    BCC     .end
+    JMP     $6008
+
+.end:
+    RTS
+
+.copy_level_data:
+<<Copy level data>>
+@
+
+We're not really using [[ROW_ADDR]] here as a row address, just as
+a convenient place to store a pointer. Also, we can see that
+level data is stored in 256-byte pages at [[9F00]], [[A000]], and so on.
+Level numbers start from 1, so [[9E00]] doesn't actually contain level data.
+
+<<Copy level data>>=
+<<[[ROW_ADDR = $9E00 + LEVELNUM * $0100]]>>
+<<Copy data from [[ROW_ADDR]] into [[COMPRESSED_LEVEL_DATA]]>>
+@
+
+<<[[ROW_ADDR = $9E00 + LEVELNUM * $0100]]>>=
+    LDA     LEVELNUM        ; 1-based
+    CLC
+    ADC     #$9E
+    STA     ROW_ADDR+1
+    LDY     #$00
+    STY     ROW_ADDR        ; ROW_ADDR <- 9E00 + LEVELNUM * 0x100
+@
+
+<<Copy data from [[ROW_ADDR]] into [[COMPRESSED_LEVEL_DATA]]>>=
+.copyloop:
+    LDA     (ROW_ADDR),Y
+    STA     COMPRESSED_LEVEL_DATA,Y
+    INY
+    BNE     .copyloop
+    RTS
+@
+
+\subsection{Uncompressing and displaying the level}
+
+<<load level>>=
+    ORG     $6238
+LOAD_LEVEL:
+    SUBROUTINE
+    ; Enter routine with X set to whether the level should be
+    ; loaded verbatim or not.
+
+    STX     VERBATIM
+
+<<Initialize level counts>>
+
+    LDA     1
+    STA     ALIVE
+    JSR     LOAD_COMPRESSED_LEVEL_DATA
+
+<<uncompress level data>>
+@ %def LOAD_LEVEL
+
+<<defines>>=
+LEVEL_DATA_INDEX        EQU     $92
+@
+
+<<tables>>=
+    ORG     $0C98
+TABLE_0C98      DS      6
+    ORG     $0CE0
+TABLE_0CE0      DS      31
+@
+
+Here we are initializing variables in preparation for loading the level data.
+Since drawing the level will keep track of ladder, gold, and guard count, we
+need to zero them out. There are also some areas of memory whose purpose is
+not yet known, and these are zeroed out also.
+
+<<Initialize level counts>>=
+    LDX     #$FF
+    STX     PLAYER_COL
+    INX
+    STX     LADDER_COUNT
+    STX     GOLD_COUNT
+    STX     GUARD_COUNT
+    STX     $19
+    STX     $A0
+    STX     LEVEL_DATA_INDEX
+    STX     $1A
+    STX     GAME_ROWNUM
+    TXA
+
+    LDX     30
+.loop1
+    STA     TABLE_0CE0,X
+    DEX
+    BPL     .loop1
+
+    LDX     5
+.loop2
+    STA     TABLE_0C98,X
+    DEX
+    BPL     .loop2
+@
+
+The level data is stored in "compressed" form, just 4 bits per sprite since we
+don't use any higher ones to define a level. For each of the 16 game rows,
+we load up the compressed row data and break it apart, one 4-bit sprite per
+column.
+
+Once we've done that, we draw the level using [[DRAW_LEVEL_PAGE2]]. That
+routine returns an error if there was no player sprite in the level. If
+there was no error, we simply return. Otherwise we have to handle the
+error condition, since there's no point in playing without a player!
+
+<<uncompress level data>>=
+.row_loop:
+<<get row destination pointer for uncompressing level data>>
+<<uncompress row data>>
+<<next compressed row for [[row_loop]]>>
+
+    JSR     DRAW_LEVEL_PAGE2
+    BCC     .end                ; No error
+
+<<handle no player sprite in level>>
+
+.end:
+    RTS
+
+.62c4:
+    JMP     $6008       ; play? complain? fall over?
+@
+
+Each row will have their sprite data stored at locations specified by
+the [[CURR_LEVEL_ROW_SPRITES_PTR_]] tables.
+
+<<get row destination pointer for uncompressing level data>>=
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+@
+
+To uncompress the data for a row, we use the counter in [[$1A]] as an odd/even
+switch so that we know which 4-bit chunk (nibble) in a byte we want. Even
+numbers are for the low nibble while odd numbers are for the high nibble.
+
+In addition, if we encounter sprite 10 (all white) then we replace it with
+sprite 0 (all black).
+
+<<uncompress row data>>=
+    LDA     0
+    STA     GAME_COLNUM
+
+.col_loop:
+    LDA     $1A                         ; odd/even counter
+    LSR
+    LDY     LEVEL_DATA_INDEX
+    LDA     COMPRESSED_LEVEL_DATA,Y
+    BCS     .628c                       ; odd? 
+    AND     #$0F
+    BPL     .6292
+.628c
+
+    LSR
+    LSR
+    LSR
+    LSR
+    INC     LEVEL_DATA_INDEX
+
+.6292
+    INC     $1A
+    LDY     GAME_COLNUM
+
+    CMP     10
+    BCC     .629c
+    LDA     0                           ; sprite 10 (all white) -> sprite 0
+.629c:
+
+    STA     (PTR1),Y
+    STA     (PTR2),Y
+
+    INC     GAME_COLNUM
+    LDA     GAME_COLNUM
+    CMP     28
+    BCC     .col_loop                   ; loop while GAME_COLNUM < 28
+@
+
+<<next compressed row for [[row_loop]]>>=
+    INC     GAME_ROWNUM
+    LDY     GAME_ROWNUM
+    CPY     16
+    BCC     .row_loop                   ; loop while GAME_ROWNUM < 16
+@
+
+When there's no player sprite in the level, a few things can happen. Firstly,
+if [[\$96]] is zero, we're going to jump to [[\$6008]]. Otherwise, we set
+[[\$96]] to zero, increment [[\$97]], set X to [[0xFF]],
+and retry [[LOAD_LEVEL]] from the very beginning.
+
+<<handle no player sprite in level>>=
+    LDA     $96
+    BEQ     .62c4
+
+    LDX     0
+    STX     $96
+    INC     $97
+    DEX
+    JMP     LOAD_LEVEL
+@
 
 \chapter{The whole thing}
 We then put together the entire assembly file:
 
 <<routines>>=
 ; These are in the order they were placed in the original file.
+<<level draw routine>>
 <<iris wipe>>
 <<iris wipe step>>
 <<draw wipe step>>

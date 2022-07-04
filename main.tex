@@ -73,7 +73,7 @@ We have routines to clear these screens.
     ORG     $0A
 \nwlinkedidentc{TMP_PTR}{NW1Xx3lK-10jlgu-1}         DS.W    1
 \nwindexdefn{\nwixident{TMP{\_}PTR}}{TMP:unPTR}{NW1Xx3lK-10jlgu-1}\eatline
-\nwalsodefined{\\{NW1Xx3lK-10jlgu-2}\\{NW1Xx3lK-10jlgu-3}\\{NW1Xx3lK-10jlgu-4}\\{NW1Xx3lK-10jlgu-5}\\{NW1Xx3lK-10jlgu-6}\\{NW1Xx3lK-10jlgu-7}\\{NW1Xx3lK-10jlgu-8}\\{NW1Xx3lK-10jlgu-9}\\{NW1Xx3lK-10jlgu-A}\\{NW1Xx3lK-10jlgu-B}\\{NW1Xx3lK-10jlgu-C}\\{NW1Xx3lK-10jlgu-D}\\{NW1Xx3lK-10jlgu-E}\\{NW1Xx3lK-10jlgu-F}\\{NW1Xx3lK-10jlgu-G}\\{NW1Xx3lK-10jlgu-H}}\nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{TMP{\_}PTR}}{TMP:unPTR}}}\nwendcode{}\nwbegindocs{3}\nwdocspar
+\nwalsodefined{\\{NW1Xx3lK-10jlgu-2}\\{NW1Xx3lK-10jlgu-3}\\{NW1Xx3lK-10jlgu-4}\\{NW1Xx3lK-10jlgu-5}\\{NW1Xx3lK-10jlgu-6}\\{NW1Xx3lK-10jlgu-7}\\{NW1Xx3lK-10jlgu-8}\\{NW1Xx3lK-10jlgu-9}\\{NW1Xx3lK-10jlgu-A}\\{NW1Xx3lK-10jlgu-B}\\{NW1Xx3lK-10jlgu-C}\\{NW1Xx3lK-10jlgu-D}\\{NW1Xx3lK-10jlgu-E}\\{NW1Xx3lK-10jlgu-F}\\{NW1Xx3lK-10jlgu-G}\\{NW1Xx3lK-10jlgu-H}\\{NW1Xx3lK-10jlgu-I}}\nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{TMP{\_}PTR}}{TMP:unPTR}}}\nwendcode{}\nwbegindocs{3}\nwdocspar
 \nwenddocs{}\nwbegincode{4}\sublabel{NW1Xx3lK-8jv1b-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}}\moddef{routines~{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{\relax}{NW1Xx3lK-8jv1b-2}\nwenddeflinemarkup
     ORG     $7A51
 \nwlinkedidentc{CLEAR_HGR1}{NW1Xx3lK-8jv1b-1}:
@@ -228,7 +228,7 @@ Later we will see that only the leftmost 10 pixels out of the 14-pixel descripti
 \nwlinkedidentc{SPRITE_DATA}{NW1Xx3lK-1W8AJS-1}:
     INCLUDE "sprite_data.asm"
 \nwindexdefn{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}{NW1Xx3lK-1W8AJS-1}\eatline
-\nwalsodefined{\\{NW1Xx3lK-1W8AJS-2}\\{NW1Xx3lK-1W8AJS-3}\\{NW1Xx3lK-1W8AJS-4}\\{NW1Xx3lK-1W8AJS-5}\\{NW1Xx3lK-1W8AJS-6}\\{NW1Xx3lK-1W8AJS-7}\\{NW1Xx3lK-1W8AJS-8}\\{NW1Xx3lK-1W8AJS-9}\\{NW1Xx3lK-1W8AJS-A}\\{NW1Xx3lK-1W8AJS-B}}\nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}}}\nwendcode{}\nwbegindocs{7}\nwdocspar
+\nwalsodefined{\\{NW1Xx3lK-1W8AJS-2}\\{NW1Xx3lK-1W8AJS-3}\\{NW1Xx3lK-1W8AJS-4}\\{NW1Xx3lK-1W8AJS-5}\\{NW1Xx3lK-1W8AJS-6}\\{NW1Xx3lK-1W8AJS-7}\\{NW1Xx3lK-1W8AJS-8}\\{NW1Xx3lK-1W8AJS-9}\\{NW1Xx3lK-1W8AJS-A}\\{NW1Xx3lK-1W8AJS-B}\\{NW1Xx3lK-1W8AJS-C}}\nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{SPRITE{\_}DATA}}{SPRITE:unDATA}}}\nwendcode{}\nwbegindocs{7}\nwdocspar
 \input{sprite_tables.tex}
 
 \section{Shifting sprites}
@@ -1078,17 +1078,19 @@ see the draw happening.
 
 We start by looping backwards over rows 15 through 0:
 
-\nwenddocs{}\nwbegincode{64}\sublabel{NW1Xx3lK-2Mcso2-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{\relax}{NW1Xx3lK-2Mcso2-2}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{64}\sublabel{NW1Xx3lK-2Mcso2-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{\relax}{NW1Xx3lK-2Mcso2-2}\nwenddeflinemarkup
     ORG     $63B3
 \nwlinkedidentc{DRAW_LEVEL_PAGE2}{NW1Xx3lK-2Mcso2-1}:
     SUBROUTINE
+    ; Returns carry set if there was no player sprite in the level,
+    ; or carry clear if there was.
 
     LDY     15
     STY     \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-5}
 
 .row_loop:
 \nwindexdefn{\nwixident{DRAW{\_}LEVEL{\_}PAGE2}}{DRAW:unLEVEL:unPAGE2}{NW1Xx3lK-2Mcso2-1}\eatline
-\nwalsodefined{\\{NW1Xx3lK-2Mcso2-2}\\{NW1Xx3lK-2Mcso2-3}\\{NW1Xx3lK-2Mcso2-4}\\{NW1Xx3lK-2Mcso2-5}\\{NW1Xx3lK-2Mcso2-6}\\{NW1Xx3lK-2Mcso2-7}\\{NW1Xx3lK-2Mcso2-8}\\{NW1Xx3lK-2Mcso2-9}\\{NW1Xx3lK-2Mcso2-A}\\{NW1Xx3lK-2Mcso2-B}\\{NW1Xx3lK-2Mcso2-C}\\{NW1Xx3lK-2Mcso2-D}\\{NW1Xx3lK-2Mcso2-E}\\{NW1Xx3lK-2Mcso2-F}\\{NW1Xx3lK-2Mcso2-G}}\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentdefs{\\{{\nwixident{DRAW{\_}LEVEL{\_}PAGE2}}{DRAW:unLEVEL:unPAGE2}}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-1}\nwendcode{}\nwbegindocs{65}\nwdocspar
+\nwalsodefined{\\{NW1Xx3lK-2Mcso2-2}\\{NW1Xx3lK-2Mcso2-3}\\{NW1Xx3lK-2Mcso2-4}\\{NW1Xx3lK-2Mcso2-5}\\{NW1Xx3lK-2Mcso2-6}\\{NW1Xx3lK-2Mcso2-7}\\{NW1Xx3lK-2Mcso2-8}\\{NW1Xx3lK-2Mcso2-9}\\{NW1Xx3lK-2Mcso2-A}\\{NW1Xx3lK-2Mcso2-B}\\{NW1Xx3lK-2Mcso2-C}\\{NW1Xx3lK-2Mcso2-D}\\{NW1Xx3lK-2Mcso2-E}\\{NW1Xx3lK-2Mcso2-F}\\{NW1Xx3lK-2Mcso2-G}}\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentdefs{\\{{\nwixident{DRAW{\_}LEVEL{\_}PAGE2}}{DRAW:unLEVEL:unPAGE2}}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-1}\nwendcode{}\nwbegindocs{65}\nwdocspar
 We'll assume the level data is stored in
 a table which contains 16 pointers, one for each row. As usual in Lode Runner,
 the pages and offsets for those pointers are stored in separate tables. these
@@ -1115,7 +1117,7 @@ call {\Tt{}\nwlinkedidentq{PTR1}{NW1Xx3lK-10jlgu-B}\nwendquote} and {\Tt{}\nwlin
 We set {\Tt{}\nwlinkedidentq{PTR1}{NW1Xx3lK-10jlgu-B}\nwendquote} to the pointer corresponding to the current row, and {\Tt{}\nwlinkedidentq{PTR2}{NW1Xx3lK-10jlgu-B}\nwendquote} to the other
 page, though I don't know what it's for yet.
 
-\nwenddocs{}\nwbegincode{70}\sublabel{NW1Xx3lK-2Mcso2-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-2}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-1}{NW1Xx3lK-2Mcso2-3}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{70}\sublabel{NW1Xx3lK-2Mcso2-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-2}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-1}{NW1Xx3lK-2Mcso2-3}\nwenddeflinemarkup
     LDA     \nwlinkedidentc{CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS}{NW1Xx3lK-1W8AJS-8},Y
     STA     \nwlinkedidentc{PTR1}{NW1Xx3lK-10jlgu-B}
     STA     \nwlinkedidentc{PTR2}{NW1Xx3lK-10jlgu-B}
@@ -1123,22 +1125,22 @@ page, though I don't know what it's for yet.
     STA     \nwlinkedidentc{PTR1}{NW1Xx3lK-10jlgu-B}+1
     LDA     \nwlinkedidentc{CURR_LEVEL_ROW_SPRITES_PTR_PAGES2}{NW1Xx3lK-1W8AJS-8},Y
     STA     \nwlinkedidentc{PTR2}{NW1Xx3lK-10jlgu-B}+1
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}}\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}}\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES2}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES2}}\\{{\nwixident{PTR1}}{PTR1}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}{NW1Xx3lK-2Mcso2-2}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}{NW1Xx3lK-2Mcso2-2}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES2}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES2}{NW1Xx3lK-2Mcso2-2}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-2Mcso2-2}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-2Mcso2-2}\nwendcode{}\nwbegindocs{71}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}}\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}}\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES2}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES2}}\\{{\nwixident{PTR1}}{PTR1}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}{NW1Xx3lK-2Mcso2-2}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}{NW1Xx3lK-2Mcso2-2}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES2}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES2}{NW1Xx3lK-2Mcso2-2}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-2Mcso2-2}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-2Mcso2-2}\nwendcode{}\nwbegindocs{71}\nwdocspar
 
 Next, we loop over the columns backwards from 27 to 0.
 
-\nwenddocs{}\nwbegincode{72}\sublabel{NW1Xx3lK-2Mcso2-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-3}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-2}{NW1Xx3lK-2Mcso2-4}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{72}\sublabel{NW1Xx3lK-2Mcso2-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-3}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-2}{NW1Xx3lK-2Mcso2-4}\nwenddeflinemarkup
     LDY     27
     STY     \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-5}
 
 .col_loop:
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}}\nwindexuse{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-2Mcso2-3}\nwendcode{}\nwbegindocs{73}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}}\nwindexuse{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-2Mcso2-3}\nwendcode{}\nwbegindocs{73}\nwdocspar
 
 We load the sprite from the level data.
 
-\nwenddocs{}\nwbegincode{74}\sublabel{NW1Xx3lK-2Mcso2-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-4}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-3}{NW1Xx3lK-2Mcso2-5}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{74}\sublabel{NW1Xx3lK-2Mcso2-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-4}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-3}{NW1Xx3lK-2Mcso2-5}\nwenddeflinemarkup
     LDA     (\nwlinkedidentc{PTR1}{NW1Xx3lK-10jlgu-B}),Y
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{PTR1}}{PTR1}}}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-2Mcso2-4}\nwendcode{}\nwbegindocs{75}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{PTR1}}{PTR1}}}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-2Mcso2-4}\nwendcode{}\nwbegindocs{75}\nwdocspar
 
 Now, as we place each sprite, we count the number of each piece we've used so far.
 Remember that anyone can create a level, but there are some limitations. Specifically,
@@ -1168,12 +1170,12 @@ level editor.
 \nwlinkedidentc{VERBATIM}{NW1Xx3lK-10jlgu-D}        DS      1
 \nwindexdefn{\nwixident{VERBATIM}}{VERBATIM}{NW1Xx3lK-10jlgu-D}\eatline
 \nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{VERBATIM}}{VERBATIM}}}\nwendcode{}\nwbegindocs{79}\nwdocspar
-\nwenddocs{}\nwbegincode{80}\sublabel{NW1Xx3lK-2Mcso2-5}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-5}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-4}{NW1Xx3lK-2Mcso2-6}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{80}\sublabel{NW1Xx3lK-2Mcso2-5}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-5}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-4}{NW1Xx3lK-2Mcso2-6}\nwenddeflinemarkup
     LDX     \nwlinkedidentc{VERBATIM}{NW1Xx3lK-10jlgu-D}
     BEQ     .draw_sprite1       ; This will then unconditionally jump to
                                 ; .draw_sprite2. We have to do that because of
                                 ; relative jump amount limitations.
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{VERBATIM}}{VERBATIM}}}\nwindexuse{\nwixident{VERBATIM}}{VERBATIM}{NW1Xx3lK-2Mcso2-5}\nwendcode{}\nwbegindocs{81}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{VERBATIM}}{VERBATIM}}}\nwindexuse{\nwixident{VERBATIM}}{VERBATIM}{NW1Xx3lK-2Mcso2-5}\nwendcode{}\nwbegindocs{81}\nwdocspar
 
 Next we handle sprite 6, which is a symbol used to denote ladder placement. If we've already
 got the maximum number of ladders, we just put in a space instead. For each ladder placed, we
@@ -1185,7 +1187,7 @@ write the {\Tt{}LADDER{\_}LOCS\nwendquote} table with its coordinates.
 \nwlinkedidentc{LADDER_LOCS_ROW}{NW1Xx3lK-1W8AJS-9}     DS      48
 \nwindexdefn{\nwixident{LADDER{\_}LOCS{\_}COL}}{LADDER:unLOCS:unCOL}{NW1Xx3lK-1W8AJS-9}\nwindexdefn{\nwixident{LADDER{\_}LOCS{\_}ROW}}{LADDER:unLOCS:unROW}{NW1Xx3lK-1W8AJS-9}\eatline
 \nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{LADDER{\_}LOCS{\_}COL}}{LADDER:unLOCS:unCOL}}\\{{\nwixident{LADDER{\_}LOCS{\_}ROW}}{LADDER:unLOCS:unROW}}}\nwendcode{}\nwbegindocs{83}\nwdocspar
-\nwenddocs{}\nwbegincode{84}\sublabel{NW1Xx3lK-2Mcso2-6}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-6}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-5}{NW1Xx3lK-2Mcso2-7}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{84}\sublabel{NW1Xx3lK-2Mcso2-6}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-6}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-5}{NW1Xx3lK-2Mcso2-7}\nwenddeflinemarkup
     CMP      #$06
     BNE     .check_for_box
 
@@ -1200,11 +1202,11 @@ write the {\Tt{}LADDER{\_}LOCS\nwendquote} table with its coordinates.
     TYA
     STA     \nwlinkedidentc{LADDER_LOCS_COL}{NW1Xx3lK-1W8AJS-9},X
 
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{LADDER{\_}COUNT}}{LADDER:unCOUNT}}\\{{\nwixident{LADDER{\_}LOCS{\_}COL}}{LADDER:unLOCS:unCOL}}\\{{\nwixident{LADDER{\_}LOCS{\_}ROW}}{LADDER:unLOCS:unROW}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-6}\nwindexuse{\nwixident{LADDER{\_}COUNT}}{LADDER:unCOUNT}{NW1Xx3lK-2Mcso2-6}\nwindexuse{\nwixident{LADDER{\_}LOCS{\_}COL}}{LADDER:unLOCS:unCOL}{NW1Xx3lK-2Mcso2-6}\nwindexuse{\nwixident{LADDER{\_}LOCS{\_}ROW}}{LADDER:unLOCS:unROW}{NW1Xx3lK-2Mcso2-6}\nwendcode{}\nwbegindocs{85}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{LADDER{\_}COUNT}}{LADDER:unCOUNT}}\\{{\nwixident{LADDER{\_}LOCS{\_}COL}}{LADDER:unLOCS:unCOL}}\\{{\nwixident{LADDER{\_}LOCS{\_}ROW}}{LADDER:unLOCS:unROW}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-6}\nwindexuse{\nwixident{LADDER{\_}COUNT}}{LADDER:unCOUNT}{NW1Xx3lK-2Mcso2-6}\nwindexuse{\nwixident{LADDER{\_}LOCS{\_}COL}}{LADDER:unLOCS:unCOL}{NW1Xx3lK-2Mcso2-6}\nwindexuse{\nwixident{LADDER{\_}LOCS{\_}ROW}}{LADDER:unLOCS:unROW}{NW1Xx3lK-2Mcso2-6}\nwendcode{}\nwbegindocs{85}\nwdocspar
 
 In any case, we remove the sprite from the current level data.
 
-\nwenddocs{}\nwbegincode{86}\sublabel{NW1Xx3lK-2Mcso2-7}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-7}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-6}{NW1Xx3lK-2Mcso2-8}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{86}\sublabel{NW1Xx3lK-2Mcso2-7}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-7}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-6}{NW1Xx3lK-2Mcso2-8}\nwenddeflinemarkup
 .remove_sprite:
     LDA     0
     STA     (\nwlinkedidentc{PTR1}{NW1Xx3lK-10jlgu-B}),Y
@@ -1212,11 +1214,11 @@ In any case, we remove the sprite from the current level data.
 
 .draw_sprite1
     BEQ     .draw_sprite        ; Unconditional jump.
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{PTR1}}{PTR1}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-2Mcso2-7}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-2Mcso2-7}\nwendcode{}\nwbegindocs{87}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{PTR1}}{PTR1}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-2Mcso2-7}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-2Mcso2-7}\nwendcode{}\nwbegindocs{87}\nwdocspar
 
 Next, we check for sprite 7, the gold box.
 
-\nwenddocs{}\nwbegincode{88}\sublabel{NW1Xx3lK-2Mcso2-8}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-8}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-7}{NW1Xx3lK-2Mcso2-9}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{88}\sublabel{NW1Xx3lK-2Mcso2-8}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-8}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-7}{NW1Xx3lK-2Mcso2-9}\nwenddeflinemarkup
 .check_for_box:
     CMP      #$07
     BNE     .check_for_8
@@ -1228,7 +1230,7 @@ Next, we check for sprite 7, the gold box.
                                 ; just draws the sprite anyway. So this is kind
                                 ; of unconditional.
 
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{GOLD{\_}COUNT}}{GOLD:unCOUNT}}}\nwindexuse{\nwixident{GOLD{\_}COUNT}}{GOLD:unCOUNT}{NW1Xx3lK-2Mcso2-8}\nwendcode{}\nwbegindocs{89}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{GOLD{\_}COUNT}}{GOLD:unCOUNT}}}\nwindexuse{\nwixident{GOLD{\_}COUNT}}{GOLD:unCOUNT}{NW1Xx3lK-2Mcso2-8}\nwendcode{}\nwbegindocs{89}\nwdocspar
 
 Next, we check for sprite 8, a guard. If we've already
 got the maximum number of guards, we just put in a space instead. For each guard placed, we
@@ -1245,7 +1247,7 @@ tables.
 \nwlinkedidentc{GUARD_FLAGS_0C88}{NW1Xx3lK-1W8AJS-A}    DS      8
 \nwindexdefn{\nwixident{GUARD{\_}LOCS{\_}COL}}{GUARD:unLOCS:unCOL}{NW1Xx3lK-1W8AJS-A}\nwindexdefn{\nwixident{GUARD{\_}LOCS{\_}ROW}}{GUARD:unLOCS:unROW}{NW1Xx3lK-1W8AJS-A}\nwindexdefn{\nwixident{GUARD{\_}FLAGS{\_}0C70}}{GUARD:unFLAGS:un0C70}{NW1Xx3lK-1W8AJS-A}\nwindexdefn{\nwixident{GUARD{\_}FLAGS{\_}0C78}}{GUARD:unFLAGS:un0C78}{NW1Xx3lK-1W8AJS-A}\nwindexdefn{\nwixident{GUARD{\_}FLAGS{\_}0C80}}{GUARD:unFLAGS:un0C80}{NW1Xx3lK-1W8AJS-A}\nwindexdefn{\nwixident{GUARD{\_}FLAGS{\_}0C88}}{GUARD:unFLAGS:un0C88}{NW1Xx3lK-1W8AJS-A}\eatline
 \nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{GUARD{\_}FLAGS{\_}0C70}}{GUARD:unFLAGS:un0C70}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C78}}{GUARD:unFLAGS:un0C78}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C80}}{GUARD:unFLAGS:un0C80}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C88}}{GUARD:unFLAGS:un0C88}}\\{{\nwixident{GUARD{\_}LOCS{\_}COL}}{GUARD:unLOCS:unCOL}}\\{{\nwixident{GUARD{\_}LOCS{\_}ROW}}{GUARD:unLOCS:unROW}}}\nwendcode{}\nwbegindocs{91}\nwdocspar
-\nwenddocs{}\nwbegincode{92}\sublabel{NW1Xx3lK-2Mcso2-9}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-9}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-8}{NW1Xx3lK-2Mcso2-A}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{92}\sublabel{NW1Xx3lK-2Mcso2-9}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-9}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-8}{NW1Xx3lK-2Mcso2-A}\nwenddeflinemarkup
 .check_for_8:
     CMP     #$08
     BNE     .check_for_9
@@ -1272,16 +1274,16 @@ tables.
     LDA     #$08
     BNE     .draw_sprite            ; Unconditional jump.
 
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{GUARD{\_}COUNT}}{GUARD:unCOUNT}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C70}}{GUARD:unFLAGS:un0C70}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C78}}{GUARD:unFLAGS:un0C78}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C80}}{GUARD:unFLAGS:un0C80}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C88}}{GUARD:unFLAGS:un0C88}}\\{{\nwixident{GUARD{\_}LOCS{\_}COL}}{GUARD:unLOCS:unCOL}}\\{{\nwixident{GUARD{\_}LOCS{\_}ROW}}{GUARD:unLOCS:unROW}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}COUNT}}{GUARD:unCOUNT}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}FLAGS{\_}0C70}}{GUARD:unFLAGS:un0C70}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}FLAGS{\_}0C78}}{GUARD:unFLAGS:un0C78}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}FLAGS{\_}0C80}}{GUARD:unFLAGS:un0C80}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}FLAGS{\_}0C88}}{GUARD:unFLAGS:un0C88}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}LOCS{\_}COL}}{GUARD:unLOCS:unCOL}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}LOCS{\_}ROW}}{GUARD:unLOCS:unROW}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-2Mcso2-9}\nwendcode{}\nwbegindocs{93}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{GUARD{\_}COUNT}}{GUARD:unCOUNT}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C70}}{GUARD:unFLAGS:un0C70}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C78}}{GUARD:unFLAGS:un0C78}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C80}}{GUARD:unFLAGS:un0C80}}\\{{\nwixident{GUARD{\_}FLAGS{\_}0C88}}{GUARD:unFLAGS:un0C88}}\\{{\nwixident{GUARD{\_}LOCS{\_}COL}}{GUARD:unLOCS:unCOL}}\\{{\nwixident{GUARD{\_}LOCS{\_}ROW}}{GUARD:unLOCS:unROW}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}COUNT}}{GUARD:unCOUNT}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}FLAGS{\_}0C70}}{GUARD:unFLAGS:un0C70}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}FLAGS{\_}0C78}}{GUARD:unFLAGS:un0C78}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}FLAGS{\_}0C80}}{GUARD:unFLAGS:un0C80}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}FLAGS{\_}0C88}}{GUARD:unFLAGS:un0C88}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}LOCS{\_}COL}}{GUARD:unLOCS:unCOL}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{GUARD{\_}LOCS{\_}ROW}}{GUARD:unLOCS:unROW}{NW1Xx3lK-2Mcso2-9}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-2Mcso2-9}\nwendcode{}\nwbegindocs{93}\nwdocspar
 
 Here we insert a few unconditional branches because of relative jump limitations.
 
-\nwenddocs{}\nwbegincode{94}\sublabel{NW1Xx3lK-2Mcso2-A}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-A}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-9}{NW1Xx3lK-2Mcso2-B}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{94}\sublabel{NW1Xx3lK-2Mcso2-A}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-A}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-9}{NW1Xx3lK-2Mcso2-B}\nwenddeflinemarkup
 .next_row:
     BPL     .row_loop
 .next_col:
     BPL     .col_loop
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwendcode{}\nwbegindocs{95}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwendcode{}\nwbegindocs{95}\nwdocspar
 
 Next we check for sprite 9, the player.
 
@@ -1291,7 +1293,7 @@ Next we check for sprite 9, the player.
 \nwlinkedidentc{PLAYER_FLAGS_0004}{NW1Xx3lK-10jlgu-E}   EQU     $04
 \nwindexdefn{\nwixident{PLAYER{\_}FLAGS{\_}0002}}{PLAYER:unFLAGS:un0002}{NW1Xx3lK-10jlgu-E}\nwindexdefn{\nwixident{PLAYER{\_}FLAGS{\_}0003}}{PLAYER:unFLAGS:un0003}{NW1Xx3lK-10jlgu-E}\nwindexdefn{\nwixident{PLAYER{\_}FLAGS{\_}0004}}{PLAYER:unFLAGS:un0004}{NW1Xx3lK-10jlgu-E}\eatline
 \nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{PLAYER{\_}FLAGS{\_}0002}}{PLAYER:unFLAGS:un0002}}\\{{\nwixident{PLAYER{\_}FLAGS{\_}0003}}{PLAYER:unFLAGS:un0003}}\\{{\nwixident{PLAYER{\_}FLAGS{\_}0004}}{PLAYER:unFLAGS:un0004}}}\nwendcode{}\nwbegindocs{97}\nwdocspar
-\nwenddocs{}\nwbegincode{98}\sublabel{NW1Xx3lK-2Mcso2-B}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-B}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-A}{NW1Xx3lK-2Mcso2-C}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{98}\sublabel{NW1Xx3lK-2Mcso2-B}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-B}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-A}{NW1Xx3lK-2Mcso2-C}\nwenddeflinemarkup
 .check_for_9:
     CMP     #$09
     BNE     .check_for_5
@@ -1312,21 +1314,21 @@ Next we check for sprite 9, the player.
     STA     (\nwlinkedidentc{PTR2}{NW1Xx3lK-10jlgu-B}),Y
     LDA     #$09
     BNE     .draw_sprite            ; Unconditional jump.
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}}\\{{\nwixident{PLAYER{\_}FLAGS{\_}0002}}{PLAYER:unFLAGS:un0002}}\\{{\nwixident{PLAYER{\_}FLAGS{\_}0003}}{PLAYER:unFLAGS:un0003}}\\{{\nwixident{PLAYER{\_}FLAGS{\_}0004}}{PLAYER:unFLAGS:un0004}}\\{{\nwixident{PLAYER{\_}ROW}}{PLAYER:unROW}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}FLAGS{\_}0002}}{PLAYER:unFLAGS:un0002}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}FLAGS{\_}0003}}{PLAYER:unFLAGS:un0003}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}FLAGS{\_}0004}}{PLAYER:unFLAGS:un0004}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}ROW}}{PLAYER:unROW}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-2Mcso2-B}\nwendcode{}\nwbegindocs{99}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}}\\{{\nwixident{PLAYER{\_}FLAGS{\_}0002}}{PLAYER:unFLAGS:un0002}}\\{{\nwixident{PLAYER{\_}FLAGS{\_}0003}}{PLAYER:unFLAGS:un0003}}\\{{\nwixident{PLAYER{\_}FLAGS{\_}0004}}{PLAYER:unFLAGS:un0004}}\\{{\nwixident{PLAYER{\_}ROW}}{PLAYER:unROW}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}FLAGS{\_}0002}}{PLAYER:unFLAGS:un0002}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}FLAGS{\_}0003}}{PLAYER:unFLAGS:un0003}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}FLAGS{\_}0004}}{PLAYER:unFLAGS:un0004}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PLAYER{\_}ROW}}{PLAYER:unROW}{NW1Xx3lK-2Mcso2-B}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-2Mcso2-B}\nwendcode{}\nwbegindocs{99}\nwdocspar
 
 Finally, we check for sprite 5, the symbol for a brick, and replace it with a brick. If the
 sprite is anything else, we just draw it.
 
-\nwenddocs{}\nwbegincode{100}\sublabel{NW1Xx3lK-2Mcso2-C}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-C}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-B}{NW1Xx3lK-2Mcso2-D}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{100}\sublabel{NW1Xx3lK-2Mcso2-C}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-C}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-B}{NW1Xx3lK-2Mcso2-D}\nwenddeflinemarkup
 .check_for_5:
     CMP     #$05
     BNE     .draw_sprite
     LDA     #$01                    ; Brick sprite
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwendcode{}\nwbegindocs{101}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwendcode{}\nwbegindocs{101}\nwdocspar
 
 We finally draw the sprite, on page 2, and advance the loop.
 
-\nwenddocs{}\nwbegincode{102}\sublabel{NW1Xx3lK-2Mcso2-D}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-D}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-C}{NW1Xx3lK-2Mcso2-E}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{102}\sublabel{NW1Xx3lK-2Mcso2-D}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-D}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-C}{NW1Xx3lK-2Mcso2-E}\nwenddeflinemarkup
 .draw_sprite:
     JSR     \nwlinkedidentc{DRAW_SPRITE_PAGE2}{NW1Xx3lK-8jv1b-6}
 
@@ -1337,13 +1339,13 @@ We finally draw the sprite, on page 2, and advance the loop.
     DEC     \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-5}
     LDY     \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-5}
     BPL     .next_row               ; Jumps to .row_loop
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}}\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}}\nwindexuse{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}{NW1Xx3lK-2Mcso2-D}\nwindexuse{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-2Mcso2-D}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-D}\nwendcode{}\nwbegindocs{103}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}}\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}}\nwindexuse{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}{NW1Xx3lK-2Mcso2-D}\nwindexuse{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-2Mcso2-D}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-D}\nwendcode{}\nwbegindocs{103}\nwdocspar
 
 After the loop, in verbatim mode, we copy the entire page 2 into page 1 and return.
 Otherwise, if we did place a player sprite, reveal the screen. If we didn't place
 a player sprite, that's an error!
 
-\nwenddocs{}\nwbegincode{104}\sublabel{NW1Xx3lK-2Mcso2-E}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-E}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-D}{NW1Xx3lK-2Mcso2-F}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{104}\sublabel{NW1Xx3lK-2Mcso2-E}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-E}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-D}{NW1Xx3lK-2Mcso2-F}\nwenddeflinemarkup
     LDA     \nwlinkedidentc{VERBATIM}{NW1Xx3lK-10jlgu-D}
     BEQ     .copy_page2_to_page1
 
@@ -1352,11 +1354,11 @@ a player sprite, that's an error!
 
     SEC                             ; Oops, no player! Return error.
     RTS
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}}\\{{\nwixident{VERBATIM}}{VERBATIM}}}\nwindexuse{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}{NW1Xx3lK-2Mcso2-E}\nwindexuse{\nwixident{VERBATIM}}{VERBATIM}{NW1Xx3lK-2Mcso2-E}\nwendcode{}\nwbegindocs{105}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}}\\{{\nwixident{VERBATIM}}{VERBATIM}}}\nwindexuse{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}{NW1Xx3lK-2Mcso2-E}\nwindexuse{\nwixident{VERBATIM}}{VERBATIM}{NW1Xx3lK-2Mcso2-E}\nwendcode{}\nwbegindocs{105}\nwdocspar
 
 To copy the page, we'll need that second {\Tt{}\nwlinkedidentq{ROW{\_}ADDR2}{NW1Xx3lK-10jlgu-4}\nwendquote} pointer.
 
-\nwenddocs{}\nwbegincode{106}\sublabel{NW1Xx3lK-2Mcso2-F}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-F}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-E}{NW1Xx3lK-2Mcso2-G}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{106}\sublabel{NW1Xx3lK-2Mcso2-F}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-F}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-E}{NW1Xx3lK-2Mcso2-G}\nwenddeflinemarkup
 .copy_page2_to_page1:
     LDA     #$20
     STA     \nwlinkedidentc{ROW_ADDR2}{NW1Xx3lK-10jlgu-4}+1
@@ -1381,11 +1383,11 @@ To copy the page, we'll need that second {\Tt{}\nwlinkedidentq{ROW{\_}ADDR2}{NW1
 
     CLC
     RTS
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}}\\{{\nwixident{ROW{\_}ADDR2}}{ROW:unADDR2}}}\nwindexuse{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}{NW1Xx3lK-2Mcso2-F}\nwindexuse{\nwixident{ROW{\_}ADDR2}}{ROW:unADDR2}{NW1Xx3lK-2Mcso2-F}\nwendcode{}\nwbegindocs{107}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}}\\{{\nwixident{ROW{\_}ADDR2}}{ROW:unADDR2}}}\nwindexuse{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}{NW1Xx3lK-2Mcso2-F}\nwindexuse{\nwixident{ROW{\_}ADDR2}}{ROW:unADDR2}{NW1Xx3lK-2Mcso2-F}\nwendcode{}\nwbegindocs{107}\nwdocspar
 
 Revealing the screen, using an iris wipe. Then, we remove the guard and player sprites!
 
-\nwenddocs{}\nwbegincode{108}\sublabel{NW1Xx3lK-2Mcso2-G}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-G}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-F}{\relax}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{108}\sublabel{NW1Xx3lK-2Mcso2-G}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-G}}}\moddef{level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwprevnextdefs{NW1Xx3lK-2Mcso2-F}{\relax}\nwenddeflinemarkup
 .reveal_screen
     JSR     \nwlinkedidentc{IRIS_WIPE}{NW1Xx3lK-6p0m3-1}
 
@@ -1422,7 +1424,7 @@ Revealing the screen, using an iris wipe. Then, we remove the guard and player s
 
     CLC
     RTS
-\nwused{\\{NW1Xx3lK-8jv1b-F}}\nwidentuses{\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}}\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}}\\{{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}}\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{IRIS{\_}WIPE}}{IRIS:unWIPE}}\\{{\nwixident{PTR1}}{PTR1}}}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{IRIS{\_}WIPE}}{IRIS:unWIPE}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-2Mcso2-G}\nwendcode{}\nwbegindocs{109}\nwdocspar
+\nwused{\\{NW1Xx3lK-8jv1b-F}\\{NW1Xx3lK-8jv1b-H}}\nwidentuses{\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}}\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}}\\{{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}}\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{IRIS{\_}WIPE}}{IRIS:unWIPE}}\\{{\nwixident{PTR1}}{PTR1}}}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{DRAW{\_}SPRITE{\_}PAGE2}}{DRAW:unSPRITE:unPAGE2}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{IRIS{\_}WIPE}}{IRIS:unWIPE}{NW1Xx3lK-2Mcso2-G}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-2Mcso2-G}\nwendcode{}\nwbegindocs{109}\nwdocspar
 
 \nwenddocs{}\nwbegincode{110}\sublabel{NW1Xx3lK-8jv1b-F}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-F}}}\moddef{routines~{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-8jv1b-E}{NW1Xx3lK-8jv1b-G}\nwenddeflinemarkup
 \LA{}level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}\RA{}
@@ -1536,7 +1538,7 @@ result in Y, with remainder in A. The routine effectively does long division. It
 \nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwidentdefs{\\{{\nwixident{DIV{\_}BY{\_}7}}{DIV:unBY:un7}}}\nwidentuses{\\{{\nwixident{MATH{\_}TMPH}}{MATH:unTMPH}}\\{{\nwixident{MATH{\_}TMPL}}{MATH:unTMPL}}}\nwindexuse{\nwixident{MATH{\_}TMPH}}{MATH:unTMPH}{NW1Xx3lK-8jv1b-G}\nwindexuse{\nwixident{MATH{\_}TMPL}}{MATH:unTMPL}{NW1Xx3lK-8jv1b-G}\nwendcode{}\nwbegindocs{119}\nwdocspar
 Now, for one iris wipe step, we will need lots and lots of temporaries.
 
-\nwenddocs{}\nwbegincode{120}\sublabel{NW1Xx3lK-10jlgu-H}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-H}}}\moddef{defines~{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-10jlgu-G}{\relax}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{120}\sublabel{NW1Xx3lK-10jlgu-H}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-H}}}\moddef{defines~{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-10jlgu-G}{NW1Xx3lK-10jlgu-I}\nwenddeflinemarkup
 \nwlinkedidentc{WIPE0}{NW1Xx3lK-10jlgu-H}       EQU     $69     ; 16-bit value
 \nwlinkedidentc{WIPE1}{NW1Xx3lK-10jlgu-H}       EQU     $67     ; 16-bit value
 \nwlinkedidentc{WIPE2}{NW1Xx3lK-10jlgu-H}       EQU     $6B     ; 16-bit value
@@ -1782,7 +1784,7 @@ copies some pixels from page 2 into page 1.
     RTS
 \nwindexdefn{\nwixident{DRAW{\_}WIPE{\_}BLOCK}}{DRAW:unWIPE:unBLOCK}{NW1Xx3lK-32wUsj-1}\eatline
 \nwused{\\{NW1Xx3lK-8jv1b-H}}\nwidentdefs{\\{{\nwixident{DRAW{\_}WIPE{\_}BLOCK}}{DRAW:unWIPE:unBLOCK}}}\nwidentuses{\\{{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}}\\{{\nwixident{ROW{\_}ADDR2}}{ROW:unADDR2}}\\{{\nwixident{WIPE{\_}BLOCK{\_}CLOSE{\_}MASK}}{WIPE:unBLOCK:unCLOSE:unMASK}}\\{{\nwixident{WIPE{\_}BLOCK{\_}OPEN{\_}MASK}}{WIPE:unBLOCK:unOPEN:unMASK}}}\nwindexuse{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}{NW1Xx3lK-32wUsj-1}\nwindexuse{\nwixident{ROW{\_}ADDR2}}{ROW:unADDR2}{NW1Xx3lK-32wUsj-1}\nwindexuse{\nwixident{WIPE{\_}BLOCK{\_}CLOSE{\_}MASK}}{WIPE:unBLOCK:unCLOSE:unMASK}{NW1Xx3lK-32wUsj-1}\nwindexuse{\nwixident{WIPE{\_}BLOCK{\_}OPEN{\_}MASK}}{WIPE:unBLOCK:unOPEN:unMASK}{NW1Xx3lK-32wUsj-1}\nwendcode{}\nwbegindocs{137}\nwdocspar
-\nwenddocs{}\nwbegincode{138}\sublabel{NW1Xx3lK-1W8AJS-B}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-B}}}\moddef{tables~{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-1W8AJS-A}{\relax}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{138}\sublabel{NW1Xx3lK-1W8AJS-B}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-B}}}\moddef{tables~{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-1W8AJS-A}{NW1Xx3lK-1W8AJS-C}\nwenddeflinemarkup
     ORG     $8B0C
 \nwlinkedidentc{WIPE_BLOCK_CLOSE_MASK}{NW1Xx3lK-1W8AJS-B}:
     BYTE     %11110000
@@ -2087,24 +2089,277 @@ copies some pixels from page 2 into page 1.
 .8a42
 \nwused{\\{NW1Xx3lK-1tGalf-2}}\nwidentuses{\\{{\nwixident{WIPE8D}}{WIPE8D}}\\{{\nwixident{WIPE8R}}{WIPE8R}}}\nwindexuse{\nwixident{WIPE8D}}{WIPE8D}{NW1Xx3lK-nzt1T-1}\nwindexuse{\nwixident{WIPE8R}}{WIPE8R}{NW1Xx3lK-nzt1T-1}\nwendcode{}\nwbegindocs{185}\nwdocspar
 
+\section{Level data}
+
+Now that we have the ability to draw a level from level data, we need a routine
+to get that level data. Recall that level data needs to be stored in pointers
+specified in the {\Tt{}CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}\nwendquote} tables.
+
+\subsection{Getting the compressed level data}
+
+The level data is stored in the game in compressed form, so we first grab
+the data for the level and put it into the {\Tt{}COMPRESSED{\_}LEVEL{\_}DATA\nwendquote} buffer.
+
+\nwenddocs{}\nwbegincode{186}\sublabel{NW1Xx3lK-3PxSCl-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-3PxSCl-1}}}\moddef{load compressed level data~{\nwtagstyle{}\subpageref{NW1Xx3lK-3PxSCl-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+    ORG     $630E
+LOAD_COMPRESSED_LEVEL_DATA:
+    SUBROUTINE
+    ; Enter routine with A set to 1.
+
+    STA     $bf74
+    LDA     $A7
+    LSR
+    BEQ     .copy_level_data        ; If $A7 was 0 or 1, copy level data
+
+    LDA     $96
+    LSR
+    LSR
+    LSR
+    LSR
+    CLC
+    ADC     3
+    STA     $b7ec       ; = 3 + 16 * $96
+    LDA     $96
+    AND     #$0F
+    STA     $b7ed
+    LDA     #$00
+    STA     $b7f0
+    LDA     #$0D
+    STA     $b7f1
+    LDA     #$00
+    STA     $b7eb
+    LDY     #$E8
+    LDA     #$B7        ; AY = B7E8
+
+    JSR     $23         ; JMP ($24)
+    BCC     .end
+    JMP     $6008
+
+.end:
+    RTS
+
+.copy_level_data:
+\LA{}Copy level data~{\nwtagstyle{}\subpageref{NW1Xx3lK-2LsNSf-1}}\RA{}
+\nwnotused{load compressed level data}\nwendcode{}\nwbegindocs{187}\nwdocspar
+
+We're not really using {\Tt{}\nwlinkedidentq{ROW{\_}ADDR}{NW1Xx3lK-10jlgu-4}\nwendquote} here as a row address, just as
+a convenient place to store a pointer. Also, we can see that
+level data is stored in 256-byte pages at {\Tt{}9F00\nwendquote}, {\Tt{}A000\nwendquote}, and so on.
+Level numbers start from 1, so {\Tt{}9E00\nwendquote} doesn't actually contain level data.
+
+\nwenddocs{}\nwbegincode{188}\sublabel{NW1Xx3lK-2LsNSf-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-2LsNSf-1}}}\moddef{Copy level data~{\nwtagstyle{}\subpageref{NW1Xx3lK-2LsNSf-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-3PxSCl-1}}\nwenddeflinemarkup
+\LA{}\code{}ROW{\_}ADDR\ =\ {\$}9E00\ +\ LEVELNUM\ *\ {\$}0100\edoc{}~{\nwtagstyle{}\subpageref{NW1Xx3lK-31Je2E-1}}\RA{}
+\LA{}Copy data from \code{}ROW{\_}ADDR\edoc{} into \code{}COMPRESSED{\_}LEVEL{\_}DATA\edoc{}~{\nwtagstyle{}\subpageref{NW1Xx3lK-4619D8-1}}\RA{}
+\nwused{\\{NW1Xx3lK-3PxSCl-1}}\nwendcode{}\nwbegindocs{189}\nwdocspar
+
+\nwenddocs{}\nwbegincode{190}\sublabel{NW1Xx3lK-31Je2E-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-31Je2E-1}}}\moddef{\code{}ROW{\_}ADDR\ =\ {\$}9E00\ +\ LEVELNUM\ *\ {\$}0100\edoc{}~{\nwtagstyle{}\subpageref{NW1Xx3lK-31Je2E-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-2LsNSf-1}}\nwenddeflinemarkup
+    LDA     \nwlinkedidentc{LEVELNUM}{NW1Xx3lK-10jlgu-A}        ; 1-based
+    CLC
+    ADC     #$9E
+    STA     \nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-4}+1
+    LDY     #$00
+    STY     \nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-4}        ; \nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-4} <- 9E00 + \nwlinkedidentc{LEVELNUM}{NW1Xx3lK-10jlgu-A} * 0x100
+\nwused{\\{NW1Xx3lK-2LsNSf-1}}\nwidentuses{\\{{\nwixident{LEVELNUM}}{LEVELNUM}}\\{{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}}}\nwindexuse{\nwixident{LEVELNUM}}{LEVELNUM}{NW1Xx3lK-31Je2E-1}\nwindexuse{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}{NW1Xx3lK-31Je2E-1}\nwendcode{}\nwbegindocs{191}\nwdocspar
+
+\nwenddocs{}\nwbegincode{192}\sublabel{NW1Xx3lK-4619D8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-4619D8-1}}}\moddef{Copy data from \code{}ROW{\_}ADDR\edoc{} into \code{}COMPRESSED{\_}LEVEL{\_}DATA\edoc{}~{\nwtagstyle{}\subpageref{NW1Xx3lK-4619D8-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-2LsNSf-1}}\nwenddeflinemarkup
+.copyloop:
+    LDA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-4}),Y
+    STA     COMPRESSED_LEVEL_DATA,Y
+    INY
+    BNE     .copyloop
+    RTS
+\nwused{\\{NW1Xx3lK-2LsNSf-1}}\nwidentuses{\\{{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}}}\nwindexuse{\nwixident{ROW{\_}ADDR}}{ROW:unADDR}{NW1Xx3lK-4619D8-1}\nwendcode{}\nwbegindocs{193}\nwdocspar
+
+\subsection{Uncompressing and displaying the level}
+
+\nwenddocs{}\nwbegincode{194}\sublabel{NW1Xx3lK-457nLk-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-457nLk-1}}}\moddef{load level~{\nwtagstyle{}\subpageref{NW1Xx3lK-457nLk-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+    ORG     $6238
+\nwlinkedidentc{LOAD_LEVEL}{NW1Xx3lK-457nLk-1}:
+    SUBROUTINE
+    ; Enter routine with X set to whether the level should be
+    ; loaded verbatim or not.
+
+    STX     \nwlinkedidentc{VERBATIM}{NW1Xx3lK-10jlgu-D}
+
+\LA{}Initialize level counts~{\nwtagstyle{}\subpageref{NW1Xx3lK-21IJ8X-1}}\RA{}
+
+    LDA     1
+    STA     ALIVE
+    JSR     LOAD_COMPRESSED_LEVEL_DATA
+
+\LA{}uncompress level data~{\nwtagstyle{}\subpageref{NW1Xx3lK-3GdkXL-1}}\RA{}
+\nwindexdefn{\nwixident{LOAD{\_}LEVEL}}{LOAD:unLEVEL}{NW1Xx3lK-457nLk-1}\eatline
+\nwnotused{load level}\nwidentdefs{\\{{\nwixident{LOAD{\_}LEVEL}}{LOAD:unLEVEL}}}\nwidentuses{\\{{\nwixident{VERBATIM}}{VERBATIM}}}\nwindexuse{\nwixident{VERBATIM}}{VERBATIM}{NW1Xx3lK-457nLk-1}\nwendcode{}\nwbegindocs{195}\nwdocspar
+\nwenddocs{}\nwbegincode{196}\sublabel{NW1Xx3lK-10jlgu-I}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-I}}}\moddef{defines~{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-10jlgu-H}{\relax}\nwenddeflinemarkup
+LEVEL_DATA_INDEX        EQU     $92
+\nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwendcode{}\nwbegindocs{197}\nwdocspar
+
+\nwenddocs{}\nwbegincode{198}\sublabel{NW1Xx3lK-1W8AJS-C}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-C}}}\moddef{tables~{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-1W8AJS-B}{\relax}\nwenddeflinemarkup
+    ORG     $0C98
+TABLE_0C98      DS      6
+    ORG     $0CE0
+TABLE_0CE0      DS      31
+\nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwendcode{}\nwbegindocs{199}\nwdocspar
+
+Here we are initializing variables in preparation for loading the level data.
+Since drawing the level will keep track of ladder, gold, and guard count, we
+need to zero them out. There are also some areas of memory whose purpose is
+not yet known, and these are zeroed out also.
+
+\nwenddocs{}\nwbegincode{200}\sublabel{NW1Xx3lK-21IJ8X-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-21IJ8X-1}}}\moddef{Initialize level counts~{\nwtagstyle{}\subpageref{NW1Xx3lK-21IJ8X-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-457nLk-1}}\nwenddeflinemarkup
+    LDX     #$FF
+    STX     \nwlinkedidentc{PLAYER_COL}{NW1Xx3lK-10jlgu-C}
+    INX
+    STX     \nwlinkedidentc{LADDER_COUNT}{NW1Xx3lK-10jlgu-C}
+    STX     \nwlinkedidentc{GOLD_COUNT}{NW1Xx3lK-10jlgu-C}
+    STX     \nwlinkedidentc{GUARD_COUNT}{NW1Xx3lK-10jlgu-C}
+    STX     $19
+    STX     $A0
+    STX     LEVEL_DATA_INDEX
+    STX     $1A
+    STX     \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-5}
+    TXA
+
+    LDX     30
+.loop1
+    STA     TABLE_0CE0,X
+    DEX
+    BPL     .loop1
+
+    LDX     5
+.loop2
+    STA     TABLE_0C98,X
+    DEX
+    BPL     .loop2
+\nwused{\\{NW1Xx3lK-457nLk-1}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}\\{{\nwixident{GOLD{\_}COUNT}}{GOLD:unCOUNT}}\\{{\nwixident{GUARD{\_}COUNT}}{GUARD:unCOUNT}}\\{{\nwixident{LADDER{\_}COUNT}}{LADDER:unCOUNT}}\\{{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-21IJ8X-1}\nwindexuse{\nwixident{GOLD{\_}COUNT}}{GOLD:unCOUNT}{NW1Xx3lK-21IJ8X-1}\nwindexuse{\nwixident{GUARD{\_}COUNT}}{GUARD:unCOUNT}{NW1Xx3lK-21IJ8X-1}\nwindexuse{\nwixident{LADDER{\_}COUNT}}{LADDER:unCOUNT}{NW1Xx3lK-21IJ8X-1}\nwindexuse{\nwixident{PLAYER{\_}COL}}{PLAYER:unCOL}{NW1Xx3lK-21IJ8X-1}\nwendcode{}\nwbegindocs{201}\nwdocspar
+
+The level data is stored in "compressed" form, just 4 bits per sprite since we
+don't use any higher ones to define a level. For each of the 16 game rows,
+we load up the compressed row data and break it apart, one 4-bit sprite per
+column.
+
+Once we've done that, we draw the level using {\Tt{}\nwlinkedidentq{DRAW{\_}LEVEL{\_}PAGE2}{NW1Xx3lK-2Mcso2-1}\nwendquote}. That
+routines returns an error if there was no player sprite in the level. If
+there was no error, we simply return. Otherwise we have to handle the
+error condition, since there's no point in playing without a player!
+
+\nwenddocs{}\nwbegincode{202}\sublabel{NW1Xx3lK-3GdkXL-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-3GdkXL-1}}}\moddef{uncompress level data~{\nwtagstyle{}\subpageref{NW1Xx3lK-3GdkXL-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-457nLk-1}}\nwenddeflinemarkup
+.row_loop:
+\LA{}get row destination pointer for uncompressing level data~{\nwtagstyle{}\subpageref{NW1Xx3lK-3jZ8nn-1}}\RA{}
+\LA{}uncompress row data~{\nwtagstyle{}\subpageref{NW1Xx3lK-Bj1QX-1}}\RA{}
+\LA{}next compressed row for \code{}row{\_}loop\edoc{}~{\nwtagstyle{}\subpageref{NW1Xx3lK-MjH02-1}}\RA{}
+
+    JSR     \nwlinkedidentc{DRAW_LEVEL_PAGE2}{NW1Xx3lK-2Mcso2-1}
+    BCC     .end                ; No error
+
+\LA{}handle no player sprite in level~{\nwtagstyle{}\subpageref{NW1Xx3lK-1MFPi9-1}}\RA{}
+
+.end:
+    RTS
+
+.62c4:
+    JMP     $6008       ; play? complain? fall over?
+\nwused{\\{NW1Xx3lK-457nLk-1}}\nwidentuses{\\{{\nwixident{DRAW{\_}LEVEL{\_}PAGE2}}{DRAW:unLEVEL:unPAGE2}}}\nwindexuse{\nwixident{DRAW{\_}LEVEL{\_}PAGE2}}{DRAW:unLEVEL:unPAGE2}{NW1Xx3lK-3GdkXL-1}\nwendcode{}\nwbegindocs{203}\nwdocspar
+
+Each row will have their sprite data stored at locations specified by
+the {\Tt{}CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}\nwendquote} tables.
+
+\nwenddocs{}\nwbegincode{204}\sublabel{NW1Xx3lK-3jZ8nn-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-3jZ8nn-1}}}\moddef{get row destination pointer for uncompressing level data~{\nwtagstyle{}\subpageref{NW1Xx3lK-3jZ8nn-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-3GdkXL-1}}\nwenddeflinemarkup
+    LDA     \nwlinkedidentc{CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS}{NW1Xx3lK-1W8AJS-8},Y
+    STA     \nwlinkedidentc{PTR1}{NW1Xx3lK-10jlgu-B}
+    STA     \nwlinkedidentc{PTR2}{NW1Xx3lK-10jlgu-B}
+    LDA     \nwlinkedidentc{CURR_LEVEL_ROW_SPRITES_PTR_PAGES}{NW1Xx3lK-1W8AJS-8},Y
+    STA     \nwlinkedidentc{PTR1}{NW1Xx3lK-10jlgu-B}+1
+    LDA     \nwlinkedidentc{CURR_LEVEL_ROW_SPRITES_PTR_PAGES2}{NW1Xx3lK-1W8AJS-8},Y
+    STA     \nwlinkedidentc{PTR2}{NW1Xx3lK-10jlgu-B}+1
+\nwused{\\{NW1Xx3lK-3GdkXL-1}}\nwidentuses{\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}}\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}}\\{{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES2}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES2}}\\{{\nwixident{PTR1}}{PTR1}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}OFFSETS}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unOFFSETS}{NW1Xx3lK-3jZ8nn-1}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES}{NW1Xx3lK-3jZ8nn-1}\nwindexuse{\nwixident{CURR{\_}LEVEL{\_}ROW{\_}SPRITES{\_}PTR{\_}PAGES2}}{CURR:unLEVEL:unROW:unSPRITES:unPTR:unPAGES2}{NW1Xx3lK-3jZ8nn-1}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-3jZ8nn-1}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-3jZ8nn-1}\nwendcode{}\nwbegindocs{205}\nwdocspar
+
+To uncompress the data for a row, we use the counter in {\Tt{}{\$}1A\nwendquote} as an odd/even
+switch so that we know which 4-bit chunk (nibble) in a byte we want. Even
+numbers are for the low nibble while odd numbers are for the high nibble.
+
+In addition, if we encounter sprite 10 (all white) then we replace it with
+sprite 0 (all black).
+
+\nwenddocs{}\nwbegincode{206}\sublabel{NW1Xx3lK-Bj1QX-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-Bj1QX-1}}}\moddef{uncompress row data~{\nwtagstyle{}\subpageref{NW1Xx3lK-Bj1QX-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-3GdkXL-1}}\nwenddeflinemarkup
+    LDA     0
+    STA     \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-5}
+
+.col_loop:
+    LDA     $1A                         ; odd/even counter
+    LSR
+    LDY     LEVEL_DATA_INDEX
+    LDA     COMPRESSED_LEVEL_DATA,Y
+    BCS     .628c                       ; odd? 
+    AND     #$0F
+    BPL     .6292
+.628c
+
+    LSR
+    LSR
+    LSR
+    LSR
+    INC     LEVEL_DATA_INDEX
+
+.6292
+    INC     $1A
+    LDY     \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-5}
+
+    CMP     10
+    BCC     .629c
+    LDA     0                           ; sprite 10 (all white) -> sprite 0
+.629c:
+
+    STA     (\nwlinkedidentc{PTR1}{NW1Xx3lK-10jlgu-B}),Y
+    STA     (\nwlinkedidentc{PTR2}{NW1Xx3lK-10jlgu-B}),Y
+
+    INC     \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-5}
+    LDA     \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-5}
+    CMP     28
+    BCC     .col_loop                   ; loop while \nwlinkedidentc{GAME_COLNUM}{NW1Xx3lK-10jlgu-5} < 28
+\nwused{\\{NW1Xx3lK-3GdkXL-1}}\nwidentuses{\\{{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}}\\{{\nwixident{PTR1}}{PTR1}}\\{{\nwixident{PTR2}}{PTR2}}}\nwindexuse{\nwixident{GAME{\_}COLNUM}}{GAME:unCOLNUM}{NW1Xx3lK-Bj1QX-1}\nwindexuse{\nwixident{PTR1}}{PTR1}{NW1Xx3lK-Bj1QX-1}\nwindexuse{\nwixident{PTR2}}{PTR2}{NW1Xx3lK-Bj1QX-1}\nwendcode{}\nwbegindocs{207}\nwdocspar
+
+\nwenddocs{}\nwbegincode{208}\sublabel{NW1Xx3lK-MjH02-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-MjH02-1}}}\moddef{next compressed row for \code{}row{\_}loop\edoc{}~{\nwtagstyle{}\subpageref{NW1Xx3lK-MjH02-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-3GdkXL-1}}\nwenddeflinemarkup
+    INC     \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-5}
+    LDY     \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-5}
+    CPY     16
+    BCC     .row_loop                   ; loop while \nwlinkedidentc{GAME_ROWNUM}{NW1Xx3lK-10jlgu-5} < 16
+\nwused{\\{NW1Xx3lK-3GdkXL-1}}\nwidentuses{\\{{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}}}\nwindexuse{\nwixident{GAME{\_}ROWNUM}}{GAME:unROWNUM}{NW1Xx3lK-MjH02-1}\nwendcode{}\nwbegindocs{209}\nwdocspar
+
+When there's no player sprite in the level, a few things can happen. Firstly,
+if {\Tt{}{\nwbackslash}{\$}96\nwendquote} is zero, we're going to jump to {\Tt{}{\nwbackslash}{\$}6008\nwendquote}. Otherwise, we set
+{\Tt{}{\nwbackslash}{\$}96\nwendquote} to zero, increment {\Tt{}{\nwbackslash}{\$}97\nwendquote}, set X to {\Tt{}0xFF\nwendquote},
+and retry {\Tt{}\nwlinkedidentq{LOAD{\_}LEVEL}{NW1Xx3lK-457nLk-1}\nwendquote} from the very beginning.
+
+\nwenddocs{}\nwbegincode{210}\sublabel{NW1Xx3lK-1MFPi9-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1MFPi9-1}}}\moddef{handle no player sprite in level~{\nwtagstyle{}\subpageref{NW1Xx3lK-1MFPi9-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-3GdkXL-1}}\nwenddeflinemarkup
+    LDA     $96
+    BEQ     .62c4
+
+    LDX     0
+    STX     $96
+    INC     $97
+    DEX
+    JMP     \nwlinkedidentc{LOAD_LEVEL}{NW1Xx3lK-457nLk-1}
+\nwused{\\{NW1Xx3lK-3GdkXL-1}}\nwidentuses{\\{{\nwixident{LOAD{\_}LEVEL}}{LOAD:unLEVEL}}}\nwindexuse{\nwixident{LOAD{\_}LEVEL}}{LOAD:unLEVEL}{NW1Xx3lK-1MFPi9-1}\nwendcode{}\nwbegindocs{211}\nwdocspar
 
 \chapter{The whole thing}
 We then put together the entire assembly file:
 
-\nwenddocs{}\nwbegincode{186}\sublabel{NW1Xx3lK-8jv1b-H}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-H}}}\moddef{routines~{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-8jv1b-G}{\relax}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{212}\sublabel{NW1Xx3lK-8jv1b-H}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-H}}}\moddef{routines~{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1Xx3lK-1p0Y9w-1}}\nwprevnextdefs{NW1Xx3lK-8jv1b-G}{\relax}\nwenddeflinemarkup
 ; These are in the order they were placed in the original file.
+\LA{}level draw routine~{\nwtagstyle{}\subpageref{NW1Xx3lK-2Mcso2-1}}\RA{}
 \LA{}iris wipe~{\nwtagstyle{}\subpageref{NW1Xx3lK-6p0m3-1}}\RA{}
 \LA{}iris wipe step~{\nwtagstyle{}\subpageref{NW1Xx3lK-1tGalf-1}}\RA{}
 \LA{}draw wipe step~{\nwtagstyle{}\subpageref{NW1Xx3lK-1DtO18-1}}\RA{}
 \LA{}draw wipe block~{\nwtagstyle{}\subpageref{NW1Xx3lK-32wUsj-1}}\RA{}
-\nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwendcode{}\nwbegindocs{187}\nwdocspar
+\nwused{\\{NW1Xx3lK-1p0Y9w-1}}\nwendcode{}\nwbegindocs{213}\nwdocspar
 
-\nwenddocs{}\nwbegincode{188}\sublabel{NW1Xx3lK-1p0Y9w-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1p0Y9w-1}}}\moddef{*~{\nwtagstyle{}\subpageref{NW1Xx3lK-1p0Y9w-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{214}\sublabel{NW1Xx3lK-1p0Y9w-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1Xx3lK-1p0Y9w-1}}}\moddef{*~{\nwtagstyle{}\subpageref{NW1Xx3lK-1p0Y9w-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
     PROCESSOR 6502
 \LA{}defines~{\nwtagstyle{}\subpageref{NW1Xx3lK-10jlgu-1}}\RA{}
 \LA{}tables~{\nwtagstyle{}\subpageref{NW1Xx3lK-1W8AJS-1}}\RA{}
 \LA{}routines~{\nwtagstyle{}\subpageref{NW1Xx3lK-8jv1b-1}}\RA{}
-\nwnotused{*}\nwendcode{}\nwbegindocs{189}\nwdocspar
+\nwnotused{*}\nwendcode{}\nwbegindocs{215}\nwdocspar
 
 \chapter{Defined Chunks}\par\noindent
 \nowebchunks
@@ -2113,6 +2368,7 @@ We then put together the entire assembly file:
 \nwenddocs{}
 
 \nwixlogsorted{c}{{*}{NW1Xx3lK-1p0Y9w-1}{\nwixd{NW1Xx3lK-1p0Y9w-1}}}%
+\nwixlogsorted{c}{{\code{}ROW{\_}ADDR\ =\ {\$}9E00\ +\ LEVELNUM\ *\ {\$}0100\edoc{}}{NW1Xx3lK-31Je2E-1}{\nwixu{NW1Xx3lK-2LsNSf-1}\nwixd{NW1Xx3lK-31Je2E-1}}}%
 \nwixlogsorted{c}{{\code{}WIPE0\ =\ WIPE{\_}COUNTER\edoc{}}{NW1Xx3lK-2Rx43B-1}{\nwixu{NW1Xx3lK-1tGalf-1}\nwixd{NW1Xx3lK-2Rx43B-1}}}%
 \nwixlogsorted{c}{{\code{}WIPE1\ =\ 0\edoc{}}{NW1Xx3lK-1ZlBVV-1}{\nwixu{NW1Xx3lK-1tGalf-1}\nwixd{NW1Xx3lK-1ZlBVV-1}}}%
 \nwixlogsorted{c}{{\code{}WIPE10\ =\ (WIPE{\_}CENTER{\_}X\ +\ WIPE{\_}COUNTER)\ /\ 7\edoc{}}{NW1Xx3lK-2Um1dk-1}{\nwixu{NW1Xx3lK-1tGalf-1}\nwixd{NW1Xx3lK-2Um1dk-1}}}%
@@ -2125,29 +2381,39 @@ We then put together the entire assembly file:
 \nwixlogsorted{c}{{\code{}WIPE6\ =\ WIPE{\_}CENTER{\_}Y\ +\ WIPE{\_}COUNTER\edoc{}}{NW1Xx3lK-4TkslJ-1}{\nwixu{NW1Xx3lK-1tGalf-1}\nwixd{NW1Xx3lK-4TkslJ-1}}}%
 \nwixlogsorted{c}{{\code{}WIPE7\ =\ (WIPE{\_}CENTER{\_}X\ -\ WIPE{\_}COUNTER)\ /\ 7\edoc{}}{NW1Xx3lK-2ojStX-1}{\nwixu{NW1Xx3lK-1tGalf-1}\nwixd{NW1Xx3lK-2ojStX-1}}}%
 \nwixlogsorted{c}{{\code{}WIPE8\ =\ WIPE9\ =\ WIPE{\_}CENTER{\_}X\ /\ 7\edoc{}}{NW1Xx3lK-2QGdSi-1}{\nwixu{NW1Xx3lK-1tGalf-1}\nwixd{NW1Xx3lK-2QGdSi-1}}}%
+\nwixlogsorted{c}{{Copy data from \code{}ROW{\_}ADDR\edoc{} into \code{}COMPRESSED{\_}LEVEL{\_}DATA\edoc{}}{NW1Xx3lK-4619D8-1}{\nwixu{NW1Xx3lK-2LsNSf-1}\nwixd{NW1Xx3lK-4619D8-1}}}%
+\nwixlogsorted{c}{{Copy level data}{NW1Xx3lK-2LsNSf-1}{\nwixu{NW1Xx3lK-3PxSCl-1}\nwixd{NW1Xx3lK-2LsNSf-1}}}%
 \nwixlogsorted{c}{{Decrement \code{}WIPE0\edoc{}}{NW1Xx3lK-2u2rZr-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-2u2rZr-1}}}%
 \nwixlogsorted{c}{{Decrement \code{}WIPE10\edoc{} modulo 7}{NW1Xx3lK-11REH7-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-11REH7-1}}}%
 \nwixlogsorted{c}{{Decrement \code{}WIPE4\edoc{}}{NW1Xx3lK-2u2srL-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-2u2srL-1}}}%
 \nwixlogsorted{c}{{Decrement \code{}WIPE6\edoc{}}{NW1Xx3lK-2u2n6B-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-2u2n6B-1}}}%
 \nwixlogsorted{c}{{Decrement \code{}WIPE8\edoc{} modulo 7}{NW1Xx3lK-nzt1T-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-nzt1T-1}}}%
-\nwixlogsorted{c}{{defines}{NW1Xx3lK-10jlgu-1}{\nwixd{NW1Xx3lK-10jlgu-1}\nwixd{NW1Xx3lK-10jlgu-2}\nwixd{NW1Xx3lK-10jlgu-3}\nwixd{NW1Xx3lK-10jlgu-4}\nwixd{NW1Xx3lK-10jlgu-5}\nwixd{NW1Xx3lK-10jlgu-6}\nwixd{NW1Xx3lK-10jlgu-7}\nwixd{NW1Xx3lK-10jlgu-8}\nwixd{NW1Xx3lK-10jlgu-9}\nwixd{NW1Xx3lK-10jlgu-A}\nwixd{NW1Xx3lK-10jlgu-B}\nwixd{NW1Xx3lK-10jlgu-C}\nwixd{NW1Xx3lK-10jlgu-D}\nwixd{NW1Xx3lK-10jlgu-E}\nwixd{NW1Xx3lK-10jlgu-F}\nwixd{NW1Xx3lK-10jlgu-G}\nwixd{NW1Xx3lK-10jlgu-H}\nwixu{NW1Xx3lK-1p0Y9w-1}}}%
+\nwixlogsorted{c}{{defines}{NW1Xx3lK-10jlgu-1}{\nwixd{NW1Xx3lK-10jlgu-1}\nwixd{NW1Xx3lK-10jlgu-2}\nwixd{NW1Xx3lK-10jlgu-3}\nwixd{NW1Xx3lK-10jlgu-4}\nwixd{NW1Xx3lK-10jlgu-5}\nwixd{NW1Xx3lK-10jlgu-6}\nwixd{NW1Xx3lK-10jlgu-7}\nwixd{NW1Xx3lK-10jlgu-8}\nwixd{NW1Xx3lK-10jlgu-9}\nwixd{NW1Xx3lK-10jlgu-A}\nwixd{NW1Xx3lK-10jlgu-B}\nwixd{NW1Xx3lK-10jlgu-C}\nwixd{NW1Xx3lK-10jlgu-D}\nwixd{NW1Xx3lK-10jlgu-E}\nwixd{NW1Xx3lK-10jlgu-F}\nwixd{NW1Xx3lK-10jlgu-G}\nwixd{NW1Xx3lK-10jlgu-H}\nwixd{NW1Xx3lK-10jlgu-I}\nwixu{NW1Xx3lK-1p0Y9w-1}}}%
 \nwixlogsorted{c}{{draw wipe block}{NW1Xx3lK-32wUsj-1}{\nwixd{NW1Xx3lK-32wUsj-1}\nwixu{NW1Xx3lK-8jv1b-H}}}%
 \nwixlogsorted{c}{{Draw wipe for north part}{NW1Xx3lK-29yoMR-1}{\nwixu{NW1Xx3lK-1DtO18-1}\nwixd{NW1Xx3lK-29yoMR-1}}}%
 \nwixlogsorted{c}{{Draw wipe for north2 part}{NW1Xx3lK-3AjGdu-1}{\nwixu{NW1Xx3lK-1DtO18-1}\nwixd{NW1Xx3lK-3AjGdu-1}}}%
 \nwixlogsorted{c}{{Draw wipe for south part}{NW1Xx3lK-29jG99-1}{\nwixu{NW1Xx3lK-1DtO18-1}\nwixd{NW1Xx3lK-29jG99-1}}}%
 \nwixlogsorted{c}{{Draw wipe for south2 part}{NW1Xx3lK-3OCJye-1}{\nwixu{NW1Xx3lK-1DtO18-1}\nwixd{NW1Xx3lK-3OCJye-1}}}%
 \nwixlogsorted{c}{{draw wipe step}{NW1Xx3lK-1DtO18-1}{\nwixd{NW1Xx3lK-1DtO18-1}\nwixu{NW1Xx3lK-8jv1b-H}}}%
+\nwixlogsorted{c}{{get row destination pointer for uncompressing level data}{NW1Xx3lK-3jZ8nn-1}{\nwixu{NW1Xx3lK-3GdkXL-1}\nwixd{NW1Xx3lK-3jZ8nn-1}}}%
+\nwixlogsorted{c}{{handle no player sprite in level}{NW1Xx3lK-1MFPi9-1}{\nwixu{NW1Xx3lK-3GdkXL-1}\nwixd{NW1Xx3lK-1MFPi9-1}}}%
 \nwixlogsorted{c}{{Increment \code{}WIPE1\edoc{}}{NW1Xx3lK-13RECF-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-13RECF-1}}}%
 \nwixlogsorted{c}{{Increment \code{}WIPE3\edoc{}}{NW1Xx3lK-13RMM3-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-13RMM3-1}}}%
 \nwixlogsorted{c}{{Increment \code{}WIPE5\edoc{}}{NW1Xx3lK-13RI6p-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-13RI6p-1}}}%
 \nwixlogsorted{c}{{Increment \code{}WIPE7\edoc{} modulo 7}{NW1Xx3lK-11uG8h-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-11uG8h-1}}}%
 \nwixlogsorted{c}{{Increment \code{}WIPE9\edoc{} modulo 7}{NW1Xx3lK-3Y2gMs-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-3Y2gMs-1}}}%
+\nwixlogsorted{c}{{Initialize level counts}{NW1Xx3lK-21IJ8X-1}{\nwixu{NW1Xx3lK-457nLk-1}\nwixd{NW1Xx3lK-21IJ8X-1}}}%
 \nwixlogsorted{c}{{iris wipe}{NW1Xx3lK-6p0m3-1}{\nwixd{NW1Xx3lK-6p0m3-1}\nwixu{NW1Xx3lK-8jv1b-H}}}%
 \nwixlogsorted{c}{{iris wipe loop check}{NW1Xx3lK-3vxyMm-1}{\nwixu{NW1Xx3lK-1tGalf-2}\nwixd{NW1Xx3lK-3vxyMm-1}}}%
 \nwixlogsorted{c}{{iris wipe step}{NW1Xx3lK-1tGalf-1}{\nwixd{NW1Xx3lK-1tGalf-1}\nwixd{NW1Xx3lK-1tGalf-2}\nwixu{NW1Xx3lK-8jv1b-H}}}%
-\nwixlogsorted{c}{{level draw routine}{NW1Xx3lK-2Mcso2-1}{\nwixd{NW1Xx3lK-2Mcso2-1}\nwixd{NW1Xx3lK-2Mcso2-2}\nwixd{NW1Xx3lK-2Mcso2-3}\nwixd{NW1Xx3lK-2Mcso2-4}\nwixd{NW1Xx3lK-2Mcso2-5}\nwixd{NW1Xx3lK-2Mcso2-6}\nwixd{NW1Xx3lK-2Mcso2-7}\nwixd{NW1Xx3lK-2Mcso2-8}\nwixd{NW1Xx3lK-2Mcso2-9}\nwixd{NW1Xx3lK-2Mcso2-A}\nwixd{NW1Xx3lK-2Mcso2-B}\nwixd{NW1Xx3lK-2Mcso2-C}\nwixd{NW1Xx3lK-2Mcso2-D}\nwixd{NW1Xx3lK-2Mcso2-E}\nwixd{NW1Xx3lK-2Mcso2-F}\nwixd{NW1Xx3lK-2Mcso2-G}\nwixu{NW1Xx3lK-8jv1b-F}}}%
+\nwixlogsorted{c}{{level draw routine}{NW1Xx3lK-2Mcso2-1}{\nwixd{NW1Xx3lK-2Mcso2-1}\nwixd{NW1Xx3lK-2Mcso2-2}\nwixd{NW1Xx3lK-2Mcso2-3}\nwixd{NW1Xx3lK-2Mcso2-4}\nwixd{NW1Xx3lK-2Mcso2-5}\nwixd{NW1Xx3lK-2Mcso2-6}\nwixd{NW1Xx3lK-2Mcso2-7}\nwixd{NW1Xx3lK-2Mcso2-8}\nwixd{NW1Xx3lK-2Mcso2-9}\nwixd{NW1Xx3lK-2Mcso2-A}\nwixd{NW1Xx3lK-2Mcso2-B}\nwixd{NW1Xx3lK-2Mcso2-C}\nwixd{NW1Xx3lK-2Mcso2-D}\nwixd{NW1Xx3lK-2Mcso2-E}\nwixd{NW1Xx3lK-2Mcso2-F}\nwixd{NW1Xx3lK-2Mcso2-G}\nwixu{NW1Xx3lK-8jv1b-F}\nwixu{NW1Xx3lK-8jv1b-H}}}%
+\nwixlogsorted{c}{{load compressed level data}{NW1Xx3lK-3PxSCl-1}{\nwixd{NW1Xx3lK-3PxSCl-1}}}%
+\nwixlogsorted{c}{{load level}{NW1Xx3lK-457nLk-1}{\nwixd{NW1Xx3lK-457nLk-1}}}%
+\nwixlogsorted{c}{{next compressed row for \code{}row{\_}loop\edoc{}}{NW1Xx3lK-MjH02-1}{\nwixu{NW1Xx3lK-3GdkXL-1}\nwixd{NW1Xx3lK-MjH02-1}}}%
 \nwixlogsorted{c}{{routines}{NW1Xx3lK-8jv1b-1}{\nwixd{NW1Xx3lK-8jv1b-1}\nwixd{NW1Xx3lK-8jv1b-2}\nwixd{NW1Xx3lK-8jv1b-3}\nwixd{NW1Xx3lK-8jv1b-4}\nwixd{NW1Xx3lK-8jv1b-5}\nwixd{NW1Xx3lK-8jv1b-6}\nwixd{NW1Xx3lK-8jv1b-7}\nwixd{NW1Xx3lK-8jv1b-8}\nwixd{NW1Xx3lK-8jv1b-9}\nwixd{NW1Xx3lK-8jv1b-A}\nwixd{NW1Xx3lK-8jv1b-B}\nwixd{NW1Xx3lK-8jv1b-C}\nwixd{NW1Xx3lK-8jv1b-D}\nwixd{NW1Xx3lK-8jv1b-E}\nwixd{NW1Xx3lK-8jv1b-F}\nwixd{NW1Xx3lK-8jv1b-G}\nwixd{NW1Xx3lK-8jv1b-H}\nwixu{NW1Xx3lK-1p0Y9w-1}}}%
-\nwixlogsorted{c}{{tables}{NW1Xx3lK-1W8AJS-1}{\nwixd{NW1Xx3lK-1W8AJS-1}\nwixd{NW1Xx3lK-1W8AJS-2}\nwixd{NW1Xx3lK-1W8AJS-3}\nwixd{NW1Xx3lK-1W8AJS-4}\nwixd{NW1Xx3lK-1W8AJS-5}\nwixd{NW1Xx3lK-1W8AJS-6}\nwixd{NW1Xx3lK-1W8AJS-7}\nwixd{NW1Xx3lK-1W8AJS-8}\nwixd{NW1Xx3lK-1W8AJS-9}\nwixd{NW1Xx3lK-1W8AJS-A}\nwixd{NW1Xx3lK-1W8AJS-B}\nwixu{NW1Xx3lK-1p0Y9w-1}}}%
+\nwixlogsorted{c}{{tables}{NW1Xx3lK-1W8AJS-1}{\nwixd{NW1Xx3lK-1W8AJS-1}\nwixd{NW1Xx3lK-1W8AJS-2}\nwixd{NW1Xx3lK-1W8AJS-3}\nwixd{NW1Xx3lK-1W8AJS-4}\nwixd{NW1Xx3lK-1W8AJS-5}\nwixd{NW1Xx3lK-1W8AJS-6}\nwixd{NW1Xx3lK-1W8AJS-7}\nwixd{NW1Xx3lK-1W8AJS-8}\nwixd{NW1Xx3lK-1W8AJS-9}\nwixd{NW1Xx3lK-1W8AJS-A}\nwixd{NW1Xx3lK-1W8AJS-B}\nwixd{NW1Xx3lK-1W8AJS-C}\nwixu{NW1Xx3lK-1p0Y9w-1}}}%
+\nwixlogsorted{c}{{uncompress level data}{NW1Xx3lK-3GdkXL-1}{\nwixu{NW1Xx3lK-457nLk-1}\nwixd{NW1Xx3lK-3GdkXL-1}}}%
+\nwixlogsorted{c}{{uncompress row data}{NW1Xx3lK-Bj1QX-1}{\nwixu{NW1Xx3lK-3GdkXL-1}\nwixd{NW1Xx3lK-Bj1QX-1}}}%
 \nwixlogsorted{i}{{\nwixident{ADD{\_}AND{\_}UPDATE{\_}SCORE}}{ADD:unAND:unUPDATE:unSCORE}}%
 \nwixlogsorted{i}{{\nwixident{BCD{\_}TO{\_}DECIMAL2}}{BCD:unTO:unDECIMAL2}}%
 \nwixlogsorted{i}{{\nwixident{BLOCK{\_}DATA}}{BLOCK:unDATA}}%
@@ -2190,6 +2456,7 @@ We then put together the entire assembly file:
 \nwixlogsorted{i}{{\nwixident{LADDER{\_}LOCS{\_}ROW}}{LADDER:unLOCS:unROW}}%
 \nwixlogsorted{i}{{\nwixident{LEVELNUM}}{LEVELNUM}}%
 \nwixlogsorted{i}{{\nwixident{LIVES}}{LIVES}}%
+\nwixlogsorted{i}{{\nwixident{LOAD{\_}LEVEL}}{LOAD:unLEVEL}}%
 \nwixlogsorted{i}{{\nwixident{MATH{\_}TMPH}}{MATH:unTMPH}}%
 \nwixlogsorted{i}{{\nwixident{MATH{\_}TMPL}}{MATH:unTMPL}}%
 \nwixlogsorted{i}{{\nwixident{NEWLINE}}{NEWLINE}}%
@@ -2252,6 +2519,6 @@ We then put together the entire assembly file:
 \nwixlogsorted{i}{{\nwixident{WIPE{\_}BLOCK{\_}OPEN{\_}MASK}}{WIPE:unBLOCK:unOPEN:unMASK}}%
 \nwixlogsorted{i}{{\nwixident{WIPE{\_}COUNTER}}{WIPE:unCOUNTER}}%
 \nwixlogsorted{i}{{\nwixident{WIPE{\_}MODE}}{WIPE:unMODE}}%
-\nwbegindocs{190}\nwdocspar
+\nwbegindocs{216}\nwdocspar
 \end{document}
 \nwenddocs{}
