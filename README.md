@@ -18,11 +18,11 @@ This step should not be necessary, as the release provides the assembly files, t
 * A distribution of [TeX Live](https://www.tug.org/texlive/) with the `booktabs` and `tikz` packages.
 * [`noweb`](https://github.com/nrnrnr/noweb)
 
-### Procedure
-
 To compile `main.nw`, you must use the `noweb` package and a `TeX` distribution such as TeX Live.
 
-WARNING: The latest TeX Live, 2022, is known to break `noweb` [[bug](https://github.com/nrnrnr/noweb/issues/24)]. Use TeXLive 2019 until the bug is fixed.
+WARNING: The latest TeX Live, 2022, is known to break `noweb` [[bug](https://github.com/nrnrnr/noweb/issues/24)]. Use TeXLive 2021 or earlier until the bug is fixed.
+
+### Generating the PDF
 
 ```sh
 $ noweave -delay -index main.nw > main.tex
@@ -32,8 +32,14 @@ $ pdflatex main.tex
 
 Yes, you have to run `pdflatex` twice. The first run generates auxilliary information about indexes that the second run can use to properly cross-reference things.
 
+### Generating the binary
+
+First, you must place the filter script `ignore_preuse_text.py` in `/usr/lib/noweb`. Sorry Windows users, I don't know where to put your filter scripts.
+
+The `ignore_preuse_text.py` filter makes it so that uses of code blocks do not get extra indentation when that use is indented. This is important for the assembly language output, and makes the PDF output more pleasant to read.
+
 ```sh
-$ notangle main.nw > main2.asm
+$ notangle -filter ignore_preuse_text.py main.nw > main2.asm
 $ python3 reorder_asm.py main2.asm > main.asm
 $ dasm main.asm -f3 -omain.bin
 ```
@@ -41,6 +47,8 @@ $ dasm main.asm -f3 -omain.bin
 `reorder_asm.py` reads the `main.asm` output, and reorders code blocks so that
 their ORG locations are increasing. This is necessary because `dasm` doesn't handle
 code blocks whose origins jump around.
+
+## License
 
 This work is licensed under a
 [Creative Commons Attribution-ShareAlike 4.0 International License][cc-by-sa].

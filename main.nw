@@ -516,20 +516,20 @@ ROW_TO_ADDR_FOR_BOTH_PAGES:
 
 
 Lode Runner's screens are organized into 28 sprites across by 17 sprites
-down. To convert between sprite coordinates and screen coordinates, we
+down. To convert between sprite coordinates and screen coordinates and vice-versa, we
 use tables and lookup routines. Each sprite is 10 pixels across by 11 pixels down.
 
 <<tables>>=
     ORG     $1C35
-ROW_TABLE2:
-    ; 28 rows of 5 pixels each
+HALF_SCREEN_COL_TABLE:
+    ; 28 cols of 5 double-pixels each
     HEX     00 05 0a 0f 14 19 1e 23 28 2d 32 37 3c 41 46 4b
     HEX     50 55 5a 5f 64 69 6e 73 78 7d 82 87
-ROW_TABLE:
+SCREEN_ROW_TABLE:
     ; 17 rows of 11 pixels each
     HEX     00 0B 16 21 2C 37 42 4D 58 63 6E 79 84 8F 9A A5
     HEX     B5
-COL_TABLE:
+COL_BYTE_TABLE:
     ; Byte number
     HEX     00 01 02 04 05 07 08 0A 0B 0C 0E 0F 11 12 14 15
     HEX     16 18 19 1B 1C 1E 1F 20 22 23 25 26
@@ -537,56 +537,156 @@ COL_SHIFT_TABLE:
     ; Right shift amount
     HEX     00 03 06 02 05 01 04 00 03 06 02 05 01 04 00 03
     HEX     06 02 05 01 04 00 03 06 02 05 01 04
-@ %def ROW_TABLE COL_TABLE ROW_TABLE2 COL_SHIFT_TABLE
+HALF_SCREEN_COL_BYTE_TABLE:
+    HEX     00 00 00 00 01 01 01 02 02 02 02 03 03 03 04 04
+    HEX     04 04 05 05 05 06 06 06 06 07 07 07 08 08 08 08
+    HEX     09 09 09 0A 0A 0A 0A 0B 0B 0B 0C 0C 0C 0C 0D 0D
+    HEX     0D 0E 0E 0E 0E 0F 0F 0F 10 10 10 10 11 11 11 12
+    HEX     12 12 12 13 13 13 14 14 14 14 15 15 15 16 16 16
+    HEX     16 17 17 17 18 18 18 18 19 19 19 1A 1A 1A 1A 1B
+    HEX     1B 1B 1C 1C 1C 1C 1D 1D 1D 1E 1E 1E 1E 1F 1F 1F
+    HEX     20 20 20 20 21 21 21 22 22 22 22 23 23 23 24 24
+    HEX     24 24 25 25 25 26 26 26 26 27 27 27
+HALF_SCREEN_COL_SHIFT_TABLE:
+    HEX     00 02 04 06 01 03 05 00 02 04 06 01 03 05 00 02
+    HEX     04 06 01 03 05 00 02 04 06 01 03 05 00 02 04 06
+    HEX     01 03 05 00 02 04 06 01 03 05 00 02 04 06 01 03
+    HEX     05 00 02 04 06 01 03 05 00 02 04 06 01 03 05 00
+    HEX     02 04 06 01 03 05 00 02 04 06 01 03 05 00 02 04
+    HEX     06 01 03 05 00 02 04 06 01 03 05 00 02 04 06 01
+    HEX     03 05 00 02 04 06 01 03 05 00 02 04 06 01 03 05
+    HEX     00 02 04 06 01 03 05 00 02 04 06 01 03 05 00 02
+    HEX     04 06 01 03 05 00 02 04 06 01 03 05
+@ %def SCREEN_ROW_TABLE COL_BYTE_TABLE HALF_SCREEN_COL_TABLE COL_SHIFT_TABLE HALF_SCREEN_COL_BYTE_TABLE HALF_SCREEN_COL_SHIFT_TABLE
+
+Here is the routine to return the screen coordinates for the given sprite coordinates.
+The reason that [[GET_SCREEN_COORDS_FOR]] returns half the screen column coordinate
+is that otherwise the screen column coordinate wouldn't fit in a register.
 
 <<routines>>=
     ORG     $885D
-GET_ROWNUM_FOR:
+GET_SCREEN_COORDS_FOR:
     SUBROUTINE
-    ; Enter routine with Y set to sprite row. On
-    ; return,Y  will be set to screen row.
-    ; We can also set X to something, and on return
-    ; X is set to something based on ROW_TABLE2, but
-    ; so far I'm not sure what it's used for.
+    ; Enter routine with Y set to sprite row (0-16) and
+    ; X set to sprite column (0-27). On return, Y will be set to
+    ; screen row, and X is set to half screen column.
 
-    LDA     ROW_TABLE,Y 
+    LDA     SCREEN_ROW_TABLE,Y 
     PHA
-    LDA     ROW_TABLE2,X 
-    TAX                         ; X = ROW_TABLE2[X]
+    LDA     HALF_SCREEN_COL_TABLE,X 
+    TAX                         ; X = HALF_SCREEN_COL_TABLE[X]
     PLA
-    TAY                         ; Y = ROW_TABLE[Y]
+    TAY                         ; Y = SCREEN_ROW_TABLE[Y]
     RTS
+@ %def GET_SCREEN_COORDS_FOR 
 
-GET_COLNUM_FOR:
+This routine takes a sprite column and converts it to
+the memory-mapped byte offset and right-shift amount.
+
+<<routines>>=
+    ORG     $8868
+GET_BYTE_AND_SHIFT_FOR_COL:
     SUBROUTINE
-    ; Enter routine with X set to sprite number. On
+    ; Enter routine with X set to sprite column. On
     ; return, A will be set to screen column byte number
     ; and X will be set to an additional right shift amount.
 
-    LDA     COL_TABLE,X 
-    PHA                         ; A = COL_TABLE2[X]
+    LDA     COL_BYTE_TABLE,X 
+    PHA                         ; A = COL_BYTE_TABLE[X]
     LDA     COL_SHIFT_TABLE,X 
     TAX                         ; X = COL_SHIFT_TABLE[X]
     PLA
     RTS
-@ %def GET_ROWNUM_FOR GET_COLNUM_FOR
+@ %def GET_BYTE_AND_SHIFT_FOR_COL
 
-Now we can finally write the routines that draw a sprite on the screen.
+This routine takes half the screen column coordinate and converts it to
+the memory-mapped byte offset and right-shift amount.
+
+<<routines>>=
+    ORG     $8872
+GET_BYTE_AND_SHIFT_FOR_HALF_SCREEN_COL:
+    SUBROUTINE
+    ; Enter routine with X set to half screen column. On
+    ; return, A will be set to screen column byte number
+    ; and X will be set to an additional right shift amount.
+
+    LDA     HALF_SCREEN_COL_BYTE_TABLE,X 
+    PHA                         ; A = HALF_SCREEN_COL_BYTE_TABLE[X]
+    LDA     HALF_SCREEN_COL_SHIFT_TABLE,X 
+    TAX                         ; X = HALF_SCREEN_COL_SHIFT_TABLE[X]
+    PLA
+    RTS
+@ %def GET_BYTE_AND_SHIFT_FOR_HALF_SCREEN_COL
+
+We also have some utility routines that let us take a sprite row or column and
+get its screen row or half column, but offset in either row or column by anywhere from
+[[-2]] to [[+2]].
+
+<<tables>>=
+    ORG     $888A
+ROW_OFFSET_TABLE:
+    HEX     FB FD 00 02 04
+@ %def ROW_OFFSET_TABLE
+
+<<routines>>=
+    ORG     $887C
+GET_SCREEN_ROW_OFFSET_IN_X_FOR:
+    SUBROUTINE
+    ; Enter routine with X set to offset+2 (in double-pixels) and
+    ; Y set to sprite row. On return, X will retain its value and
+    ; Y will be set to the screen row.
+
+    TXA
+    PHA
+    JSR     GET_SCREEN_COORDS_FOR
+    PLA
+    TAX                                 ; Restore X
+    TYA
+    CLC
+    ADC     ROW_OFFSET_TABLE,X
+    TAY
+    RTS
+@ %def GET_SCREEN_ROW_OFFSET_IN_X_FOR
+
+<<tables>>=
+    ORG     $889D
+COL_OFFSET_TABLE:
+    HEX     FE FF 00 01 02
+@ %def COL_OFFSET_TABLE
+
+<<routines>>=
+    ORG     $888F
+GET_HALF_SCREEN_COL_OFFSET_IN_Y_FOR:
+    SUBROUTINE
+    ; Enter routine with Y set to offset+2 (in double-pixels) and
+    ; X set to sprite column. On return, Y will retain its value and
+    ; X will be set to the half screen column.
+
+    TYA
+    PHA
+    JSR     GET_SCREEN_COORDS_FOR
+    PLA
+    TAY                                 ; Restore Y
+    TXA
+    CLC
+    ADC     COL_OFFSET_TABLE,Y
+    TAX
+    RTS
+@ %def GET_HALF_SCREEN_COL_OFFSET_IN_Y_FOR
+
+Now we can finally write the routines that draw a sprite on the screen. We have one
+routine that draws a sprite at a given game row and game column.
 There are two entry points, one to draw on HGR1, and one for HGR2.
 
 <<defines>>=
-    ORG     $1B
-ROWNUM          DS      1
-COLNUM          DS      1
-    ORG     $50
-MASK0           DS      1
-MASK1           DS      1
-    ORG     $71
-COL_SHIFT_AMT   DS      1
-    ORG     $85
-GAME_COLNUM     DS      1
-GAME_ROWNUM     DS      1
-@ %def ROWNUM COLNUM COL_SHIFT_AMT GAME_COLNUM GAME_ROWNUM
+ROWNUM          EQU     $1B
+COLNUM          EQU     $1C
+MASK0           EQU     $50
+MASK1           EQU     $51
+COL_SHIFT_AMT   EQU     $71
+GAME_COLNUM     EQU     $85
+GAME_ROWNUM     EQU     $86
+@ %def ROWNUM COLNUM MASK0 MASK1 COL_SHIFT_AMT GAME_COLNUM GAME_ROWNUM
 
 <<tables>>=
     ORG     $8328
@@ -633,12 +733,12 @@ DRAW_SPRITE_PAGE2:
 DRAW_SPRITE:
     STA     HGR_PAGE
     LDY     GAME_ROWNUM
-    JSR     GET_ROWNUM_FOR
-    STY     ROWNUM              ; ROWNUM = ROW_TABLE[GAME_ROWNUM]
+    JSR     GET_SCREEN_COORDS_FOR
+    STY     ROWNUM              ; ROWNUM = SCREEN_ROW_TABLE[GAME_ROWNUM]
 
     LDX     GAME_COLNUM
-    JSR     GET_COLNUM_FOR
-    STA     COLNUM              ; COLNUM = COL_TABLE[GAME_COLNUM]
+    JSR     GET_BYTE_AND_SHIFT_FOR_COL
+    STA     COLNUM              ; COLNUM = COL_BYTE_TABLE[GAME_COLNUM]
     STX     COL_SHIFT_AMT       ; COL_SHIFT_AMT = COL_SHIFT_TABLE[GAME_COLNUM]
 
     LDA     PIXEL_MASK0,X 
@@ -707,6 +807,87 @@ DRAW_SPRITE:
     RTS
 @ %def DRAW_SPRITE_PAGE1 DRAW_SPRITE_PAGE2
 
+There is a different routine which draws a sprite at a given screen coordinate. Upon
+entry, the Y register needs to be set to the screen row coordinate (0-191). However, the
+X register needs to be set to half the screen column coordinate (0-139) because otherwise
+the maximum coordinate (279) wouldn't fit in a register.
+
+<<draw sprite at screen coordinate>>=
+    ORG     $8336
+DRAW_SPRITE_AT_PIXEL_COORDS:
+    SUBROUTINE
+    ; Enter routine with A set to sprite number to draw,
+    ; Y set to the screen row to draw it at, and X
+    ; set to *half* the screen column to draw it at.
+
+    STY     ROWNUM
+    STA     SPRITE_NUM
+    JSR     GET_BYTE_AND_SHIFT_FOR_HALF_SCREEN_COL
+    STA     COLNUM
+    STX     COL_SHIFT_AMT
+    JSR     COMPUTE_SHIFTED_SPRITE
+
+    LDA     #$0B
+    STA     ROW_COUNT
+    LDX     #$00
+    LDA     COL_SHIFT_AMT
+    CMP     #$05
+    BCS     .need_3_bytes       ; If COL_SHIFT_AMT >= 5, we need to alter three screen bytes,
+                                ; otherwise just two bytes.
+
+.loop1:
+    LDY     ROWNUM
+    JSR     ROW_TO_ADDR_FOR_BOTH_PAGES
+    LDY     COLNUM
+    LDA     BLOCK_DATA,X
+    EOR     #$7F
+    AND     (ROW_ADDR),Y
+    ORA     (ROW_ADDR2),Y
+    STA     (ROW_ADDR),Y
+    INX
+    INY
+    LDA     BLOCK_DATA+1,X
+    EOR     #$7F
+    AND     (ROW_ADDR),Y
+    ORA     (ROW_ADDR2),Y
+    STA     (ROW_ADDR),Y
+    INX
+    INX
+    INC     ROWNUM
+    DEC     ROW_COUNT
+    BNE     .loop1
+    RTS
+
+.need_3_bytes:
+    LDY     ROWNUM
+    JSR     ROW_TO_ADDR_FOR_BOTH_PAGES
+    LDY     COLNUM
+    LDA     BLOCK_DATA,X
+    EOR     #$7F
+    AND     (ROW_ADDR),Y
+    ORA     (ROW_ADDR2),Y
+    STA     (ROW_ADDR),Y
+    INX
+    INY
+    LDA     BLOCK_DATA+1,X
+    EOR     #$7F
+    AND     (ROW_ADDR),Y
+    ORA     (ROW_ADDR2),Y
+    STA     (ROW_ADDR),Y
+    INX
+    INY
+    LDA     BLOCK_DATA+2,X
+    EOR     #$7F
+    AND     (ROW_ADDR),Y
+    ORA     (ROW_ADDR2),Y
+    STA     (ROW_ADDR),Y
+    INX
+    INC     ROWNUM
+    DEC     ROW_COUNT
+    BNE     .need_3_bytes
+    RTS
+@ %def DRAW_SPRITE_AT_PIXEL_COORDS
+
 \section{Printing strings}
 
 Now that we can put sprites onto the screen at any game coordinate, we can
@@ -723,7 +904,7 @@ its sprite number. Lode Runner sets the high bit of the code to
 make it be treated as ASCII.
 
 <<routines>>=
-    ORG     $7b2a
+    ORG     $7B2A
 CHAR_TO_SPRITE_NUM:
     SUBROUTINE
     ; Enter routine with A set to the ASCII code of the
@@ -784,7 +965,7 @@ DRAW_PAGE   EQU     $87     ; 0x20 for page 1, 0x40 for page 2
 @ %def DRAW_PAGE
 
 <<routines>>=
-    ORG     $7b64
+    ORG     $7B64
 PUT_CHAR:
     SUBROUTINE
     ; Enter routine with A set to the ASCII code of the
@@ -1065,6 +1246,194 @@ PUT_STATUS_LEVEL:
 
 @ %def PUT_STATUS_LIVES PUT_STATUS_LEVEL
 
+\chapter{Sound}
+
+\section{Sound "strings"}
+
+A sound "string" describes a sound to play in terms of pitch and duration, ending in a [[00]].
+Just like in the [[PUT_STRING]] routine, rather than take
+an address pointing to a sound string, instead it uses the return address as the source for data.
+It then has to fix up the actual return address at the end to be just after the zero-terminating
+byte of the string.
+
+Because [[NOTE_INDEX]] is not zeroed out, this actually appends to the sound data buffer.
+
+The format of a sound string is duration, followed by pitch, although the pitch is lower for higher numbers.
+
+One example of a sound string is [[07 45 06 55 05 44 04 54 03 43 02 53]], found in [[CHECK_FOR_GOLD_PICKED_UP_BY_PLAYER]].
+
+
+<<defines>>=
+NOTE_INDEX      EQU     $54
+SOUND_DURATION  EQU     $0E00       ; 128 bytes
+SOUND_PITCH     EQU     $0E80       ; 128 bytes
+@ %def NOTE_INDEX SOUND_DURATION SOUND_PITCH
+
+<<load sound data>>=
+    ORG     $87E1
+LOAD_SOUND_DATA:
+    SUBROUTINE
+
+    PLA
+    STA     SAVED_RET_ADDR
+    PLA
+    STA     SAVED_RET_ADDR+1
+    BNE     .next
+
+.loop:
+    LDY     #$00
+    LDA     (SAVED_RET_ADDR),Y
+    BEQ     .end
+    INC     NOTE_INDEX
+    LDX     NOTE_INDEX
+    STA     SOUND_DURATION,X
+    INY
+    LDA     (SAVED_RET_ADDR),Y
+    STA     SOUND_PITCH,X
+
+    INC     SAVED_RET_ADDR
+    BNE     .next
+    INC     SAVED_RET_ADDR+1
+
+.next:
+    INC     SAVED_RET_ADDR
+    BNE     .loop
+    INC     SAVED_RET_ADDR+1
+    BNE     .loop
+
+.end:
+    LDA     SAVED_RET_ADDR+1
+    PHA
+    LDA     SAVED_RET_ADDR
+    PHA
+    RTS
+@ %def LOAD_SOUND_DATA
+
+\section{Playing notes}
+
+The [[PLAY_NOTE]] routines plays a note through the built-in speaker. The time the note is played is
+based on X and Y forming a 16-bit counter (X being the most significant byte), but A controls the pitch,
+which is how often the speaker is clicked. The higher A, the lower the pitch.
+
+The [[ENABLE_SOUND]] location can also disable playing the note, but the routine still takes as long as it would have.
+
+<<defines>>=
+ENABLE_SOUND    EQU     $99     ; If 0, do not click speaker.
+SPKR            EQU     $C030   ; Access clicks the speaker.
+@ %def ENABLE_SOUND SPKR
+
+<<play note>>=
+    ORG     $87BA
+PLAY_NOTE:
+    SUBROUTINE
+
+    STA     TMP_PTR
+    STX     TMP_PTR+1
+
+.loop:
+    LDA     ENABLE_SOUND
+    BEQ     .decrement_counter
+    LDA     SPKR
+
+.decrement_counter:
+    DEY
+    BNE     .counter_decremented
+    DEC     TMP_PTR+1
+    BEQ     .end
+
+.counter_decremented:
+    DEX
+    BNE     .decrement_counter
+    LDX     TMP_PTR
+    JMP     .loop
+
+.end:
+    RTS
+@ %def PLAY_NOTE
+
+\section{Playing a sound}
+
+The [[SOUND_DELAY]] routine delays an amount of time based on the X register. The total number of cycles is about 905 per each X.
+Since the Apple //e clock cycle was 980 nsec (on an NTSC system), this routine would delay approximately 887 microseconds times X.
+PAL systems were very slightly slower (by $0.47\%$), which corresponds to 883 microseconds times X.
+
+<<sound delay>>=
+    ORG     $86B5
+SOUND_DELAY:
+    SUBROUTINE
+
+    LDY     #$B4        ; 180
+.loop:
+    DEY                 ; 2 cycles
+    BNE     .loop       ; 3 cycles
+    DEX                 ; 2 cycles
+    BNE     .loop       ; 3 cycles
+    RTS
+@ %def SOUND_DELAY
+
+Finally, the [[PLAY_SOUND]] routine plays one section of the sound string stored in the [[SOUND_PITCH]]
+and [[SOUND_DURATION]] buffers. We have to break up the playing of the sound so that gameplay doesn't
+pause while playing the sound, although game play does pause while playing the note.
+
+Alternatively, if there is no sound string, we can play the note stored in location [[\$A4]] as long as
+location [[\$9B]] is zero. The duration is [[2 + SOUND_PERIOD]].
+
+The routine is designed to delay approximately the same amount regardless of sound duration. The
+delay is controlled by [[SOUND_PERIOD]]. This value is hardcoded to [[6]].
+
+<<defines>>=
+    ORG     $8C
+SOUND_PERIOD:
+    HEX     06
+@ %def SOUND_PERIOD
+
+<<play sound>>=
+    ORG     $8811
+PLAY_SOUND:
+    SUBROUTINE
+
+    LDY     NOTE_INDEX
+    BEQ     .no_more_notes
+    LDA     SOUND_PITCH,Y
+    LDX     SOUND_DURATION,Y
+    JSR     PLAY_NOTE
+
+    LDY     NOTE_INDEX              ; Y = NOTE_INDEX
+    DEC     NOTE_INDEX              ; NOTE_INDEX--
+    LDA     SOUND_PERIOD
+    SEC
+    SBC     SOUND_DURATION,Y        ; A = SOUND_PERIOD - SOUND_DURATION[Y]
+    BEQ     .done
+    BCC     .done                   ; If A <= 0, done.
+    TAX
+    JSR     SOUND_DELAY
+
+.done:
+    SEC
+    RTS
+
+.no_more_notes:
+    LDA     $9B
+    BNE     .end
+    LDA     $A4
+    LSR                     ; pitch = $A4 >> 1
+    INC     $A4             ; $A4++
+    LDX     SOUND_PERIOD
+    INX
+    INX                     ; duration = SOUND_PERIOD + 2
+    JSR     PLAY_NOTE
+
+    CLC
+    RTS
+
+.end:
+    LDX     SOUND_PERIOD
+    JSR     SOUND_DELAY
+
+    CLC
+    RTS
+@ %def PLAY_SOUND
+
 \chapter{Levels}
 
 One of the appealing things about Lode Runner are its levels. 150 levels are stored
@@ -1288,10 +1657,11 @@ Here we insert a few unconditional branches because of relative jump limitations
 Next we check for sprite 9, the player.
 
 <<defines>>=
-PLAYER_FLAGS_0002   EQU     $02
-PLAYER_FLAGS_0003   EQU     $03
-PLAYER_FLAGS_0004   EQU     $04
-@ %def PLAYER_FLAGS_0002 PLAYER_FLAGS_0003 PLAYER_FLAGS_0004
+PLAYER_X_ADJ                EQU     $02     ; [0-4] minus 2 (so 2 = right on the sprite location)
+PLAYER_Y_ADJ                EQU     $03     ; [0-4] minus 2 (so 2 = right on the sprite location)
+PLAYER_ANIM_STATE           EQU     $04     ; Index into SPRITE_ANIM_SEQS
+PLAYER_FACING_DIRECTION     EQU     $05     ; Hi bit set: facing left, otherwise facing right
+@ %def PLAYER_X_ADJ PLAYER_Y_ADJ PLAYER_ANIM_STATE
 
 <<level draw routine>>=
 .check_for_9:
@@ -1305,10 +1675,10 @@ PLAYER_FLAGS_0004   EQU     $04
     LDX     GAME_ROWNUM
     STX     PLAYER_ROW
     LDX     #$02
-    STX     PLAYER_FLAGS_0002
-    STX     PLAYER_FLAGS_0003
+    STX     PLAYER_X_ADJ
+    STX     PLAYER_Y_ADJ            ; Set Player X and Y movement to 0.
     LDX     #$08
-    STX     PLAYER_FLAGS_0004
+    STX     PLAYER_ANIM_STATE       ; Corresponds to sprite 9 (see SPRITE_ANIM_SEQS)
 
     LDA     #$00
     STA     (PTR2),Y
@@ -1424,10 +1794,6 @@ Revealing the screen, using an iris wipe. Then, we remove the guard and player s
 
     CLC
     RTS
-@
-
-<<routines>>=
-<<level draw routine>>
 @
 
 \section{Iris Wipe}
@@ -2100,6 +2466,13 @@ specified in the [[CURR_LEVEL_ROW_SPRITES_PTR_]] tables.
 The level data is stored in the game in compressed form, so we first grab
 the data for the level and put it into the [[COMPRESSED_LEVEL_DATA]] buffer.
 
+There's one switch here, [[PREGAME_MODE]], which dictates whether we're going to
+display the high-score screen, attract-mode game play, or an actual level for playing.
+
+<<defines>>=
+PREGAME_MODE    EQU     $A7
+@ %def PREGAME_MODE
+
 <<load compressed level data>>=
     ORG     $630E
 LOAD_COMPRESSED_LEVEL_DATA:
@@ -2107,9 +2480,9 @@ LOAD_COMPRESSED_LEVEL_DATA:
     ; Enter routine with A set to 1.
 
     STA     $bf74
-    LDA     $A7
+    LDA     PREGAME_MODE
     LSR
-    BEQ     .copy_level_data        ; If $A7 was 0 or 1, copy level data
+    BEQ     .copy_level_data        ; If PREGAME_MODE was 0 or 1, copy level data
 
     LDA     $96
     LSR
@@ -2148,8 +2521,8 @@ level data is stored in 256-byte pages at [[9F00]], [[A000]], and so on.
 Level numbers start from 1, so [[9E00]] doesn't actually contain level data.
 
 <<Copy level data>>=
-<<[[ROW_ADDR = $9E00 + LEVELNUM * $0100]]>>
-<<Copy data from [[ROW_ADDR]] into [[COMPRESSED_LEVEL_DATA]]>>
+    <<[[ROW_ADDR = $9E00 + LEVELNUM * $0100]]>>
+    <<Copy data from [[ROW_ADDR]] into [[COMPRESSED_LEVEL_DATA]]>>
 @
 
 <<[[ROW_ADDR = $9E00 + LEVELNUM * $0100]]>>=
@@ -2181,16 +2554,17 @@ LOAD_LEVEL:
 
     STX     VERBATIM
 
-<<Initialize level counts>>
+    <<Initialize level counts>>
 
     LDA     1
     STA     ALIVE
     JSR     LOAD_COMPRESSED_LEVEL_DATA
 
-<<uncompress level data>>
+    <<uncompress level data>>
 @ %def LOAD_LEVEL
 
 <<defines>>=
+TMP                     EQU     $1A
 LEVEL_DATA_INDEX        EQU     $92
 @
 
@@ -2216,7 +2590,7 @@ not yet known, and these are zeroed out also.
     STX     $19
     STX     $A0
     STX     LEVEL_DATA_INDEX
-    STX     $1A
+    STX     TMP
     STX     GAME_ROWNUM
     TXA
 
@@ -2274,11 +2648,11 @@ the [[CURR_LEVEL_ROW_SPRITES_PTR_]] tables.
     STA     PTR2+1
 @
 
-To uncompress the data for a row, we use the counter in [[$1A]] as an odd/even
+To uncompress the data for a row, we use the counter in [[TMP]] as an odd/even
 switch so that we know which 4-bit chunk (nibble) in a byte we want. Even
 numbers are for the low nibble while odd numbers are for the high nibble.
 
-In addition, if we encounter sprite 10 (all white) then we replace it with
+In addition, if we encounter any sprite number 10 or above then we replace it with
 sprite 0 (all black).
 
 <<uncompress row data>>=
@@ -2286,13 +2660,13 @@ sprite 0 (all black).
     STA     GAME_COLNUM
 
 .col_loop:
-    LDA     $1A                         ; odd/even counter
+    LDA     TMP                         ; odd/even counter
     LSR
     LDY     LEVEL_DATA_INDEX
     LDA     COMPRESSED_LEVEL_DATA,Y
     BCS     .628c                       ; odd? 
     AND     #$0F
-    BPL     .6292
+    BPL     .6292                       ; unconditional jump
 .628c
 
     LSR
@@ -2302,12 +2676,12 @@ sprite 0 (all black).
     INC     LEVEL_DATA_INDEX
 
 .6292
-    INC     $1A
-    LDY     GAME_COLNUM
+    INC     TMP
 
+    LDY     GAME_COLNUM
     CMP     10
     BCC     .629c
-    LDA     0                           ; sprite 10 (all white) -> sprite 0
+    LDA     0                           ; sprite >= 10 -> sprite 0
 .629c:
 
     STA     (PTR1),Y
@@ -2342,23 +2716,913 @@ and retry [[LOAD_LEVEL]] from the very beginning.
     JMP     LOAD_LEVEL
 @
 
+\chapter{High scores}
+
+For this routine, we have two indexes. The first is stored in [[\$55]] and is the high score
+number, from 1 to 10. The second is stored in [[\$56]] and keeps our place in the actual
+high score data table stored at [[\$1F00]].
+
+There are ten slots in the high score table, each with eight bytes. The first three bytes are
+for the player initials, the fourth byte is the level -- or zero if the row should be empty -- and
+the last four bytes are the BCD-encoded score, most significant byte first.
+
+<<defines>>=
+HI_SCORE_DATA    EQU     $1F00
+@ %def HI_SCORE_DATA
+
+<<construct and display high score screen>>=
+    ORG     $786B
+
+HI_SCORE_SCREEN:
+    SUBROUTINE
+
+    JSR     CLEAR_HGR2
+    LDA     #$40
+    STA     DRAW_PAGE
+    LDA     #$00
+    STA     GAME_COLNUM
+    STA     GAME_ROWNUM
+
+    <<draw high score table header>>
+    <<draw high score rows>>
+    <<show high score page>>
+@ %def HI_SCORE_SCREEN
+
+<<draw high score table header>>=
+    ; "    LODE RUNNER HIGH SCORES\r"
+    ; "\r"
+    ; "\r"
+    ; "    INITIALS LEVEL  SCORE\r"
+    ; "    -------- ----- --------\r"
+    JSR     PUT_STRING
+    HEX     A0 A0 A0 A0 CC CF C4 C5 A0 D2 D5 CE CE C5 D2 A0
+    HEX     C8 C9 C7 C8 A0 D3 C3 CF D2 C5 D3 8D 8D 8D A0 A0
+    HEX     A0 A0 C9 CE C9 D4 C9 C1 CC D3 A0 CC C5 D6 C5 CC
+    HEX     A0 A0 D3 C3 CF D2 C5 8D A0 A0 A0 A0 AD AD AD AD
+    HEX     AD AD AD AD A0 AD AD AD AD AD A0 AD AD AD AD AD
+    HEX     AD AD AD 8D 00
+@
+
+<<draw high score rows>>=
+    LDA     #$01
+    STA     $55             ; Used for row number
+.loop:
+    <<draw high score row number>>
+    <<draw high score initials>>
+    <<draw high score level>>
+    <<draw high score>>
+    <<next high score row>>
+@
+
+<<draw high score row number>>=
+    CMP     #$0A
+    BNE     .display_0_to_9
+    LDA     #1
+    JSR     PUT_DIGIT
+    LDA     #0
+    JSR     PUT_DIGIT
+    JMP     .rest_of_row_number
+
+.display_0_to_9:
+    LDA     #$A0
+    JSR     PUT_CHAR        ; space
+    LDA     $55
+    JSR     PUT_DIGIT
+
+.rest_of_row_number:
+    ; ".    "
+    JSR     PUT_STRING
+    HEX     AE A0 A0 A0 A0 00
+@
+
+<<tables>>=
+    ORG     $79A2
+HI_SCORE_TABLE_OFFSETS:
+    HEX     00 08 10 18 20 28 30 38 40 48
+@ %def HI_SCORE_TABLE_OFFSETS
+
+<<draw high score initials>>=
+    LDX     $55
+    LDY     HI_SCORE_TABLE_OFFSETS,X
+    STY     $56
+    LDA     HI_SCORE_DATA+3,Y
+    BNE     .draw_initials
+    JMP     .next_high_score_row
+.draw_initials:
+    LDY     $56
+    LDA     HI_SCORE_DATA,Y
+    JSR     PUT_CHAR
+    LDY     $56
+    LDA     HI_SCORE_DATA+1,Y
+    JSR     PUT_CHAR
+    LDY     $56
+    LDA     HI_SCORE_DATA+2,Y
+    JSR     PUT_CHAR
+
+    ; "    "
+    JSR     PUT_STRING
+    HEX     A0 A0 A0 A0 00
+@
+
+<<draw high score level>>=
+    LDY     $56
+    LDA     HI_SCORE_DATA+3,Y
+    JSR     TO_DECIMAL3
+    LDA     HUNDREDS
+    JSR     PUT_DIGIT
+    LDA     TENS
+    JSR     PUT_DIGIT
+    LDA     UNITS
+    JSR     PUT_DIGIT
+
+    ; "  "
+    JSR     PUT_STRING
+    HEX     A0 A0 00
+@
+
+<<draw high score>>=
+    LDY     $56
+    LDA     HI_SCORE_DATA+4,Y
+    JSR     BCD_TO_DECIMAL2
+    LDA     TENS
+    JSR     PUT_DIGIT
+    LDA     UNITS
+    JSR     PUT_DIGIT
+
+    LDY     $56
+    LDA     HI_SCORE_DATA+5,Y
+    JSR     BCD_TO_DECIMAL2
+    LDA     TENS
+    JSR     PUT_DIGIT
+    LDA     UNITS
+    JSR     PUT_DIGIT
+
+    LDY     $56
+    LDA     HI_SCORE_DATA+6,Y
+    JSR     BCD_TO_DECIMAL2
+    LDA     TENS
+    JSR     PUT_DIGIT
+    LDA     UNITS
+    JSR     PUT_DIGIT
+
+    LDY     $56
+    LDA     HI_SCORE_DATA+7,Y
+    JSR     BCD_TO_DECIMAL2
+    LDA     TENS
+    JSR     PUT_DIGIT
+    LDA     UNITS
+    JSR     PUT_DIGIT
+@
+
+<<next high score row>>=
+.next_high_score_row:
+    JSR     NEWLINE
+    INC     $55
+    LDA     $55
+    CMP     #11
+    BCS     .end
+    JMP     .loop
+@
+
+<<defines>>=
+TXTPAGE2                EQU     $C055
+@ %def TXTPAGE2
+
+<<show high score page>>=
+.end:
+    STA     TXTPAGE2        ; Flip to page 2
+    LDA     #$20
+    STA     DRAW_PAGE       ; Set draw page to 1
+    RTS
+@
+
+\chapter{Game play}
+
+\section{Splash screen}
+
+<<splash screen>>=
+    ORG     $6008
+.main:
+    JSR     CLEAR_HGR1
+
+    LDA     #$FF
+    STA     .rd_table+1
+    LDA     #$0E
+    STA     .rd_table+2     ; RD_TABLE = 0x0EFF
+    LDY     0
+    STY     GAME_ROWNUM
+    STY     PREGAME_MODE
+    STY     $96             ; GAME_ROWNUM = $96 = PREGAME_MODE = 0
+    LDA     #$20
+    STA     HGR_PAGE
+    STA     DRAW_PAGE       ; HGR_PAGE = DRAW_PAGE = 0x20
+
+    <<splash screen loop>>
+
+    STA     TXTPAGE1
+    STA     HIRES
+    STA     MIXCLR
+    STA     TXTCLR
+    JMP     .618E
+@
+
+This loop writes a screen of graphics by reading from the table starting at [[\$0F00]].
+The table is in pairs of bytes, where the
+first byte is the byte offset from the beginning of the row, and the second byte is the byte
+to write. However, if the first byte is [[0x00]] then we end that row.
+
+As in other cases, the pointer into the table is stored in the [[LDA]] instruction that reads from
+the table.
+
+The code takes advantage of the fact that all bytes written to the page have their high bit
+set, while offsets from the beginning of the row are always less than [[0x80]]. Thus, if we
+read a byte and it is [[0x00]], we end the loop. Otherwise, if the byte is less than [[0x80]] we
+set that as the offset. Otherwise, the byte has its high bit set, and we write that byte to the
+graphics page.
+
+<<splash screen loop>>=
+.draw_splash_screen_row:
+    JSR     ROW_TO_ADDR     ; ROW_ADDR = ROW_TO_ADDR(Y)
+    LDY     #0
+
+.loop:
+    INC     .rd_table+1
+    BNE     .rd_table
+    INC     .rd_table+2     ; RD_TABLE++
+
+.rd_table:
+    LDA     $1A84           ; A <- *RD_TABLE ($1A84 is just a dummy value)
+    BEQ     .end_of_row     ; if A == 0: break
+    BPL     .is_row_offset  ; if A > 0: A -> Y, .loop
+    STA     (ROW_ADDR),Y    ; *(ROW_ADDR+Y) = A
+
+    INY                     ; Y++
+    BPL     .loop           ; While Y < 0x80 (really while not 00)
+
+.is_row_offset:
+    TAY
+    BPL     .loop           ; Unconditional jump
+
+.end_of_row:
+    INC     GAME_ROWNUM
+    LDY     GAME_ROWNUM
+    CPY     #192
+    BCC     .draw_splash_screen_row
+@
+
+\section{Startup code}
+
+The startup code is run immediately after relocating memory blocks.
+
+<<startup code>>=
+    <<set startup softswitches>>
+    <<set stack size>>
+    <<maybe set carry but not really>>
+    <<ready yourself>>
+@
+
+The first address, [[ROMIN_RDROM_WRRAM2]] is a bank-select switch. By reading it twice, we set
+up the memory area from [[\$D000-\$DFFF]] to read from the ROM, but write to RAM bank 2.
+
+The next four softswiches set up the display for full-screen hi-res graphics, page 1.
+
+<<defines>>=
+ROMIN_RDROM_WRRAM2      EQU     $C081
+TXTCLR                  EQU     $C050
+MIXCLR                  EQU     $C052
+TXTPAGE1                EQU     $C054
+HIRES                   EQU     $C057
+@ %def ROMIN_RDROM_WRRAM2 TXTCLR MIXCLR TXTPAGE1 HIRES
+
+<<set startup softswitches>>=
+    ORG     $5F7D
+
+    LDA     ROMIN_RDROM_WRRAM2
+    LDA     ROMIN_RDROM_WRRAM2
+    LDA     TXTCLR
+    LDA     MIXCLR
+    LDA     TXTPAGE1
+    LDA     HIRES
+@
+
+The 6502 stack, at maximum, runs from [[\$0100-\$01FF]]. The stack starts at [[\$0100]] plus the stack
+index (the S register), and grows towards [[\$0100]]. Here we are setting the S register to [[0x07]]
+which makes for a very small stack -- 8 bytes.
+
+<<set stack size>>=
+    LDX     #$07
+    TXS
+@
+
+This next part seems to set the carry only if certain bits in location [[\$5F94]] are set. I can
+find no writes to this location, so the effect is that the carry is cleared. It's entirely possible
+that this was altered by the cracker.
+
+<<maybe set carry but not really>>=
+    CLC
+    LDA     #$01
+    AND     #$A4
+    BEQ     .short_delay_mode
+    SEC
+    ; fall through to short delay mode
+@
+
+This next part sets the delay for this game mode, and also reads the keyboard strobe softswtich.
+That just clears the keyboard strobe in readiness to see if a key is pressed. Then we get dumped
+into the main loop.
+
+<<defines>>=
+KBDSTRB     EQU     $C010
+@ %def KBDSTRB
+
+<<ready yourself>>=
+    ORG     $5F9A
+
+.short_delay_mode:
+    LDX     #$22            ; Number of times to check for keyboard press (34).
+    LDY     #$02            ; Number of times to do X checks (2).
+                            ; GAME_ROWNUM was initialized to 1, so we do 34*2*1 checks.
+    LDA     KBDSTRB
+    LDA     #$CA            ; Fake keypress 0x4A (J)
+    JMP     .check_for_button_down
+@
+
+Checking for a joystick button (or equivalently the open apple and solid apple keys) to be pressed
+involves checking the high bit after reading the corresponding button softswitch. Here we're checking
+if any of the buttons are pressed.
+
+<<defines>>=
+BUTN0       EQU     $C061       ; Or open apple
+BUTN1       EQU     $C062       ; Or solid apple
+STORED_KEY  EQU     $95
+    ORG     $95
+    HEX     CA
+@ %def BUTN0 BUTN1 STORED_KEY
+
+<<check for button down>>=
+    ORG     $6199
+
+.check_stored_key:
+    LDA     STORED_KEY
+
+.check_for_button_down:
+    CMP     #$CB                ; Key pressed is 0x4B (K)?
+    BEQ     .no_button_pressed  ; Skip check button presses.
+    LDA     BUTN1
+    BMI     .button_pressed
+    LDA     BUTN0
+    BMI     .button_pressed
+
+    ; fall through to .no_button_pressed
+@
+
+Here we read the keyboard, which involves checking the high bit of the [[KBD]] softswitch. This
+also loads the ASCII code for the key. We check for a keypress in a loop based on the X and Y registers,
+and on [[GAME_ROWNUM]]! So we check for [[X x Y x GAME_ROWNUM]] iterations. This controls
+alternation between "attract-mode" gameplay and the high score screen.
+
+<<defines>>=
+KBD         EQU     $C000
+@ %def KBD
+
+<<no button pressed>>=
+    ORG     $61A9
+
+.no_button_pressed:
+    LDA     KBD
+    BMI     .key_pressed
+    DEX
+    BNE     .check_stored_key
+    DEY
+    BNE     .check_stored_key
+    DEC     GAME_ROWNUM
+    BNE     .check_stored_key
+
+    ; fall through to .no_button_or_key_timeout
+@
+
+If one of the joystick buttons was pressed:
+
+<<button pressed at startup>>=
+    ORG     $6201
+
+.button_pressed:
+    LDX     #$00
+    STX     $96
+    INX
+    STX     LEVELNUM
+    STX     $9D
+    LDA     #$02
+    STX     PREGAME_MODE
+    JMP     .play_game
+@
+
+And if one of the keys was pressed:
+
+<<key pressed at startup>>=
+    ORG     $61F6
+
+.key_pressed:
+    STA     KBDSTRB     ; Clear keyboard strobe
+    CMP     #$85        ; if ctrl-E:
+    BEQ     .ctrl_e_pressed
+    CMP     #$8D        ; if return key:
+    BEQ     .return_pressed
+
+    ; fall through to .button_pressed
+@
+
+Two keys are special, ctrl-E, which opens the level editor, and return, which starts a new game (?).
+
+<<ctrl-e pressed>>=
+    ORG     $6211
+
+.ctrl_e_pressed:
+    JMP     .start_level_editor
+@
+
+<<return pressed>>=
+    ORG     $61E4
+
+.return_pressed:
+    LDA     #$01
+    JSR     $6359
+@
+
+Finally, if no key or button was pressed and we've reached the maximum number of polls through the loop:
+
+<<timed out waiting for button or keypress>>=
+    ORG     $61B8
+
+.no_button_or_key_timeout:
+    LDA     PREGAME_MODE
+    BNE     .check_game_mode    ; If PREGAME_MODE != 0, .check_game_mode.
+
+    ; When PREGAME_MODE = 0:
+    LDX     #$01
+    STX     PREGAME_MODE        ; Set PREGAME_MODE = 1
+    STX     LEVELNUM
+    STX     $AC
+    STX     $9D                 ; LEVELNUM = $AC = $9D = 1
+    LDX     $99
+    STX     .restore_99+1       ; Save previous value of $99
+    STA     $99                 ; $99 = 0
+    JMP     .init_game_data
+@
+
+<<check game mode>>=
+    ORG     $61DE
+
+.check_game_mode:
+    CMP     #$01
+    BNE     .game_mode_not_1
+    BEQ     .display_high_score_screen        ; Unconditional jump
+@
+
+<<game mode not 1>>=
+    ORG     $61F3
+
+.game_mode_not_1:
+    JMP     $6008
+@
+
+<<display high score screen>>=
+    ORG     $61E9
+
+.display_high_score_screen:
+    JSR     HI_SCORE_SCREEN
+    LDA     #$02
+    STA     PREGAME_MODE            ; PREGAME_MODE = 2
+    JMP     .long_delay_attact_mode
+@
+
+When we change over to attract mode, we set the delay to the next mode very large: 195075 times
+around the loop.
+
+<<long delay attract mode>>=
+    ORG     $618E
+
+.long_delay_attact_mode:
+    JSR     $869f
+    LDX     #$FF
+    LDY     #$FF
+    LDA     #$03
+    STA     GAME_ROWNUM
+
+    ; fall through to .check_stored_key
+@
+
+\section{Moving the player}
+
+The player's sprite position is stored in [[PLAYER_COL]] and [[PLAYER_ROW]], while the offset from
+the exact sprive location is stored in [[PLAYER_X_ADJ]] and [[PLAYER_Y_ADJ]]. These adjustments are offset by 2, so that
+2 means zero offset. The player also has a [[PLAYER_ANIM_STATE]] which is an index into the
+[[SPRITE_ANIM_SEQS]] table. The [[GET_SPRITE_AND_SCREEN_COORD_AT_PLAYER]] gets the sprite corresponding
+to the player's animation state and the player's adjusted screen coordinate.
+
+<<tables>>=
+    ORG     $6968
+SPRITE_ANIM_SEQS:
+    HEX     0B 0C 0D        ; player running left
+    HEX     18 19 1A        ; player monkey swinging left
+    HEX     0F              ; player digging left
+    HEX     13              ; player falling, facing left
+    HEX     09 10 11        ; player running right
+    HEX     15 16 17        ; player monkey swinging right
+    HEX     25              ; player digging right
+    HEX     14              ; player falling, facing right
+    HEX     0E 12           ; player climbing on ladder
+@ %def SPRITE_ANIM_SEQS
+
+<<get player sprite data>>=
+    ORG     $6B85
+GET_SPRITE_AND_SCREEN_COORD_AT_PLAYER:
+    SUBROUTINE
+    ; Using PLAYER_COL/ROW, PLAYER_X/Y_ADJ, and PLAYER_ANIM_STATE,
+    ; return the player sprite in A, and the screen coords in X and Y.
+
+    LDX     PLAYER_COL
+    LDY     PLAYER_X_ADJ
+    JSR     GET_HALF_SCREEN_COL_OFFSET_IN_Y_FOR
+    STX     SPRITE_NUM          ; Used only as a temporary to save X
+    LDY     PLAYER_ROW
+    LDX     PLAYER_Y_ADJ
+    JSR     GET_SCREEN_ROW_OFFSET_IN_X_FOR
+    LDX     PLAYER_ANIM_STATE
+    LDA     SPRITE_ANIM_SEQS,X
+    LDX     SPRITE_NUM
+    RTS
+@ %def GET_SPRITE_AND_SCREEN_COORD_AT_PLAYER
+
+Since [[PLAYER_ANIM_STATE]] needs to play a sequence over and over, there is a routine
+to increment the animation state and wrap if necessary. It works by loading A with the
+lower bound, and X with the upper bound.
+
+<<increment player animation state>>=
+    ORG     $6BF4
+INC_ANIM_STATE:
+    SUBROUTINE
+
+    INC     PLAYER_ANIM_STATE
+    CMP     PLAYER_ANIM_STATE
+    BCC     .check_upper_bound      ; lower bound < PLAYER_ANIM_STATE?
+    ; otherwise PLAYER_ANIM_STATE <= lower bound:
+
+.write_lower_bound:
+    STA     PLAYER_ANIM_STATE       ; PLAYER_ANIM_STATE = lower bound
+    RTS
+
+.check_upper_bound:
+    CPX     PLAYER_ANIM_STATE
+    BCC     .write_lower_bound       ; PLAYER_ANIM_STATE > upper bound?
+    ; otherwise PLAYER_ANIM_STATE <= upper bound:
+    RTS
+@ %def INC_ANIM_STATE
+
+This routine checks whether the player picks up gold. First we check to see if the player's location
+is exactly on a sprite coordinate, and return if not. Otherwise, we check the phantom sprite data
+to see if there's gold at the player's location, and return if not. So if there is gold, we decrement
+the gold count, put a blank sprite in the phantom sprite data, increment the score by 250, place
+a gold sprite on the screen at the player location, and then load up data into the sound area.
+
+<<check for gold picked up by player>>=
+    ORG     $6B9D
+CHECK_FOR_GOLD_PICKED_UP_BY_PLAYER:
+    SUBROUTINE
+
+    LDA     PLAYER_X_ADJ
+    CMP     #$02
+    BNE     .end
+    LDA     PLAYER_Y_ADJ
+    CMP     #$02
+    BNE     .end
+
+    LDY     PLAYER_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1                                  ; PTR2 <- CURR_LEVEL_ROW_SPRITES_PTR2_ + PLAYER_ROW
+
+    LDY     PLAYER_COL
+    LDA     (PTR2),Y
+    CMP     #$07                ; Gold
+    BNE     .end
+
+    LSR     $94
+    DEC     GOLD_COUNT          ; GOLD_COUNT--
+
+    LDY     PLAYER_ROW
+    STY     GAME_ROWNUM
+    LDY     PLAYER_COL
+    STY     GAME_COLNUM
+    LDA     #$00
+    STA     (PTR2),Y
+    JSR     DRAW_SPRITE_PAGE2   ; Register and draw blank at player loc in PTR2
+
+    LDY     PLAYER_ROW
+    LDX     PLAYER_COL
+    JSR     GET_SCREEN_COORDS_FOR
+    LDA     #$07                            ; Gold
+    JSR     DRAW_SPRITE_AT_PIXEL_COORDS     ; Draw gold at player loc
+
+    LDY     #$02
+    LDA     #$50
+    JSR     ADD_AND_UPDATE_SCORE            ; SCORE += 250
+    JSR     LOAD_SOUND_DATA
+    HEX     07 45 06 55 05 44 04 54 03 43 02 53 00
+
+.end:
+    RTS
+@
+
+<<move player>>=
+    ORG     $64BD
+MOVE_PLAYER:
+    SUBROUTINE
+
+    LDA     #$01
+    STA     $94                     ; $94 = 1
+    LDA     $9C
+    BEQ     .data_9C_zero           ; If $9C == 0
+    BPL     .data_9C_positive_      ; If $9C < 0x80
+    JMP     $67E7                   ; Otherwise (if $9C >= 0x80)
+
+.data_9C_positive_:
+    JMP     data_9C_positive
+
+.data_9C_zero:
+    LDY     PLAYER_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1                                  ; PTR2 <- CURR_LEVEL_ROW_SPRITES_PTR2_ + PLAYER_ROW
+
+    LDY     PLAYER_COL
+    LDA     (PTR2),Y
+    CMP     #$03
+    BEQ     .sprite_is_ladder_                      ; ladder at phantom location?
+    CMP     #$04
+    BEQ     .sprite_is_pole                         ; pole at phantom location?
+    LDA     PLAYER_Y_ADJ
+    CMP     #$02
+    BEQ     .sprite_is_ladder_                      ; player at exact sprite row?
+
+    ; player is not on exact sprite row, fallthrough.
+
+.sprite_is_pole:
+    LDA     PLAYER_Y_ADJ
+    CMP     #$02                                    
+    BCC     .player_moving_up                       ; player to the left of sprite row?
+    LDY     PLAYER_ROW
+    CPY     #$0F
+    BEQ     .sprite_is_ladder_                      ; player exactly sprite row 15?
+
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS+1,Y
+    STA     PTR1
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES+1,Y
+    STA     PTR1+1                                  ; PTR1 = CURR_LEVEL_ROW_SPRITES_PTR_ + Y
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2+1,Y
+    STA     PTR2+1                                  ; PTR2 = CURR_LEVEL_ROW_SPRITES_PTR2_ + Y
+
+    LDY     PLAYER_COL
+    LDA     (PTR1),Y
+    CMP     #$00                    ; Empty
+    BEQ     .player_moving_up
+    CMP     #$08                    ; Guard
+    BEQ     .sprite_is_ladder_
+    LDA     (PTR2),Y
+    CMP     #$01                    ; Brick
+    BEQ     .sprite_is_ladder_
+    CMP     #$02                    ; Stone
+    BEQ     .sprite_is_ladder_
+    CMP     #$03                    ; Ladder
+    BNE     .player_moving_up
+
+.sprite_is_ladder_:
+    JMP     .sprite_is_ladder
+
+.player_moving_up:
+    LDA     #$00
+    STA     $9B                     ; $9B = 0
+    JSR     GET_SPRITE_AND_SCREEN_COORD_AT_PLAYER
+    ; A = sprite number
+    ; X = half screen col
+    ; Y = screen row
+    JSR     DRAW_SPRITE_AT_PIXEL_COORDS
+
+    LDA     #$07                    ; Next anim state: player falling, facing left
+    LDX     PLAYER_FACING_DIRECTION
+    BMI     .player_facing_left
+    LDA     #$0F                    ; Next anim state: player falling, facing right
+.player_facing_left:
+    STA     PLAYER_ANIM_STATE
+
+    JSR     $6C13
+
+    INC     PLAYER_Y_ADJ            ; Go down faster
+    LDA     PLAYER_Y_ADJ
+    CMP     #$05
+    BCS     .down_too_fast          ; PLAYER_Y_ADJ >= 5
+    JSR     CHECK_FOR_GOLD_PICKED_UP_BY_PLAYER
+    JMP     $6C02           ; tailcall
+
+.down_too_fast:
+    LDA     #$00
+    STA     PLAYER_Y_ADJ            ; Wrap around to move up???
+
+    LDY     PLAYER_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS+1,Y
+    STA     PTR1
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES+1,Y
+    STA     PTR1+1                                  ; PTR1 = CURR_LEVEL_ROW_SPRITES_PTR_ + PLAYER_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2+1,Y
+    STA     PTR2+1                                  ; PTR2 = CURR_LEVEL_ROW_SPRITES_PTR2_ + PLAYER_ROW
+
+    LDY     PLAYER_COL
+    LDA     (PTR2),Y
+    CMP     #$01                ; Brick
+    BNE     .move_down
+    LDA     #$00                ; Store empty sprite
+
+.move_down:
+    STA     (PTR1),Y
+    INC     PLAYER_ROW          ; Move down
+
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS+1,Y
+    STA     PTR1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES+1,Y
+    STA     PTR1+1                                  ; PTR1 = CURR_LEVEL_ROW_SPRITES_PTR_ + PLAYER_ROW
+    LDY     PLAYER_COL
+    LDA     #$09            ; player facing right
+    STA     (PTR1),Y
+    JMP     $6C02           ; tailcall
+
+.sprite_is_ladder:
+    LDA     $9B
+    BNE     .658f
+    LDA     #$64
+    LDX     #$08
+    JSR     PLAY_NOTE
+
+.658f:
+    LDA     #$20
+    STA     $A4
+    STA     $9B
+    JSR     $6A12
+    LDA     $9E
+    CMP     #$C9
+    BNE     .65a4
+    JSR     $66BD
+    BCS     .65c2
+    RTS
+
+
+@ %def MOVE_PLAYER
+
+
+
+\section{Initialization}
+
+<<Initialize game data>>=
+    ORG     $6056
+
+.init_game_data:
+    LDA     0
+    STA     SCORE
+    STA     SCORE+1
+    STA     SCORE+2
+    STA     SCORE+3
+    STA     $97
+    STA     WIPE_MODE       ; WIPE_MODE = SCORE = $97 = 0
+    STA     $53
+    STA     $AB
+    STA     $A8             ; $53 = $AB = $A8 = 0
+    LDA     #$9b    ; 155
+    STA     $A9             ; $A9 = 155
+    LDA     5
+    STA     LIVES           ; LIVES = 5
+    LDA     PREGAME_MODE
+    LSR
+    ; if PREGAME_MODE was 0 or 1 (i.e. not displaying high score screen),
+    ; play the game.
+    BEQ     .put_status_and_start_game   
+
+    ; We were displaying the high score screen
+    LDA     1
+    JSR     $6359
+    CMP     #$00
+    BNE     .6086
+    JSR     $8106
+    JMP     $6008
+
+.6086:
+    LDA     $1FFF
+    BNE     .6091
+    LDA     $36
+    LDX     $37
+    BNE     .6095
+
+.6091:
+    LDA     $38
+    LDX     $39
+
+.6095:
+    STA     JMP_ADDR
+    STX     JMP_ADDR+1
+
+.put_status_and_start_game:
+    JSR     PUT_STATUS
+    STA     TXTPAGE1
+@
+
+<<start game>>=
+    ORG     $609F
+
+.start_game:
+    LDX     #$01
+    JSR     LOAD_LEVEL
+    LDA     #$00
+    STA     $9E
+    STA     $9F
+    LDA     PREGAME_MODE
+    LSR
+    ; if PREGAME_MODE was 0 or 1 (i.e. not displaying high score screen),
+    ; play the game.
+    BEQ     .play_game
+
+    ; When PREGAME_MODE is 2:
+    JSR     $869F
+    LDA     PLAYER_COL
+    STA     GAME_COLNUM
+    LDA     PLAYER_ROW
+    STA     GAME_ROWNUM
+    LDA     #$09
+    JSR     $8700
+
+.play_game:
+    LDX     #$00
+    STX     $9C
+    STX     NOTE_INDEX
+
+    LDA     $97
+    CLC
+    ADC     GUARD_COUNT         ; GUARD_COUNT + $97 can't be greater than 8.
+    TAY
+    LDX     TIMES_3_TABLE,Y     ; X = 3 * Y
+    LDA     $6CA7,X
+    STA     $60
+    LDA     $6CA8,X
+    STA     $61
+    LDA     $6CA9,X
+    STA     $62
+
+    LDY     $97
+    LDA     $621D,Y
+    STA     $5F
+@
+
+<<game loop>>=
+    JSR     MOVE_PLAYER
+@
+
+<<tables>>=
+    ORG     $6214
+TIMES_3_TABLE:
+    HEX     00 03 06 09 0C 0F 12 15 18
+@ %def TIMES_3_TABLE
+
 \chapter{The whole thing}
 We then put together the entire assembly file:
 
 <<routines>>=
-; These are in the order they were placed in the original file.
-<<level draw routine>>
-<<iris wipe>>
-<<iris wipe step>>
-<<draw wipe step>>
-<<draw wipe block>>
+    ; Ideally these are in the order they were placed in the original file.
+    ; However, since each section should start with ORG, it should not be
+    ; necessary.
+    <<startup code>>
+
+    ; Graphics routines
+    <<level draw routine>>
+    <<splash screen>>
+    <<construct and display high score screen>>
+    <<iris wipe>>
+    <<iris wipe step>>
+    <<draw wipe step>>
+    <<draw wipe block>>
+
+    ; Sound routines
+    <<load sound data>>
+    <<sound delay>>
+    <<play note>>
+    <<play sound>>
 @
 
 <<*>>=
     PROCESSOR 6502
-<<defines>>
-<<tables>>
-<<routines>>
+    <<defines>>
+    <<tables>>
+    <<routines>>
 @
 
 \chapter{Defined Chunks}\par\noindent
