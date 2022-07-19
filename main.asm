@@ -1,16 +1,34 @@
     PROCESSOR 6502
-    ORG    $0000
-    DS 1
-    ORG    $000A
-TMP_PTR         DS.W    1
-    ORG    $0010
-SAVED_RET_ADDR      DS.W    1
-    ORG    $001D
-ROW_COUNT       DS      1
-SPRITE_NUM      DS      1
+TMP_PTR         EQU     $0A     ; 2 bytes
+TMP                 EQU     $1A
+SCRATCH_5C          EQU     $5C
+MATH_TMPL           EQU     $6F
+MATH_TMPH           EQU     $70
+TMP_LOOP_CTR        EQU     $88
+SCRATCH_A1          EQU     $A1
+SPRITE_EMPTY        EQU     #$00
+SPRITE_BRICK        EQU     #$01
+SPRITE_STONE        EQU     #$02
+SPRITE_LADDER       EQU     #$03
+SPRITE_ROPE         EQU     #$04
+SPRITE_T_THING      EQU     #$05
+SPRITE_STAPLE       EQU     #$06
+SPRITE_GOLD         EQU     #$07
+SPRITE_GUARD        EQU     #$08
+SPRITE_PLAYER       EQU     #$09
+SPRITE_ALLWHITE     EQU     #$0A
+SPRITE_BRICK_FILL0  EQU     #$37
+SPRITE_BRICK_FILL1  EQU     #$38
+SPRITE_GUARD_EGG0   EQU     #$39
+SPRITE_GUARD_EGG1   EQU     #$3A
+BLOCK_DATA      EQU     $DF     ; 33 bytes
+ROW_COUNT       EQU     $1D
+SPRITE_NUM      EQU     $1E
 ROW_ADDR        EQU     $0C     ; 2 bytes
 ROW_ADDR2       EQU     $0E     ; 2 bytes
 HGR_PAGE        EQU     $1F     ; 0x20 for HGR1, 0x40 for HGR2
+MAX_GAME_COL        EQU     #27
+MAX_GAME_ROW        EQU     #15
 ROWNUM          EQU     $1B
 COLNUM          EQU     $1C
 MASK0           EQU     $50
@@ -20,65 +38,79 @@ GAME_COLNUM     EQU     $85
 GAME_ROWNUM     EQU     $86
 SCREENS_DIFFER      EQU     $52
 DRAW_PAGE   EQU     $87     ; 0x20 for page 1, 0x40 for page 2
-    ORG    $0023
-JMP_RWTS:
-    SUBROUTINE
-
-    JMP     $0000       ; Gets loaded with RWTS address later
-
-    ORG    $0036
-INDIRECT_TARGET:
-    WORD    DEFAULT_INDIRECT_TARGET
-DISABLE_INTS_CALL_RWTS_PTR:
-    WORD    DISABLE_INTS_CALL_RWTS
-
-DISABLE_INTS_CALL_RWTS      EQU     $B7B5
-
-    ORG    $0060
-GUARD_PATTERNS:
-    BYTE    %10000110
-    BYTE    %00111110
-    BYTE    %10000101
-    ORG    $008C
-FRAME_PERIOD:
-    HEX     06
-SCRATCH_5C      EQU     $5C
+SAVED_RET_ADDR      EQU     $10     ; 2 bytes
+HUNDREDS        EQU     $C0
+TENS            EQU     $C1
+UNITS           EQU     $C2
+SCORE       EQU     $8D     ; 4 bytes, BCD format, tens/units in first byte.
+LEVELNUM    EQU     $A6
+LIVES       EQU     $C8
+NOTE_INDEX      EQU     $54
+SOUND_DURATION  EQU     $0E00       ; 128 bytes
+SOUND_PITCH     EQU     $0E80       ; 128 bytes
+ENABLE_SOUND    EQU     $99     ; If 0, do not click speaker.
+SPKR            EQU     $C030   ; Access clicks the speaker.
+FRAME_PERIOD    EQU     $8C     ; initially 6
 PADDLE0_VALUE       EQU     $65
 PADDLE1_VALUE       EQU     $66
 PADDL0              EQU     $C064
 PADDL1              EQU     $C065
 PTRIG               EQU     $C070
 INPUT_MODE  EQU     $95         ; 0xCA = Joystick mode (J), 0xCB = Keyboard mode (K)
-    ORG    $008D
-SCORE       DS      4       ; BCD format, tens/units in first byte.
-    ORG    $0095
-    HEX     CA                  ; Start in joystick mode
+                                ; initially set to 0xCA
 JOYSTICK_MODE   EQU     #$CA
 KEYBOARD_MODE   EQU     #$CB
 
 BUTN0       EQU     $C061       ; Or open apple
 BUTN1       EQU     $C062       ; Or solid apple
-SCRATCH_A1      EQU     $A1
-    ORG    $00A6
-LEVELNUM    DS      1
-    ORG    $00C0
-HUNDREDS        DS      1
-TENS            DS      1
-UNITS           DS      1
-    ORG    $00C8
-LIVES       DS      1
-NOTE_INDEX      EQU     $54
-SOUND_DURATION  EQU     $0E00       ; 128 bytes
-SOUND_PITCH     EQU     $0E80       ; 128 bytes
-ENABLE_SOUND    EQU     $99     ; If 0, do not click speaker.
-SPKR            EQU     $C030   ; Access clicks the speaker.
-    ORG    $00DF
-BLOCK_DATA      DS      33
+KBD         EQU     $C000
+KBDSTRB     EQU     $C010
+    ORG    $0000
+ZERO_PAGE_INITIAL:
+    HEX     4C 00 28 00 C0 68 0D 00 60 10 00 40 D0 3F 00 10 
+    HEX     D4 B4 9C FA B0 FF 37 FB FE FE FC EC 76 D7 E6 20 
+    HEX     00 28 00 4C 00 00 00 D5 00 04 18 60 20 0F 0C D6 
+    HEX     FC FA FF 73 FD 8D 50 8E B5 B7 04 FF FB B7 00 1F 
+    HEX     00 18 01 60 00 00 14 D8 E8 B7 91 9A 04 02 00 08 
+    HEX     00 FD 1C 3C EC AC B4 38 C4 E9 B6 FF BA BB 2A FE 
+    HEX     86 3E 85 3A A6 3E 86 40 A0 00 A5 3A 84 3C 85 3D 
+    HEX     A6 08 20 AE 00 C5 00 D0 F9 20 AE 00 C5 01 D0 F5 
+    HEX     20 AE 00 C5 02 D0 01 20 8C C0 10 FB 06 85 3F BD 
+    HEX     8C C0 10 FB 25 CA 00 3C C8 FF EC 0E 00 C0 BD 8C 
+    HEX     C0 10 FB C5 03 D0 BD 00 3D C6 40 D0 DA 60 BD 8C 
+    HEX     C0 10 FB 60 A2 D4 86 00 E8 86 01 E8 86 02 E8 86 
+    HEX     03 A9 04 AA 60 FF 2A 29 B1 FF 48 2A 09 01 8A 49 
+    HEX     FF C9 10 AA E8 09 AA EA FF A2 00 48 CA D0 FC A2 
+    HEX     0F BD F0 04 9D 00 01 CA D0 F7 9A 60 18 69 05 29 
+    HEX     07 69 01 00 EA E8 CA E8 CA E8 CA C8 88 C8 88 C8    
+
+    ORG    $0100
+STACK_INITIAL:
+    HEX     BE B9 B7 B4 7B 63 90 61 FF 8B FE 07 FF 03 FF 5F 
+    HEX     5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 7A 
+    HEX     5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 7A 
+    HEX     5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 7A 
+    HEX     5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 7A 
+    HEX     5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 5A 7A 
+    HEX     1D 7C FE 31 29 12 2D 60 FB 5D F7 72 D9 ED D1 A8 
+    HEX     FC FC FE 7B F7 FF 5E FF 35 FE EC CD BF EF 3D DD 
+    HEX     DF EF FF DF F7 7B 7F BF 7F BF ED E5 BF DF ED D4 
+    HEX     01 2E 00 10 4A 84 48 83 02 22 50 82 9A 0C 46 04 
+    HEX     D7 19 AD 7F 4C C7 DF BE FF 8F 7B CF DF FF B3 DA 
+    HEX     00 08 02 F2 00 05 86 00 09 F3 00 63 08 00 43 02 
+    HEX     7F DF FD CF EB BF AF BF D5 FF C7 E7 BD FF BF 7B 
+    HEX     C9 E4 61 06 19 07 04 56 01 63 42 0F 93 43 C2 46 
+    HEX     89 4A 00 52 05 2F 22 A3 A0 37 00 84 0A 01 80 40 
+    HEX     00 09 00 06 17 26 FC 00 26 FC 6F BE 66 BE C6 42
+
+    ORG    $0200
+RANDOM_INIT_DATA:
+    INCLUDE "random_init_data.asm"
+
     ORG    $0C00
-LADDER_LOCS_COL     DS      48
-LADDER_LOCS_ROW     DS      48
-    ORG    $0CE0
-TABLE_0CE0      DS      31
+MORE_RANDOM_INIT_DATA:
+    INCLUDE "more_random_init_data.asm"
+
     ORG    $1A85
 ROW_TO_OFFSET_LO:
     INCLUDE "row_to_offset_lo_table.asm"
@@ -91,6 +123,8 @@ CURR_LEVEL_ROW_SPRITES_PTR_PAGES:
     HEX     08 08 08 08 08 08 08 08 08 08 09 09 09 09 09 09
 CURR_LEVEL_ROW_SPRITES_PTR_PAGES2:
     HEX     0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0B 0B 0B 0B 0B 0B
+LADDER_LOCS_COL     EQU     $0C00   ; 48 bytes
+LADDER_LOCS_ROW     EQU     $0C30   ; 48 bytes
     ORG    $1C35
 HALF_SCREEN_COL_TABLE:
     ; 28 cols of 5 double-pixels each
@@ -128,8 +162,146 @@ HALF_SCREEN_COL_SHIFT_TABLE:
     HEX     03 05 00 02 04 06 01 03 05 00 02 04 06 01 03 05
     HEX     00 02 04 06 01 03 05 00 02 04 06 01 03 05 00 02
     HEX     04 06 01 03 05 00 02 04 06 01 03 05
-    ORG    $5F7D
+    ORG    $1DB2
+DISK_BOOT_SECTOR_DATA:
+    HEX     01 20 58 FC 20 93 FE 20 89 FE A0 00 B9 34 08 F0
+    HEX     0E 20 F0 FD C9 8D D0 04 A9 09 85 24 C8 D0 ED A6
+    HEX     2B 9D 88 C0 8A 4A 4A 4A 4A 09 C0 8D 33 08 20 0C
+    HEX     FD 4C 00 C6 8D 8D 8D 8D 8D 8D 8D CC CF C4 C5 A0
+    HEX     D2 D5 CE CE C5 D2 A0 C4 C1 D4 C1 A0 C4 C9 D3 CB
+    HEX     BA 8D AD AD AD AD AD AD AD AD AD AD AD AD AD AD
+    HEX     AD AD AD AD AD AD AD AD 8D 8D C4 C9 D3 CB C5 D4
+    HEX     D4 C5 A0 D7 C9 CC CC A0 CE CF D4 A0 C2 CF CF D4
+    HEX     8D 8D A0 C9 CE D3 C5 D2 D4 A0 CE C5 D7 A0 C4 C9
+    HEX     D3 CB A0 C1 CE C4 8D A0 C8 C9 D4 A0 C1 A0 CB C5
+    HEX     D9 A0 D4 CF A0 D2 C5 C2 CF CF D4 8D 8D A0 A0 A0
+    HEX     A0 A0 A0 A0 A0 A0 A0 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+GUARD_PATTERN_OFFSET        EQU     $97
+    ORG    $1EB2
+PADDING:
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
+
+    ; Sprite routines
+
+    ORG    $1F00
+HI_SCORE_DATA:
+    HEX     D2 CC D0 06 00 03 10 75 A0 A0 A0 05 00 02 81 25
+    HEX     A0 A0 A0 02 00 01 74 25 A0 A0 A0 01 00 00 54 25
+    HEX     A0 A0 A0 01 00 00 19 75 A0 A0 A0 01 00 00 15 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 CC CF C4 C5 A0 D2 D5 CE CE C5 D2 FF
+    ORG    $5F00
+RELOCATE0_ALIAS:
+    SUBROUTINE
+
+    LDA     #$64
+    STA     $0800
+    LDA     #$76
+    STA     $0801
+    LDA     #$0D
+    STA     $0802
+
+    ; Copy 0x8100 bytes from $0800-$88FF to $3F00-$BFFF
+    LDY     #$88
+    BEQ     RELOCATE1       ; Never happens
+    STY     SRC_PTR+1
+    LDA     #$BF
+    STA     DEST_PTR+1
+    LDX     #$81
+    LDY     #$00
+    STY     SRC_PTR
+    STY     DEST_PTR
+
+.loop:
+    LDA     (SRC_PTR),Y
+    STA     (DEST_PTR),Y
+    INY
+    BNE     .loop
+    DEC     SRC_PTR+1
+    DEC     DEST_PTR+1
+    DEX
+    BNE     .loop
+    JMP     RELOCATE1
+
+RELOCATE1:
+    SUBROUTINE
+
+    LDX     #<RELOCATE_TABLE
+
+.loop:
+    LDA     RELOCATE_TABLE-<RELOCATE_TABLE,X
+    STA     .rd_insn+2
+    INX
+    LDA     RELOCATE_TABLE-<RELOCATE_TABLE,X
+    STA     .cmp_insn+1
+    INX
+    LDA     RELOCATE_TABLE-<RELOCATE_TABLE,X
+    STA     .wr_insn+2
+    INX
+    LDY     #$00
+
+.loop2:
+.rd_insn:
+    LDA     $0800,Y     ; address replaced above
+.wr_insn:
+    STA     $0800,Y     ; address replaced above
+    INY
+    BNE     .loop2
+
+    INC     .rd_insn+2
+    INC     .wr_insn+2
+    LDA     .rd_insn+2
+.cmp_insn:
+    CMP     #$FF        ; comparison value replaced above
+    BNE     .loop2
+
+    DEC     RELOCATE_SEGMENT_COUNT
+    BNE     .loop
+
+    JMP     MAIN
+
+UNUSED:
+    SUBROUTINE
+
+    LDX     #$A8
+
+.loop:
+    LDA     #$00
+
+.loop2:
+.wr_insn:
+    STA     $2000,X
+    INX
+    BNE     .loop2
+    INC     .wr_insn+2
+    LDA     .wr_insn+2
+    CMP     #$40
+    BNE     .loop
+
+    ; Fall through to MAIN
+
+    ORG    $5F7D
+MAIN:
     LDA     ROMIN_RDROM_WRRAM2
     LDA     ROMIN_RDROM_WRRAM2
     LDA     TXTCLR
@@ -145,7 +317,7 @@ HALF_SCREEN_COL_SHIFT_TABLE:
     AND     #$A4
     BEQ     .short_delay_mode
     SEC
-    ; fall through to short delay mode
+    ; fall through to .short_delay_mode
 
     ORG    $5F9A
 
@@ -154,9 +326,23 @@ HALF_SCREEN_COL_SHIFT_TABLE:
     LDY     #$02            ; Number of times to do X checks (2).
                             ; GAME_ROWNUM was initialized to 1, so we do 34*2*1 checks.
     LDA     KBDSTRB
-    LDA     JOYSTICK_MODE            ; Fake keypress 0x4A (J)
+    LDA     #JOYSTICK_MODE
     JMP     CHECK_FOR_BUTTON_DOWN
 
+
+    ORG    $5FA6
+RELOCATE_SEGMENT_COUNT:
+    HEX     04
+RELOCATE_TABLE:
+    HEX     3F 47 00
+    HEX     47 5F 08
+    HEX     60 8E 60
+    HEX     8E C0 8E
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
     ORG    $6008
 RESET_GAME:
@@ -168,17 +354,17 @@ RESET_GAME:
     STA     .rd_table+1
     LDA     #$0E
     STA     .rd_table+2     ; RD_TABLE = 0x0EFF
-    LDY     0
+    LDY     #$00
     STY     GAME_ROWNUM
-    STY     PREGAME_MODE
-    STY     DISK_LEVEL_LOC  ; GAME_ROWNUM = DISK_LEVEL_LOC = PREGAME_MODE = 0
+    STY     GAME_MODE
+    STY     DISK_LEVEL_LOC  ; GAME_ROWNUM = DISK_LEVEL_LOC = GAME_MODE = 0
     LDA     #$20
     STA     HGR_PAGE
     STA     DRAW_PAGE       ; HGR_PAGE = DRAW_PAGE = 0x20
 
 .draw_splash_screen_row:
     JSR     ROW_TO_ADDR     ; ROW_ADDR = ROW_TO_ADDR(Y)
-    LDY     #0
+    LDY     #$00
 
 .loop:
     INC     .rd_table+1
@@ -209,7 +395,7 @@ RESET_GAME:
     STA     HIRES
     STA     MIXCLR
     STA     TXTCLR
-    JMP     .long_delay_attract_mode
+    JMP     .long_delay
 
     ORG    $6056
 
@@ -228,9 +414,9 @@ RESET_GAME:
     STA     $A9             ; $A9 = 155
     LDA     #5
     STA     LIVES           ; LIVES = 5
-    LDA     PREGAME_MODE
+    LDA     GAME_MODE
     LSR
-    ; if PREGAME_MODE was 0 or 1 (i.e. not displaying high score screen or splash screen),
+    ; if GAME_MODE was 0 or 1 (i.e. not displaying high score screen or splash screen),
     ; play the game.
     BEQ     .put_status_and_start_game   
 
@@ -269,20 +455,20 @@ RESET_GAME:
     LDA     #$00
     STA     KEY_COMMAND
     STA     $9F
-    LDA     PREGAME_MODE
+    LDA     GAME_MODE
     LSR
-    ; if PREGAME_MODE was 0 or 1 (i.e. not displaying high score screen),
-    ; play the game.
+    ; if GAME_MODE was 0 or 1 (i.e. not displaying high score screen
+    ; or splash screen), play the game.
     BEQ     .play_game
 
-    ; When PREGAME_MODE is 2:
-    JSR     $869F
+    ; When GAME_MODE is 2:
+    JSR     WAIT_KEY
     LDA     PLAYER_COL
     STA     GAME_COLNUM
     LDA     PLAYER_ROW
     STA     GAME_ROWNUM
-    LDA     #$09
-    JSR     $8700
+    LDA     #SPRITE_PLAYER
+    JSR     WAIT_FOR_KEY_WITH_CURSOR_PAGE_1
 
 .play_game:
     LDX     #$00
@@ -303,9 +489,8 @@ RESET_GAME:
 
     LDY     GUARD_PATTERN_OFFSET
     LDA     $621D,Y
-    STA     $5F
+    STA     GUARD_GOLD_TIMER_START_VALUE
 
-    ORG    $60E4
 .game_loop:
     JSR     MOVE_PLAYER
     LDA     ALIVE
@@ -314,10 +499,10 @@ RESET_GAME:
     JSR     PLAY_SOUND
 
     LDA     GOLD_COUNT
-    BNE     .still_gold_present
-    JSR     $8631
+    BNE     .check_player_reached_top
+    JSR     ENABLE_NEXT_LEVEL_LADDERS
 
-.still_gold_present:
+.check_player_reached_top:
     LDA     PLAYER_ROW
     BNE     .not_at_top
     LDA     PLAYER_Y_ADJ
@@ -331,7 +516,7 @@ RESET_GAME:
     BEQ     .level_cleared      ; level cleared if GOLD_COUNT == 0 or -1.
 
 .not_at_top:
-    JSR     $75F4
+    JSR     HANDLE_TIMERS
     LDA     ALIVE
     BEQ     .died
     JSR     PLAY_SOUND
@@ -378,9 +563,9 @@ RESET_GAME:
     JSR     PLAY_SOUND
     BCS     .play_died_tune
 
-    LDA     PREGAME_MODE
+    LDA     GAME_MODE
     LSR
-    BEQ     .restore_enable_sound     ; If PREGAME_MODE is 0 or 1
+    BEQ     .restore_enable_sound     ; If GAME_MODE is 0 or 1
 
     LDA     LIVES
     BNE     .start_game_    ; We can still play.
@@ -393,56 +578,56 @@ RESET_GAME:
 
     ORG    $618E
 
-.long_delay_attract_mode:
-    JSR     $869f
+.long_delay:
+    JSR     WAIT_KEY
     LDX     #$FF
     LDY     #$FF
     LDA     #$03
     STA     GAME_ROWNUM
 
-    ; fall through to .check_input_mode
+    ; fall through to .poll_inputs
 
 
     ; Game loop
 
     ORG    $6199
 
-.check_input_mode:
+.poll_inputs:
     LDA     INPUT_MODE
 
 CHECK_FOR_BUTTON_DOWN:
-    CMP     KEYBOARD_MODE
-    BEQ     .no_button_pressed  ; If keyboard mode, skip check button presses.
+    CMP     #KEYBOARD_MODE
+    BEQ     .poll_keyboard  ; If keyboard mode, skip check button presses.
     LDA     BUTN1
-    BMI     .button_pressed
+    BMI     .set_level_0_and_play_game
     LDA     BUTN0
-    BMI     .button_pressed
+    BMI     .set_level_0_and_play_game
 
-    ; fall through to .no_button_pressed
+    ; fall through to .poll_keyboard
 
     ORG    $61A9
 
-.no_button_pressed:
+.poll_keyboard:
     LDA     KBD
     BMI     .key_pressed
     DEX
-    BNE     .check_input_mode
+    BNE     .poll_inputs
     DEY
-    BNE     .check_input_mode
+    BNE     .poll_inputs
     DEC     GAME_ROWNUM
-    BNE     .check_input_mode
+    BNE     .poll_inputs
 
     ; fall through to .no_button_or_key_timeout
 
     ORG    $61B8
 
 .no_button_or_key_timeout:
-    LDA     PREGAME_MODE
-    BNE     .check_game_mode    ; If PREGAME_MODE != 0, .check_game_mode.
+    LDA     GAME_MODE
+    BNE     .check_game_mode    ; If GAME_MODE != 0, .check_game_mode.
 
-    ; When PREGAME_MODE = 0:
+    ; When GAME_MODE = 0:
     LDX     #$01
-    STX     PREGAME_MODE        ; Set PREGAME_MODE = 1
+    STX     GAME_MODE        ; Set GAME_MODE = 1
     STX     LEVELNUM
     STX     $AC
     STX     $9D                 ; LEVELNUM = $AC = $9D = 1
@@ -457,30 +642,32 @@ CHECK_FOR_BUTTON_DOWN:
     LDA     KBD
     LDX     $AC
     BEQ     .key_pressed
-    JMP     .long_delay_attract_mode
+    JMP     .long_delay
 
     ORG    $61DE
 
 .check_game_mode:
+    ; For game mode 1, reset and play the game.
+    ; For game mode 0, display the high score screen.
     CMP     #$01
     BNE     .reset_game
-    BEQ     .pregame_mode_2        ; Unconditional jump
+    BEQ     .display_hi_score_screen        ; Unconditional jump
 
     ORG    $61E4
 
-.return_pressed:
+.read_and_display_hi_score_screen:
     LDA     #$01
     JSR     ACCESS_HI_SCORE_DATA_FROM_DISK      ; read hi score table
 
-    ; fallthrough to .pregame_mode_2
+    ; fallthrough to .display_hi_score_screen
 
     ORG    $61E9
 
-.pregame_mode_2:
+.display_hi_score_screen:
     JSR     HI_SCORE_SCREEN
     LDA     #$02
-    STA     PREGAME_MODE            ; PREGAME_MODE = 2
-    JMP     .long_delay_attract_mode
+    STA     GAME_MODE            ; GAME_MODE = 2
+    JMP     .long_delay
 
     ORG    $61F3
 
@@ -492,32 +679,35 @@ CHECK_FOR_BUTTON_DOWN:
 .key_pressed:
     STA     KBDSTRB     ; Clear keyboard strobe
     CMP     #$85        ; if ctrl-E:
-    BEQ     .ctrl_e_pressed
+    BEQ     .start_level_editor
     CMP     #$8D        ; if return key:
-    BEQ     .return_pressed
+    BEQ     .read_and_display_hi_score_screen
 
     ; fall through to .button_pressed
 
     ORG    $6201
 
-.button_pressed:
+.set_level_0_and_play_game:
     LDX     #$00
     STX     DISK_LEVEL_LOC      ; DISK_LEVEL_LOC = 0
     INX
     STX     LEVELNUM            ; LEVELNUM = 1
     STX     $9D
     LDA     #$02
-    STX     PREGAME_MODE
+    STX     GAME_MODE
     JMP     .play_game
 
     ORG    $6211
 
-.ctrl_e_pressed:
+.start_level_editor:
     JMP     START_LEVEL_EDITOR
 
     ORG    $6214
 TIMES_3_TABLE:
     HEX     00 03 06 09 0C 0F 12 15 18
+    ORG    $621D
+GUARD_GOLD_TIMER_START_VALUES:
+    HEX     26 26 2E 44 47 49 4A 4B 4C 4D 4E 4F 50
     ORG    $622A
 APPEND_LEVEL_CLEARED_NOTE:
     SUBROUTINE
@@ -555,20 +745,20 @@ LOAD_LEVEL:
     STX     GAME_ROWNUM
     TXA
 
-    LDX     30
+    LDX     #30
 .loop1
-    STA     TABLE_0CE0,X
+    STA     BRICK_FILL_TIMERS,X
     DEX
     BPL     .loop1
 
-    LDX     5
+    LDX     #$05
 .loop2
-    STA     GUARD_FLAGS_5,X
+    STA     GUARD_RESURRECTION_TIMERS,X
     DEX
     BPL     .loop2
 
 
-    LDA     #1
+    LDA     #$01
     STA     ALIVE       ; Set player live
     JSR     LOAD_COMPRESSED_LEVEL_DATA
 
@@ -581,7 +771,7 @@ LOAD_LEVEL:
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
     STA     PTR2+1
 
-    LDA     #0
+    LDA     #$00
     STA     GAME_COLNUM
 
 .col_loop:
@@ -604,9 +794,9 @@ LOAD_LEVEL:
     INC     TMP
 
     LDY     GAME_COLNUM
-    CMP     10
+    CMP     #10
     BCC     .629c
-    LDA     #0                           ; sprite >= 10 -> sprite 0
+    LDA     #SPRITE_EMPTY                ; sprite >= 10 -> sprite 0
 .629c:
 
     STA     (PTR1),Y
@@ -614,12 +804,12 @@ LOAD_LEVEL:
 
     INC     GAME_COLNUM
     LDA     GAME_COLNUM
-    CMP     28
+    CMP     #28
     BCC     .col_loop                   ; loop while GAME_COLNUM < 28
 
     INC     GAME_ROWNUM
     LDY     GAME_ROWNUM
-    CPY     16
+    CPY     #16
     BCC     .row_loop                   ; loop while GAME_ROWNUM < 16
 
 
@@ -629,7 +819,7 @@ LOAD_LEVEL:
     LDA     DISK_LEVEL_LOC
     BEQ     .reset_game
 
-    LDX     0
+    LDX     #$00
     STX     DISK_LEVEL_LOC
     INC     GUARD_PATTERN_OFFSET
     DEX
@@ -652,9 +842,9 @@ LOAD_COMPRESSED_LEVEL_DATA:
     ; Enter routine with A set to command: 1 = read, 2 = write, 4 = format
 
     STA     IOB_COMMAND_CODE
-    LDA     PREGAME_MODE
+    LDA     GAME_MODE
     LSR
-    BEQ     .copy_level_data        ; If PREGAME_MODE is 0 or 1, copy level data
+    BEQ     .copy_level_data        ; If GAME_MODE is 0 or 1, copy level data
 
     ; Read/write/format level on disk
     LDA     DISK_LEVEL_LOC
@@ -663,7 +853,7 @@ LOAD_COMPRESSED_LEVEL_DATA:
     LSR
     LSR
     CLC
-    ADC     3
+    ADC     #$03
     STA     IOB_TRACK_NUMBER            ; track 3 + (DISK_LEVEL_LOC >> 4)
     LDA     DISK_LEVEL_LOC
     AND     #$0F
@@ -778,7 +968,7 @@ DRAW_LEVEL_PAGE2:
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
     STA     PTR2+1
 
-    LDY     27
+    LDY     #27
     STY     GAME_COLNUM
 
 .col_loop:
@@ -787,11 +977,11 @@ DRAW_LEVEL_PAGE2:
     BEQ     .draw_sprite1       ; This will then unconditionally jump to
                                 ; .draw_sprite2. We have to do that because of
                                 ; relative jump amount limitations.
-    CMP      #$06
-    BNE     .check_for_box
+    CMP     #SPRITE_STAPLE
+    BNE     .check_for_gold
 
     LDX     LADDER_COUNT
-    CPX     45
+    CPX     #45
     BCS     .remove_sprite
 
     INC     LADDER_COUNT
@@ -802,14 +992,14 @@ DRAW_LEVEL_PAGE2:
     STA     LADDER_LOCS_COL,X
 
 .remove_sprite:
-    LDA     #0
+    LDA     #SPRITE_EMPTY
     STA     (PTR1),Y
     STA     (PTR2),Y
 
 .draw_sprite1
     BEQ     .draw_sprite        ; Unconditional jump.
-.check_for_box:
-    CMP      #$07
+.check_for_gold:
+    CMP      #SPRITE_GOLD
     BNE     .check_for_guard
 
     INC     GOLD_COUNT
@@ -820,7 +1010,7 @@ DRAW_LEVEL_PAGE2:
                                 ; of unconditional.
 
 .check_for_guard:
-    CMP     #$08
+    CMP     #SPRITE_GUARD
     BNE     .check_for_player
 
     LDX     GUARD_COUNT
@@ -834,15 +1024,15 @@ DRAW_LEVEL_PAGE2:
     LDA     GAME_ROWNUM
     STA     GUARD_LOCS_ROW,X
     LDA     #$00
-    STA     GUARD_FLAGS_0,X
+    STA     GUARD_GOLD_TIMERS,X
     STA     GUARD_ANIM_STATES,X
     LDA     #$02
     STA     GUARD_X_ADJS,X
     STA     GUARD_Y_ADJS,X
 
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     STA     (PTR2),Y
-    LDA     #$08
+    LDA     #SPRITE_GUARD
     BNE     .draw_sprite            ; Unconditional jump.
 
 .next_row:
@@ -850,7 +1040,7 @@ DRAW_LEVEL_PAGE2:
 .next_col:
     BPL     .col_loop
 .check_for_player:
-    CMP     #$09
+    CMP     #SPRITE_PLAYER
     BNE     .check_for_t_thing
 
     LDX     PLAYER_COL
@@ -865,14 +1055,14 @@ DRAW_LEVEL_PAGE2:
     LDX     #$08
     STX     PLAYER_ANIM_STATE       ; Corresponds to sprite 9 (see SPRITE_ANIM_SEQS)
 
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     STA     (PTR2),Y
-    LDA     #$09
+    LDA     #SPRITE_PLAYER
     BNE     .draw_sprite            ; Unconditional jump.
 .check_for_t_thing:
-    CMP     #$05
+    CMP     #SPRITE_T_THING
     BNE     .draw_sprite
-    LDA     #$01                    ; Brick sprite
+    LDA     #SPRITE_BRICK
 
     ; fallthrough to .draw_sprite
 .draw_sprite:
@@ -920,7 +1110,7 @@ DRAW_LEVEL_PAGE2:
 .reveal_screen
     JSR     IRIS_WIPE
 
-    LDY     15
+    LDY     #15
     STY     GAME_ROWNUM
 
 .row_loop2:
@@ -929,18 +1119,18 @@ DRAW_LEVEL_PAGE2:
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
     STA     PTR1+1
 
-    LDY     27
+    LDY     #27
     STY     GAME_COLNUM
 
 .col_loop2:
     LDA     (PTR1),Y
-    CMP     #$09
+    CMP     #SPRITE_PLAYER
     BEQ     .remove
-    CMP     #$08
+    CMP     #SPRITE_GUARD
     BNE     .next
 
 .remove:
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     JSR     DRAW_SPRITE_PAGE2
 
 .next:
@@ -980,9 +1170,9 @@ MOVE_PLAYER:
 
     LDY     PLAYER_COL
     LDA     (PTR2),Y
-    CMP     #$03
+    CMP     #SPRITE_LADDER
     BEQ     .check_for_keyboard_input_      ; ladder at background location?
-    CMP     #$04
+    CMP     #SPRITE_ROPE
     BEQ     .check_if_player_should_fall    ; rope at background location?
     LDA     PLAYER_Y_ADJ
     CMP     #$02
@@ -996,7 +1186,7 @@ MOVE_PLAYER:
     BCC     .make_player_fall               ; player slightly above sprite row?
 
     LDY     PLAYER_ROW
-    CPY     #$0F
+    CPY     MAX_GAME_ROW
     BEQ     .check_for_keyboard_input_      ; player exactly sprite row 15?
 
     ; Check the sprite at the player location
@@ -1011,16 +1201,16 @@ MOVE_PLAYER:
 
     LDY     PLAYER_COL
     LDA     (PTR1),Y
-    CMP     #$00                    ; Empty
+    CMP     #SPRITE_EMPTY
     BEQ     .make_player_fall
-    CMP     #$08                    ; Guard
+    CMP     #SPRITE_GUARD
     BEQ     .check_for_keyboard_input_
     LDA     (PTR2),Y
-    CMP     #$01                    ; Brick
+    CMP     #SPRITE_BRICK
     BEQ     .check_for_keyboard_input_
-    CMP     #$02                    ; Stone
+    CMP     #SPRITE_STONE
     BEQ     .check_for_keyboard_input_
-    CMP     #$03                    ; Ladder
+    CMP     #SPRITE_LADDER
     BNE     .make_player_fall
 
 .check_for_keyboard_input_:
@@ -1039,7 +1229,7 @@ MOVE_PLAYER:
 .player_facing_left:
     STA     PLAYER_ANIM_STATE
 
-    JSR     $6C13
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_COLUMN
 
     INC     PLAYER_Y_ADJ            ; Move down one
     LDA     PLAYER_Y_ADJ
@@ -1064,9 +1254,9 @@ MOVE_PLAYER:
 
     LDY     PLAYER_COL
     LDA     (PTR2),Y
-    CMP     #$01                ; Brick
+    CMP     #SPRITE_BRICK
     BNE     .set_on_level
-    LDA     #$00                ; Store empty sprite
+    LDA     #SPRITE_EMPTY
 .set_on_level:
     STA     (PTR1),Y
     INC     PLAYER_ROW          ; Move down
@@ -1078,7 +1268,7 @@ MOVE_PLAYER:
 
 
     LDY     PLAYER_COL
-    LDA     #$09            ; player facing right
+    LDA     #SPRITE_PLAYER
     STA     (PTR1),Y
     JMP     DRAW_PLAYER     ; tailcall
 
@@ -1158,11 +1348,11 @@ TRY_MOVING_LEFT:
 
     DEY
     LDA     (PTR1),Y
-    CMP     #$02
+    CMP     #SPRITE_STONE
     BEQ     .cannot_move
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BEQ     .cannot_move
-    CMP     #$05
+    CMP     #SPRITE_T_THING
     BEQ     .move_player_left       ; brick, stone, or T-thing to left, so cannot move.
 
 .cannot_move:
@@ -1173,22 +1363,22 @@ TRY_MOVING_LEFT:
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
     LDA     #$FF
     STA     PLAYER_FACING_DIRECTION             ; face left
-    JSR     MOVE_PLAYER_TOWARDS_EXACT_ROW
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_ROW
     DEC     PLAYER_X_ADJ
     BPL     .check_for_gold
 
     ; adjustment overflow
     LDY     PLAYER_COL
     LDA     (PTR2),Y
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     .set_on_level
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
 .set_on_level:
     STA     (PTR1),Y
 
     DEC     PLAYER_COL
     DEY
-    LDA     #$09
+    LDA     #SPRITE_PLAYER
     STA     (PTR1),Y            ; Write player sprite to active page.
     LDA     #$04
     STA     PLAYER_X_ADJ        ; Set adjustment to +2
@@ -1200,7 +1390,7 @@ TRY_MOVING_LEFT:
 .inc_anim_state:
     LDY     PLAYER_COL
     LDA     (PTR2),Y
-    CMP     #$04                ; rope
+    CMP     #SPRITE_ROPE
     BEQ     .anim_state_monkeying
 
     LDA     #$00
@@ -1233,16 +1423,16 @@ TRY_MOVING_RIGHT:
     BCC     .move_player_right      ; player slightly left, so can move right.
 
     LDY     PLAYER_COL
-    CPY     #$1B
+    CPY     MAX_GAME_COL
     BEQ     .cannot_move            ; col == 27, so cannot move.
 
     INY
     LDA     (PTR1),Y
-    CMP     #$02
+    CMP     #SPRITE_STONE
     BEQ     .cannot_move
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BEQ     .cannot_move
-    CMP     #$05
+    CMP     #SPRITE_T_THING
     BEQ     .move_player_right      ; brick, stone, or T-thing to right, so cannot move.
 
 .cannot_move:
@@ -1253,7 +1443,7 @@ TRY_MOVING_RIGHT:
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
     LDA     #$01
     STA     PLAYER_FACING_DIRECTION             ; face right
-    JSR     MOVE_PLAYER_TOWARDS_EXACT_ROW
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_ROW
     INC     PLAYER_X_ADJ
     LDA     PLAYER_X_ADJ
     CMP     #$05
@@ -1262,17 +1452,17 @@ TRY_MOVING_RIGHT:
     ; adjustment overflow
     LDY     PLAYER_COL
     LDA     (PTR2),Y
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     .set_on_level
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
 .set_on_level:
     STA     (PTR1),Y
 
     INC     PLAYER_COL
     INY
-    LDA     #$09
+    LDA     #SPRITE_PLAYER
     STA     (PTR1),Y            ; Write player sprite to active page.
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     STA     PLAYER_X_ADJ        ; Set adjustment to -2
     BNE     .inc_anim_state     ; Unconditional
 
@@ -1282,7 +1472,7 @@ TRY_MOVING_RIGHT:
 .inc_anim_state:
     LDY     PLAYER_COL
     LDA     (PTR2),Y
-    CMP     #$04                ; rope
+    CMP     #SPRITE_ROPE
     BEQ     .anim_state_monkeying
 
     LDA     #$08
@@ -1310,7 +1500,7 @@ TRY_MOVING_UP:
     LDY     PLAYER_COL
     LDA     (PTR2),Y
 
-    CMP     #$03
+    CMP     #SPRITE_LADDER
     BEQ     .ladder_here
 
     LDY     PLAYER_Y_ADJ
@@ -1327,7 +1517,7 @@ TRY_MOVING_UP:
     LDY     PLAYER_COL
     LDA     (PTR2),Y
 
-    CMP     #$03
+    CMP     #SPRITE_LADDER
     BEQ     .move_player_up
 
 .cannot_move:
@@ -1351,11 +1541,11 @@ TRY_MOVING_UP:
     LDY     PLAYER_COL
     LDA     (PTR1),Y                    ; Get the sprite on the row above.
 
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BEQ     .cannot_move
-    CMP     #$02
+    CMP     #SPRITE_STONE
     BEQ     .cannot_move
-    CMP     #$05
+    CMP     #SPRITE_T_THING
     BEQ     .cannot_move       ; If brick, stone, or T-thing, set carry and return
 
 .move_player_up:
@@ -1370,7 +1560,7 @@ TRY_MOVING_UP:
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
     STA     PTR2+1
 
-    JSR     MOVE_PLAYER_TOWARDS_EXACT_COLUMN
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_COLUMN
     DEC     PLAYER_Y_ADJ                ; Move player up
     BPL     TRY_MOVING_UP_check_for_gold
 
@@ -1382,9 +1572,9 @@ TRY_MOVING_UP:
     ; sprite to the active page.
     LDY     PLAYER_COL
     LDA     (PTR2),Y
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     .set_on_real_page
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
 .set_on_real_page:
     STA     (PTR1),Y
 
@@ -1396,7 +1586,7 @@ TRY_MOVING_UP:
     STA     PTR1+1
 
     LDY     PLAYER_COL
-    LDA     #$09
+    LDA     #SPRITE_PLAYER
     STA     (PTR1),Y            ; Write player sprite to active page.
     LDA     #$04
     STA     PLAYER_Y_ADJ        ; Set adjustment to +2
@@ -1422,7 +1612,7 @@ TRY_MOVING_DOWN:
     BCC     .move_player_down   ; player slightly above, so can move down.
 
     LDY     PLAYER_ROW
-    CPY     #$0F
+    CPY     MAX_GAME_ROW
     BCS     .cannot_move        ; player on row >= 15, so cannot move.
 
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS+1,Y
@@ -1432,9 +1622,9 @@ TRY_MOVING_DOWN:
 
     LDY     PLAYER_COL
     LDA     (PTR1),Y
-    CMP     #$02                ; stone
+    CMP     #SPRITE_STONE
     BEQ     .cannot_move
-    CMP     #$01                ; brick
+    CMP     #SPRITE_BRICK
     BNE     .move_player_down   ; Row below is stone or brick, so cannot move.
 
 .cannot_move:
@@ -1453,7 +1643,7 @@ TRY_MOVING_DOWN:
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
     STA     PTR2+1
 
-    JSR     MOVE_PLAYER_TOWARDS_EXACT_COLUMN
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_COLUMN
     INC     PLAYER_Y_ADJ                ; Move player down
     LDA     PLAYER_Y_ADJ
     CMP     #$05
@@ -1462,9 +1652,9 @@ TRY_MOVING_DOWN:
     ; adjustment overflow
     LDY     PLAYER_COL
     LDA     (PTR2),Y
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     .set_on_real_page
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
 .set_on_real_page:
     STA     (PTR1),Y
 
@@ -1476,9 +1666,9 @@ TRY_MOVING_DOWN:
     STA     PTR1+1
 
     LDY     PLAYER_COL
-    LDA     #$09
+    LDA     #SPRITE_PLAYER
     STA     (PTR1),Y            ; Write player sprite to active page.
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     STA     PLAYER_Y_ADJ        ; Set adjustment to -2
     JMP     TRY_MOVING_UP_inc_anim_state
 
@@ -1501,7 +1691,7 @@ TRY_DIGGING_LEFT:
 
 TRY_DIGGING_LEFT_check_can_dig_left:
     LDY     PLAYER_ROW
-    CPY     #$0F
+    CPY     MAX_GAME_ROW
     BCS     .cannot_dig_        ; row >= 15, so cannot dig.
 
     INY
@@ -1511,7 +1701,7 @@ TRY_DIGGING_LEFT_check_can_dig_left:
 
     DEY
     LDA     (PTR1),Y
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     .cannot_dig_        ; no brick below and to the left, so cannot dig left.
 
     LDY     PLAYER_ROW
@@ -1519,14 +1709,14 @@ TRY_DIGGING_LEFT_check_can_dig_left:
     LDY     PLAYER_COL
     DEY
     LDA     (PTR1),Y
-    CMP     #$00
+    CMP     #SPRITE_EMPTY
     BNE     .not_empty_to_left  ; not empty to the left, so maybe cannot dig left.
 
     ; Can dig!
     JSR     GET_SPRITE_AND_SCREEN_COORD_AT_PLAYER
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
-    JSR     MOVE_PLAYER_TOWARDS_EXACT_COLUMN
-    JSR     MOVE_PLAYER_TOWARDS_EXACT_ROW
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_COLUMN
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_ROW
     LDY     DIG_ANIM_STATE
     LDA     DIG_NOTE_PITCHES,Y
     LDX     DIG_NOTE_DURATIONS,Y
@@ -1586,7 +1776,7 @@ TRY_DIGGING_LEFT_check_can_dig_left:
     LDY     PLAYER_COL
     DEY
     STY     GAME_COLNUM
-    LDA     #$01
+    LDA     #SPRITE_BRICK
     JSR     DRAW_SPRITE_PAGE1           ; Draw brick below and to the left of player
 
     LDX     DIG_ANIM_STATE
@@ -1630,18 +1820,18 @@ TRY_DIGGING_RIGHT:
 
 TRY_DIGGING_RIGHT_check_can_dig_right:
     LDY     PLAYER_ROW
-    CPY     #$0F
+    CPY     MAX_GAME_ROW
     BCS     .cannot_dig_        ; row >= 15, so cannot dig.
 
     INY
     JSR     GET_PTRS_TO_CURR_LEVEL_SPRITE_DATA
     LDY     PLAYER_COL
-    CPY     #$1B
+    CPY     MAX_GAME_COL
     BCS     .cannot_dig_        ; col >= 27, so cannot dig right.
 
     INY
     LDA     (PTR1),Y
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     .cannot_dig_        ; no brick below and to the right, so cannot dig right.
 
     LDY     PLAYER_ROW
@@ -1649,14 +1839,14 @@ TRY_DIGGING_RIGHT_check_can_dig_right:
     LDY     PLAYER_COL
     INY
     LDA     (PTR1),Y
-    CMP     #$00
+    CMP     #SPRITE_EMPTY
     BNE     .not_empty_to_right  ; not empty to the right, so maybe cannot dig right.
 
     ; Can dig!
     JSR     GET_SPRITE_AND_SCREEN_COORD_AT_PLAYER
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
-    JSR     MOVE_PLAYER_TOWARDS_EXACT_COLUMN
-    JSR     MOVE_PLAYER_TOWARDS_EXACT_ROW
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_COLUMN
+    JSR     NUDGE_PLAYER_TOWARDS_EXACT_ROW
     LDY     DIG_ANIM_STATE
     LDA     DIG_NOTE_PITCHES-12,Y
     LDX     DIG_NOTE_DURATIONS-12,Y
@@ -1716,7 +1906,7 @@ TRY_DIGGING_RIGHT_check_can_dig_right:
     LDY     PLAYER_COL
     INY
     STY     GAME_COLNUM
-    LDA     #$01
+    LDA     #SPRITE_BRICK
     JSR     DRAW_SPRITE_PAGE1           ; Draw brick below and to the right of player
 
     LDX     DIG_ANIM_STATE
@@ -1775,7 +1965,7 @@ CHECK_FOR_MODE_1_INPUT:
     BMI     .key_pressed
 
     LDA     INPUT_MODE
-    CMP     KEYBOARD_MODE
+    CMP     #KEYBOARD_MODE
     BEQ     .nothing_pressed
     
     ; Check joystick buttons also
@@ -1842,7 +2032,7 @@ VALID_KEY_COMMANDS:
 CHECK_FOR_INPUT:
     SUBROUTINE
 
-    LDA     PREGAME_MODE
+    LDA     GAME_MODE
     CMP     #$01
     BEQ     CHECK_FOR_MODE_1_INPUT
 
@@ -1852,7 +2042,7 @@ CHECK_FOR_INPUT:
     BMI     .key_pressed
 
     LDA     INPUT_MODE
-    CMP     KEYBOARD_MODE
+    CMP     #KEYBOARD_MODE
     BEQ     .end                    ; If keyboard mode, end.
 
 .check_buttons_:
@@ -1884,7 +2074,7 @@ CHECK_FOR_INPUT:
 
 .non_ctrl_key_pressed:
     LDA     INPUT_MODE
-    CMP     JOYSTICK_MODE
+    CMP     #JOYSTICK_MODE
     BEQ     .check_buttons_         ; If joystick mode, check buttons.
 
     LDX     SPRITE_NUM
@@ -1919,7 +2109,7 @@ CTRL_AT_HANDLER:
 ESC_HANDLER:
     SUBROUTINE
 
-    JSR     WAIT_KEY
+    JSR     WAIT_KEY_QUEUED
     CMP     #$9B            ; key pressed is ESC?
     BNE     ESC_HANDLER
     JMP     CHECK_FOR_INPUT
@@ -1945,7 +2135,7 @@ CTRL_S_HANDLER:
 DOWN_ARROW_HANDLER:
     SUBROUTINE
 
-    LDA     JOYSTICK_MODE
+    LDA     #JOYSTICK_MODE
     STA     INPUT_MODE
     JMP     CHECK_FOR_INPUT
 
@@ -1953,7 +2143,7 @@ DOWN_ARROW_HANDLER:
 UP_ARROW_HANDLER:
     SUBROUTINE
 
-    LDA     KEYBOARD_MODE
+    LDA     #KEYBOARD_MODE
     STA     INPUT_MODE
     JMP     CHECK_FOR_INPUT
     ORG    $6A9E
@@ -2169,7 +2359,7 @@ CHECK_FOR_GOLD_PICKED_UP_BY_PLAYER:
     LDY     PLAYER_COL
     LDA     (PTR2),Y
 
-    CMP     #$07                ; Gold
+    CMP     #SPRITE_GOLD
     BNE     .end
 
     LSR     DIDNT_PICK_UP_GOLD  ; picked up gold
@@ -2179,14 +2369,14 @@ CHECK_FOR_GOLD_PICKED_UP_BY_PLAYER:
     STY     GAME_ROWNUM
     LDY     PLAYER_COL
     STY     GAME_COLNUM
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     STA     (PTR2),Y
     JSR     DRAW_SPRITE_PAGE2   ; Register and draw blank at player loc in background screen
 
     LDY     PLAYER_ROW
     LDX     PLAYER_COL
     JSR     GET_SCREEN_COORDS_FOR
-    LDA     #$07                            ; Gold
+    LDA     #SPRITE_GOLD
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS    ; Erase gold at player loc
 
     LDY     #$02
@@ -2232,7 +2422,7 @@ DRAW_PLAYER:
     RTS
 
     ORG    $6C13
-MOVE_PLAYER_TOWARDS_EXACT_COLUMN:
+NUDGE_PLAYER_TOWARDS_EXACT_COLUMN:
     SUBROUTINE
 
     LDA     PLAYER_X_ADJ
@@ -2252,7 +2442,7 @@ MOVE_PLAYER_TOWARDS_EXACT_COLUMN:
     RTS
 
     ORG    $6C26
-MOVE_PLAYER_TOWARDS_EXACT_ROW:
+NUDGE_PLAYER_TOWARDS_EXACT_ROW:
     SUBROUTINE
 
     LDA     PLAYER_Y_ADJ
@@ -2288,15 +2478,15 @@ DROP_PLAYER_IN_HOLE:
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
     STA     PTR1+1
 
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     LDY     GAME_COLNUM
     STA     (PTR1),Y                ; Set blank sprite at player location in active page
     JSR     DRAW_SPRITE_PAGE1
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     JSR     DRAW_SPRITE_PAGE2       ; Draw blank at player location on both graphics pages
 
     DEC     GAME_ROWNUM
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     JSR     DRAW_SPRITE_PAGE1       ; Draw blank at location above player
     INC     GAME_ROWNUM
     LDX     #$FF
@@ -2305,15 +2495,15 @@ DROP_PLAYER_IN_HOLE:
     INX
     CPX     #$1E
     BEQ     .end
-    LDA     TABLE_0CE0,X
+    LDA     BRICK_FILL_TIMERS,X
     BNE     .loop
 
     LDA     GAME_ROWNUM
-    STA     TABLE_0CC0,X
+    STA     BRICK_DIG_ROWS,X
     LDA     GAME_COLNUM
-    STA     TABLE_0CA0,X
+    STA     BRICK_DIG_COLS,X
     LDA     #$B4
-    STA     TABLE_0CE0,X
+    STA     BRICK_FILL_TIMERS,X
     SEC
 
 .end:
@@ -2388,19 +2578,20 @@ MOVE_GUARD
 .guard_num_incremented:
 
     JSR     LOAD_GUARD_DATA
-    LDA     GUARD_FLAG_0
+    LDA     GUARD_GOLD_TIMER
     BMI     .check_sprite_at_guard_pos
     BEQ     .check_sprite_at_guard_pos
 
-    DEC     GUARD_FLAG_0
-    LDY     GUARD_FLAG_0
+    ; GUARD_GOLD_TIMER > 0:
+    DEC     GUARD_GOLD_TIMER
+    LDY     GUARD_GOLD_TIMER
     CPY     #$0D
     BCS     .guard_flag_0_gt_12
     JMP     $6e65
 
 .guard_flag_0_gt_12:
     LDX     GUARD_NUM
-    LDA     GUARD_FLAGS_5,X
+    LDA     GUARD_RESURRECTION_TIMERS,X
     BEQ     .guard_flag_5_zero
     JMP     STORE_GUARD_DATA            ; tailcall
 
@@ -2417,9 +2608,9 @@ MOVE_GUARD
     LDY     GUARD_LOC_COL
     LDA     (PTR2),Y
 
-    CMP     #$03
+    CMP     #SPRITE_LADDER
     BEQ     .ladder_
-    CMP     #$04
+    CMP     #SPRITE_ROPE
     BNE     .not_rope_or_ladder
     LDA     GUARD_Y_ADJ
     CMP     #$02
@@ -2430,7 +2621,7 @@ MOVE_GUARD
     CMP     #$02
     BCC     .blank_or_player           ; if GUARD_Y_ADJ < 2
     LDY     GUARD_LOC_ROW
-    CPY     #$0F
+    CPY     MAX_GAME_ROW
     BEQ     .ladder_          ; Row == 15
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
     STA     PTR1
@@ -2443,19 +2634,19 @@ MOVE_GUARD
     LDY     GUARD_LOC_COL
     LDA     (PTR1),Y
 
-    CMP     #$00
+    CMP     #SPRITE_EMPTY
     BEQ     .blank_or_player
-    CMP     #$09
+    CMP     #SPRITE_PLAYER
     BEQ     .blank_or_player
-    CMP     #$08                ; guard
+    CMP     #SPRITE_GUARD
     BEQ     .ladder_
 
     LDA     (PTR2),Y
-    CMP     #$01                ; brick
+    CMP     #SPRITE_BRICK
     BEQ     .ladder_
-    CMP     #$02                ; stone
+    CMP     #SPRITE_STONE
     BEQ     .ladder_
-    CMP     #$03                ; ladder
+    CMP     #SPRITE_LADDER
     BNE     .blank_or_player
 
 .ladder_:
@@ -2466,7 +2657,7 @@ MOVE_GUARD
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
     JSR     $7582
     LDA     #$06
-    LDY     GUARD_FLAG_4
+    LDY     GUARD_FACING_DIRECTION
     BMI     .set_guard_flag_3
     LDA     #$0D
 .set_guard_flag_3
@@ -2490,15 +2681,15 @@ MOVE_GUARD
     LDY     GUARD_LOC_COL
     LDA     (PTR2),Y
 
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     $6db7           ; If background screen has brick
 
-    LDA     GUARD_FLAG_0
+    LDA     GUARD_GOLD_TIMER
     BPL     .6da2
     DEC     GOLD_COUNT
 .6da2:
-    LDA     $5F
-    STA     GUARD_FLAG_0
+    LDA     GUARD_GOLD_TIMER_START_VALUE
+    STA     GUARD_GOLD_TIMER
     LDY     #$00
     LDA     #$75
     JSR     ADD_AND_UPDATE_SCORE        ; SCORE += 75
@@ -2525,9 +2716,9 @@ MOVE_GUARD
 
     LDY     GUARD_LOC_COL
     LDA     (PTR2),Y
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     .set_real_sprite
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
 .set_real_sprite:
     STA     (PTR1),Y
 
@@ -2543,14 +2734,14 @@ MOVE_GUARD
 
     LDY     GUARD_LOC_COL
     LDA     (PTR1),Y
-    CMP     #$09
+    CMP     #SPRITE_PLAYER
     BNE     .get_background_sprite
     LSR     ALIVE                       ; set player to dead
 .get_background_sprite:
     LDA     (PTR2),Y
-    CMP     #$01
+    CMP     #SPRITE_BRICK
     BNE     .place_guard_at_loc
-    LDA     GUARD_FLAG_0
+    LDA     GUARD_GOLD_TIMER
     BPL     .place_guard_at_loc
 
     ; What's above the guard?
@@ -2568,20 +2759,20 @@ MOVE_GUARD
     LDY     GUARD_LOC_COL
     STY     GAME_COLNUM
     LDA     (PTR2),Y
-    CMP     #$00
+    CMP     #SPRITE_EMPTY
     BEQ     .drop_gold
     DEC     GOLD_COUNT
     JMP     .6e46
 
 .drop_gold:
-    LDA     #$07
+    LDA     #SPRITE_GOLD
     STA     (PTR1),Y
     STA     (PTR2),Y
     JSR     DRAW_SPRITE_PAGE2
     LDY     GAME_ROWNUM
     LDX     GAME_COLNUM
     JSR     GET_SCREEN_COORDS_FOR
-    LDA     #$07
+    LDA     #SPRITE_GOLD
     JSR     DRAW_SPRITE_AT_PIXEL_COORDS
 
 .6e46
@@ -2592,11 +2783,11 @@ MOVE_GUARD
     STA     PTR1+1
 
     LDA     #$00
-    STA     GUARD_FLAG_0
+    STA     GUARD_GOLD_TIMER
     LDY     GUARD_LOC_COL
 
 .place_guard_at_loc
-    LDA     #$08            ; guard
+    LDA     #SPRITE_GUARD
     STA     (PTR1),Y
 
     JSR     GET_GUARD_SPRITE_AND_COORDS
@@ -2608,7 +2799,7 @@ MOVE_GUARD
     BCC     .ladder
     JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
-    LDY     GUARD_FLAG_0
+    LDY     GUARD_GOLD_TIMER
     LDA     GUARD_X_ADJ_TABLE-7,Y
     STA     GUARD_X_ADJ
     JSR     GET_GUARD_SPRITE_AND_COORDS
@@ -2622,7 +2813,9 @@ GUARD_X_ADJ_TABLE:
 .ladder
     LDX     GUARD_LOC_COL
     LDY     GUARD_LOC_ROW
-    JSR     $70D8
+    JSR     DETERMINE_GUARD_MOVE
+
+    ; Go to a guard movement function in the GUARD_FN_TABLE
     ASL
     TAY
     LDA     GUARD_FN_TABLE+1,Y
@@ -2631,13 +2824,737 @@ GUARD_X_ADJ_TABLE:
     PHA
     RTS
 
-
-
-    ; Disk routines
-
     ORG    $6E97
 GUARD_FN_TABLE:
     WORD    STORE_GUARD_DATA-1
+    WORD    TRY_GUARD_MOVE_LEFT-1
+    WORD    TRY_GUARD_MOVE_RIGHT-1
+    WORD    TRY_GUARD_MOVE_UP-1
+    WORD    TRY_GUARD_MOVE_DOWN-1
+    ORG    $6EA1
+GUARD_DO_NOTHING:
+    SUBROUTINE
+
+    ; if GUARD_GOLD_TIMER > 0, GUARD_GOLD_TIMER++
+    LDA     GUARD_GOLD_TIMER
+    BEQ     .store_guard_data
+    BMI     .store_guard_data
+    INC     GUARD_GOLD_TIMER        
+.store_guard_data:
+    JMP     STORE_GUARD_DATA
+
+    ORG    $6EAC
+TRY_GUARD_MOVE_UP:
+    SUBROUTINE
+
+    LDY     GUARD_Y_ADJ
+    CPY     #$03
+    BCS     .move_up        ; vertical adjustment > 0
+
+    LDY     GUARD_LOC_ROW
+    BEQ     GUARD_DO_NOTHING
+    DEY
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+
+    LDY     GUARD_LOC_COL
+    LDA     (PTR1),Y
+
+    CMP     #SPRITE_BRICK
+    BEQ     GUARD_DO_NOTHING
+    CMP     #SPRITE_STONE
+    BEQ     GUARD_DO_NOTHING
+    CMP     #SPRITE_T_THING
+    BEQ     GUARD_DO_NOTHING
+    CMP     #SPRITE_GUARD
+    BEQ     GUARD_DO_NOTHING
+
+.move_up:
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    JSR     ERASE_SPRITE_AT_PIXEL_COORDS
+    JSR     NUDGE_GUARD_TOWARDS_EXACT_COLUMN
+    LDY     GUARD_LOC_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    DEC     GUARD_Y_ADJ
+    BPL     .check_for_gold
+
+    ; vertical adjustment underflow
+    JSR     GUARD_DROP_GOLD
+    LDY     GUARD_LOC_COL
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_BRICK
+    BNE     .set_active_sprite
+    LDA     #SPRITE_EMPTY
+.set_active_sprite:
+    STA     (PTR1),Y
+
+    DEC     GUARD_LOC_ROW
+    LDY     GUARD_LOC_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+
+    LDY     GUARD_LOC_COL
+    LDA     (PTR1),Y
+
+    CMP     #SPRITE_PLAYER
+    BNE     .set_guard_sprite
+
+    ; kill player
+    LSR     ALIVE
+
+.set_guard_sprite:
+    LDA     #SPRITE_GUARD
+    STA     (PTR1),Y
+
+    LDA     #$04
+    STA     GUARD_Y_ADJ         ; vertical adjust = +2
+    BNE     TRY_GUARD_MOVE_UP_inc_anim_state     ; unconditional
+
+.check_for_gold:
+    JSR     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
+
+TRY_GUARD_MOVE_UP_inc_anim_state:
+    LDA     #$0E
+    LDX     #$0F
+    JSR     INC_GUARD_ANIM_STATE
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    JSR     DRAW_SPRITE_AT_PIXEL_COORDS
+    JMP     STORE_GUARD_DATA
+
+    ORG    $6F39
+TRY_GUARD_MOVE_DOWN:
+    SUBROUTINE
+
+    LDY     GUARD_Y_ADJ
+    CPY     #$02
+    BCC     .move_down        ; vertical adjustment < 0
+
+    LDY     GUARD_LOC_ROW
+    CPY     MAX_GAME_ROW
+    BCS     .store_guard_data
+    INY
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+
+    LDY     GUARD_LOC_COL
+    LDA     (PTR1),Y
+
+    CMP     #SPRITE_STONE
+    BEQ     .store_guard_data
+    CMP     #SPRITE_GUARD
+    BEQ     .store_guard_data
+    CMP     #SPRITE_BRICK
+    BNE     .move_down
+
+.store_guard_data:
+    JMP     STORE_GUARD_DATA
+
+.move_down:
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    JSR     ERASE_SPRITE_AT_PIXEL_COORDS
+    JSR     NUDGE_GUARD_TOWARDS_EXACT_COLUMN
+    LDY     GUARD_LOC_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    INC     GUARD_Y_ADJ
+    LDA     GUARD_Y_ADJ
+    CMP     #$05
+    BCC     .check_for_gold
+
+    ; vertical adjustment overflow
+    JSR     GUARD_DROP_GOLD
+    LDY     GUARD_LOC_COL
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_BRICK
+    BNE     .set_active_sprite
+    LDA     #SPRITE_EMPTY
+.set_active_sprite:
+    STA     (PTR1),Y
+
+    INC     GUARD_LOC_ROW
+    LDY     GUARD_LOC_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+
+    LDY     GUARD_LOC_COL
+    LDA     (PTR1),Y
+
+    CMP     #SPRITE_PLAYER
+    BNE     .set_guard_sprite
+
+    ; kill player
+    LSR     ALIVE
+
+.set_guard_sprite:
+    LDA     #SPRITE_GUARD
+    STA     (PTR1),Y
+
+    LDA     #$00
+    STA     GUARD_Y_ADJ         ; vertical adjust = -2
+    JMP     TRY_GUARD_MOVE_UP_inc_anim_state
+
+.check_for_gold:
+    JMP     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
+
+    ORG    $6FBC
+TRY_GUARD_MOVE_LEFT:
+    SUBROUTINE
+
+    LDY     GUARD_LOC_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDX     GUARD_X_ADJ
+    CPX     #$03
+    BCS     .move_left           ; horizontal adjustment > 0
+
+    ; horizontal adjustment <= 0
+    LDY     GUARD_LOC_COL
+    BEQ     .store_guard_data       ; Can't go any more left
+
+    DEY
+    LDA     (PTR1),Y
+    CMP     #SPRITE_GUARD
+    BEQ     .store_guard_data
+    CMP     #SPRITE_STONE
+    BEQ     .store_guard_data
+    CMP     #SPRITE_BRICK
+    BEQ     .store_guard_data
+
+    LDA     (PTR2),Y
+    CMP     #SPRITE_T_THING
+    BNE     .move_left
+
+.store_guard_data:
+    JMP     STORE_GUARD_DATA        ; tailcall
+
+.move_left:
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    JSR     ERASE_SPRITE_AT_PIXEL_COORDS
+    JSR     NUDGE_GUARD_TOWARDS_EXACT_ROW
+    LDA     #$FF
+    STA     GUARD_FACING_DIRECTION      ; face left
+    DEC     GUARD_X_ADJ
+    BPL     .check_for_gold_pickup
+
+    ; horizontal adjustment underflow
+    JSR     GUARD_DROP_GOLD
+    LDY     GUARD_LOC_COL
+    LDA     (PTR2),Y
+    CMP     #SPRITE_BRICK
+    BNE     .store_sprite
+    LDA     #SPRITE_EMPTY
+
+.store_sprite:
+    STA     (PTR1),Y
+
+    DEC     GUARD_LOC_COL
+    DEY
+    LDA     (PTR1),Y
+    CMP     #SPRITE_PLAYER
+    BNE     .place_guard_sprite
+
+    ; kill player
+    LSR     ALIVE
+
+.place_guard_sprite:
+    LDA     #SPRITE_GUARD
+    STA     (PTR1),Y
+
+    LDA     #$04
+    STA     GUARD_X_ADJ     ; horizontal adjustment = +2
+    BNE     .determine_anim_set           ; unconditional
+
+.check_for_gold_pickup:
+    JSR     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
+
+.determine_anim_set:
+    LDY     GUARD_LOC_COL
+    LDA     (PTR2),Y
+    CMP     #SPRITE_ROPE
+    BEQ     .rope
+
+    LDA     #$00
+    LDX     #$02
+    BNE     .inc_anim_state
+
+.rope:
+    LDA     #$03
+    LDX     #$05
+
+.inc_anim_state:
+    JSR     INC_GUARD_ANIM_STATE
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    JSR     DRAW_SPRITE_AT_PIXEL_COORDS
+    JMP     STORE_GUARD_DATA                ; tailcall
+
+    ORG    $7047
+TRY_GUARD_MOVE_RIGHT:
+    SUBROUTINE
+
+    LDY     GUARD_LOC_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDX     GUARD_X_ADJ
+    CPX     #$02
+    BCC     .move_right           ; horizontal adjustment < 0
+
+    ; horizontal adjustment >= 0
+    LDY     GUARD_LOC_COL
+    CPY     MAX_GAME_COL
+    BEQ     .store_guard_data       ; Can't go any more right
+
+    INY
+    LDA     (PTR1),Y
+    CMP     #SPRITE_GUARD
+    BEQ     .store_guard_data
+    CMP     #SPRITE_STONE
+    BEQ     .store_guard_data
+    CMP     #SPRITE_BRICK
+    BEQ     .store_guard_data
+
+    LDA     (PTR2),Y
+    CMP     #SPRITE_T_THING
+    BNE     .move_right
+
+.store_guard_data:
+    JMP     STORE_GUARD_DATA        ; tailcall
+
+.move_right:
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    JSR     ERASE_SPRITE_AT_PIXEL_COORDS
+    JSR     NUDGE_GUARD_TOWARDS_EXACT_ROW
+    LDA     #$01
+    STA     GUARD_FACING_DIRECTION      ; face right
+    INC     GUARD_X_ADJ
+    LDA     GUARD_X_ADJ
+    CMP     #$05
+    BCC     .check_for_gold_pickup
+
+    ; horizontal adjustment overflow
+    JSR     GUARD_DROP_GOLD
+    LDY     GUARD_LOC_COL
+    LDA     (PTR2),Y
+    CMP     #SPRITE_BRICK
+    BNE     .store_sprite
+    LDA     #SPRITE_EMPTY
+
+.store_sprite:
+    STA     (PTR1),Y
+
+    INC     GUARD_LOC_COL
+    INY
+    LDA     (PTR1),Y
+    CMP     #SPRITE_PLAYER
+    BNE     .place_guard_sprite
+
+    ; kill player
+    LSR     ALIVE
+
+.place_guard_sprite:
+    LDA     #SPRITE_GUARD
+    STA     (PTR1),Y
+
+    LDA     #$00
+    STA     GUARD_X_ADJ     ; horizontal adjustment = -2
+    BNE     .determine_anim_set           ; unconditional
+
+.check_for_gold_pickup:
+    JSR     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
+
+.determine_anim_set:
+    LDY     GUARD_LOC_COL
+    LDA     (PTR2),Y
+    CMP     #SPRITE_ROPE
+    BEQ     .rope
+
+    LDA     #$07
+    LDX     #$09
+    BNE     .inc_anim_state
+
+.rope:
+    LDA     #$0A
+    LDX     #$0C
+
+.inc_anim_state:
+    JSR     INC_GUARD_ANIM_STATE
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    JSR     DRAW_SPRITE_AT_PIXEL_COORDS
+    JMP     STORE_GUARD_DATA                ; tailcall
+
+    ORG    $70D8
+DETERMINE_GUARD_MOVE:
+    SUBROUTINE
+
+    STX     TMP_GUARD_COL
+    STY     TMP_GUARD_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     TMP_GUARD_COL
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_BRICK
+    BNE     .end_if_row_is_not_player_row
+    LDA     GUARD_GOLD_TIMER
+    BEQ     .end_if_row_is_not_player_row
+    BMI     .end_if_row_is_not_player_row
+    LDA     #GUARD_ACTION_MOVE_UP
+    RTS
+
+.end_if_row_is_not_player_row:
+    LDY     TMP_GUARD_ROW
+    CPY     PLAYER_ROW
+    BEQ     .7100
+    JMP     .end
+
+.7100:
+    LDY     TMP_GUARD_COL
+    STY     $57
+    CPY     PLAYER_COL
+    BCS     .loop2
+    ; If TMP_GUARD_COL < PLAYER_COL:
+
+.loop:
+    INC     $57
+    LDY     TMP_GUARD_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     $57
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_LADDER
+    BEQ     .is_ladder_or_rope
+    CMP     #SPRITE_ROPE
+    BEQ     .is_ladder_or_rope
+
+    LDY     TMP_GUARD_ROW
+    CPY     MAX_GAME_ROW
+    BEQ     .is_ladder_or_rope
+
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS+1,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2+1,Y
+    STA     PTR2+1
+
+    LDY     $57
+    LDA     (PTR2),Y
+    CMP     #SPRITE_EMPTY
+    BEQ     .end
+    CMP     #SPRITE_T_THING
+    BEQ     .end
+
+.is_ladder_or_rope:
+    LDY     $57
+    CPY     PLAYER_COL
+    BNE     .loop
+
+    ; PLAYER_COL == $57:
+    LDA     #GUARD_ACTION_MOVE_RIGHT
+    RTS
+
+.loop2:
+    DEC     $57
+    LDY     TMP_GUARD_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     $57
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_LADDER
+    BEQ     .is_ladder_or_rope2
+    CMP     #SPRITE_ROPE
+    BEQ     .is_ladder_or_rope2
+
+    LDY     TMP_GUARD_ROW
+    CPY     MAX_GAME_ROW
+    BEQ     .is_ladder_or_rope2
+
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS+1,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2+1,Y
+    STA     PTR2+1
+
+    LDY     $57
+    LDA     (PTR2),Y
+    CMP     #SPRITE_EMPTY
+    BEQ     .end
+    CMP     #SPRITE_T_THING
+    BEQ     .end
+
+.is_ladder_or_rope2:
+    LDY     $57
+    CPY     PLAYER_COL
+    BNE     .loop2
+
+    ; PLAYER_COL == $57:
+    LDA     #GUARD_ACTION_MOVE_LEFT
+    RTS
+
+.end:
+    LDA     #GUARD_ACTION_DO_NOTHING
+    STA     GUARD_ACTION
+    LDA     #$FF
+    STA     $59
+    LDX     TMP_GUARD_COL
+    LDY     TMP_GUARD_ROW
+    JSR     $743E
+    JSR     $7275
+    JSR     SHOULD_GUARD_MOVE_LEFT
+    JSR     SHOULD_GUARD_MOVE_RIGHT
+    LDA     GUARD_ACTION
+    RTS
+
+    ORG    $71A1
+    SUBROUTINE
+.return:
+    RTS
+
+SHOULD_GUARD_MOVE_LEFT:
+    LDY     $5A
+    CPY     TMP_GUARD_COL
+    BEQ     .return
+
+    LDY     TMP_GUARD_ROW
+    CPY     MAX_GAME_ROW
+    BEQ     .check_here
+
+    ; Check below:
+
+    ; Get background sprite at TMP_GUARD_ROW + 1, col = $5A
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS+1,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2+1,Y
+    STA     PTR2+1
+
+    LDY     $5A
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_BRICK
+    BEQ     .check_here
+    CMP     #SPRITE_STONE
+    BEQ     .check_here
+
+    LDX     $5A
+    LDY     TMP_GUARD_ROW
+    JSR     $739D
+
+    LDX     $5A
+    JSR     PSEUDO_DISTANCE
+    CMP     $59
+    BCS     .check_here        ; dist >= $59?
+
+    ; dist < $59
+    STA     $59     ; dist
+    LDA     #GUARD_ACTION_MOVE_LEFT
+    STA     GUARD_ACTION
+
+.check_here:
+    LDY     TMP_GUARD_COL
+    BEQ     .next
+
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     $5A
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_LADDER
+    BNE     .next
+
+    ; Ladder here
+    LDY     TMP_GUARD_ROW
+    LDX     $5A
+    JSR     $7300
+
+    LDX     $5A
+    JSR     PSEUDO_DISTANCE
+    CMP     $59
+    BCS     .next        ; dist >= $59?
+
+    ; dist < $59
+    STA     $59     ; dist
+    LDA     #GUARD_ACTION_MOVE_LEFT
+    STA     GUARD_ACTION
+
+.next:
+    INC     $5A
+    JMP     SHOULD_GUARD_MOVE_LEFT
+
+    ORG    $720B
+    SUBROUTINE
+.return:
+    RTS
+
+SHOULD_GUARD_MOVE_RIGHT:
+    LDY     $5B
+    CPY     TMP_GUARD_COL
+    BEQ     .return
+
+    LDY     TMP_GUARD_ROW
+    CPY     MAX_GAME_ROW
+    BEQ     .check_here
+
+    ; Check below:
+
+    ; Get background sprite at TMP_GUARD_ROW + 1, col = $5B
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS+1,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2+1,Y
+    STA     PTR2+1
+
+    LDY     $5B
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_BRICK
+    BEQ     .check_here
+    CMP     #SPRITE_STONE
+    BEQ     .check_here
+
+    LDX     $5B
+    LDY     TMP_GUARD_ROW
+    JSR     $739D           ; returns a row number
+
+    LDX     $5B
+    JSR     PSEUDO_DISTANCE
+    CMP     $59
+    BCS     .check_here        ; dist >= $59?
+
+    ; dist < $59
+    STA     $59     ; dist
+    LDA     #GUARD_ACTION_MOVE_RIGHT
+    STA     GUARD_ACTION
+
+.check_here:
+    LDY     TMP_GUARD_COL
+    BEQ     .next
+
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     $5B
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_LADDER
+    BNE     .next
+
+    ; Ladder here
+    LDY     TMP_GUARD_ROW
+    LDX     $5B
+    JSR     $7300
+
+    LDX     $5B
+    JSR     PSEUDO_DISTANCE
+    CMP     $59
+    BCS     .next        ; dist >= $59?
+
+    ; dist < $59
+    STA     $59     ; dist
+    LDA     #GUARD_ACTION_MOVE_RIGHT
+    STA     GUARD_ACTION
+
+.next:
+    INC     $5A
+    JMP     SHOULD_GUARD_MOVE_RIGHT
+
+    ORG    $72D4
+PSEUDO_DISTANCE:
+    SUBROUTINE
+
+    STA     TMP
+    CMP     PLAYER_ROW
+    BNE     .tmp_not_player_row
+
+    ; TMP == PLAYER_ROW
+    ; return | X - GUARD_LOC_COL |
+
+    CPX     GUARD_LOC_COL
+    BCC     .x_lt_guard_col
+
+    ; X >= GUARD_LOC_COL
+    TXA
+    ; A = X - GUARD_LOC_COL
+    SEC
+    SBC     GUARD_LOC_COL
+    RTS
+
+.x_lt_guard_col:
+    STX     TMP
+
+    ; A = GUARD_LOC_COL - X
+    LDA     GUARD_LOC_COL
+    SEC
+    SBC     TMP
+    RTS
+
+.tmp_not_player_row:
+    ; If TMP >= PLAYER_ROW, return 200 + | TMP - PLAYER_ROW |
+    ; otherwise return 100 + | TMP - PLAYER_ROW |
+
+    BCC     .tmp_lt_player_row
+
+    ; TMP >= PLAYER_ROW
+    ; A = TMP - PLAYER_ROW + 200
+    SEC
+    SBC     PLAYER_ROW
+    CLC
+    ADC     #200
+    RTS
+
+.tmp_lt_player_row
+    ; A = PLAYER_ROW - TMP + 100
+    LDA     PLAYER_ROW
+    SEC
+    SBC     TMP
+    CLC
+    ADC     #100
+    RTS
 
     ORG    $74DF
 GET_GUARD_SPRITE_AND_COORDS:
@@ -2657,6 +3574,163 @@ GET_GUARD_SPRITE_AND_COORDS:
     LDX     SPRITE_NUM
     RTS
 
+    ORG    $74F7
+CHECK_FOR_GOLD_PICKED_UP_BY_GUARD:
+    SUBROUTINE
+
+    LDA     GUARD_X_ADJ
+    CMP     #$02
+    BNE     .end
+    LDA     GUARD_Y_ADJ
+    CMP     #$02
+    BNE     .end
+
+    LDY     GUARD_LOC_ROW
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     GUARD_LOC_COL
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_GOLD
+    BNE     .end
+
+    LDA     GUARD_GOLD_TIMER        ; Does guard have gold already?
+    BMI     .end
+
+    LDA     #$FF
+    SEC
+    SBC     $53
+    STA     GUARD_GOLD_TIMER        ; GUARD_GOLD_TIMER = 0xFF - $53
+
+    ; Remove gold from screen
+    LDA     #SPRITE_EMPTY
+    STA     (PTR2),Y
+    LDY     GUARD_LOC_ROW
+    STY     GAME_ROWNUM
+    LDY     GUARD_LOC_COL
+    STY     GAME_COLNUM
+    JSR     DRAW_SPRITE_PAGE2
+
+    LDY     GAME_ROWNUM
+    LDX     GAME_COLNUM
+    JSR     GET_SCREEN_COORDS_FOR
+    LDA     #SPRITE_GOLD
+    JMP     ERASE_SPRITE_AT_PIXEL_COORDS        ; tailcall
+
+.end:
+    RTS
+
+    ORG    $753E
+GUARD_DROP_GOLD:
+    SUBROUTINE
+
+    LDA     GUARD_GOLD_TIMER
+    BPL     .end
+    INC     GUARD_GOLD_TIMER
+    BNE     .end
+
+    ; GUARD_GOLD_TIMER == 0
+    LDY     GUARD_LOC_ROW
+    STY     GAME_ROWNUM
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     GUARD_LOC_COL
+    STY     GAME_COLNUM
+    LDA     (PTR2),Y
+
+    CMP     #SPRITE_EMPTY
+    BNE     .decrement_flag_0
+
+    ; Put gold at location
+    LDA     #SPRITE_GOLD
+    STA     (PTR2),Y
+    JSR     DRAW_SPRITE_PAGE2
+    LDY     GAME_ROWNUM
+    LDX     GAME_COLNUM
+    JSR     GET_SCREEN_COORDS_FOR
+    LDA     #SPRITE_GOLD
+    JMP     DRAW_SPRITE_AT_PIXEL_COORDS
+
+.decrement_flag_0:
+    DEC     GUARD_GOLD_TIMER
+
+.end:
+    RTS
+
+
+    ; Disk routines
+
+INDIRECT_TARGET             EQU     $36     ; Init with DEFAULT_INDIRECT_TARGET
+DISABLE_INTS_CALL_RWTS_PTR  EQU     $38     ; Init with DISABLE_INTS_CALL_RWTS
+DISABLE_INTS_CALL_RWTS      EQU     $B7B5
+
+JMP_RWTS        EQU     $23     ; JMP $0000, gets loaded with RWTS address later
+
+    ORG    $7574
+INC_GUARD_ANIM_STATE:
+    SUBROUTINE
+
+    INC     GUARD_ANIM_STATE
+    CMP     GUARD_ANIM_STATE
+    BCC     .check_upper_bound      ; lower bound < GUARD_ANIM_STATE?
+    ; otherwise PLAYER_ANIM_STATE <= lower bound:
+
+.write_lower_bound:
+    STA     GUARD_ANIM_STATE       ; GUARD_ANIM_STATE = lower bound
+    RTS
+
+.check_upper_bound:
+    CPX     GUARD_ANIM_STATE
+    BCC     .write_lower_bound       ; GUARD_ANIM_STATE > upper bound?
+    ; otherwise GUARD_ANIM_STATE <= upper bound:
+    RTS
+
+    ORG    $7582
+NUDGE_GUARD_TOWARDS_EXACT_COLUMN:
+    SUBROUTINE
+
+    LDA     GUARD_X_ADJ
+    CMP     #$02
+    BCC     .slightly_left
+    BEQ     .end
+
+.slightly_right:
+    DEC     GUARD_X_ADJ        ; Nudge guard left
+    JMP     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
+
+.slightly_left:
+    INC     GUARD_X_ADJ        ; Nudge guard right
+    JMP     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
+
+.end:
+    RTS
+
+    ORG    $7595
+NUDGE_GUARD_TOWARDS_EXACT_ROW:
+    SUBROUTINE
+
+    LDA     GUARD_Y_ADJ
+    CMP     #$02
+    BCC     .slightly_above
+    BEQ     .end
+
+.slightly_below:
+    DEC     GUARD_Y_ADJ        ; Nudge guard up
+    JMP     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
+
+.slightly_above:
+    INC     GUARD_Y_ADJ        ; Nudge guard down
+    JMP     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
+
+.end:
+    RTS
+
     ORG    $75A8
 STORE_GUARD_DATA:
     SUBROUTINE
@@ -2670,10 +3744,10 @@ STORE_GUARD_DATA:
     STA     GUARD_X_ADJS,X
     LDA     GUARD_Y_ADJ
     STA     GUARD_Y_ADJS,X
-    LDA     GUARD_FLAG_0
-    STA     GUARD_FLAGS_0,X
-    LDA     GUARD_FLAG_4
-    STA     GUARD_FLAGS_4,X
+    LDA     GUARD_GOLD_TIMER
+    STA     GUARD_GOLD_TIMERS,X
+    LDA     GUARD_FACING_DIRECTION
+    STA     GUARD_FACING_DIRECTIONS,X
     LDA     GUARD_ANIM_STATE
     STA     GUARD_ANIM_STATES,X
     RTS
@@ -2692,11 +3766,293 @@ LOAD_GUARD_DATA:
     STA     GUARD_Y_ADJ
     LDA     GUARD_ANIM_STATES,X
     STA     GUARD_ANIM_STATE
-    LDA     GUARD_FLAGS_4,X
-    STA     GUARD_FLAG_4
-    LDA     GUARD_FLAGS_0,X
-    STA     GUARD_FLAG_0
+    LDA     GUARD_FACING_DIRECTIONS,X
+    STA     GUARD_FACING_DIRECTION
+    LDA     GUARD_GOLD_TIMERS,X
+    STA     GUARD_GOLD_TIMER
     RTS
+
+    ORG    $75F4
+HANDLE_TIMERS:
+    SUBROUTINE
+
+    JSR     GUARD_RESURRECTIONS
+
+    ; Increment GUARD_RESURRECT_COL mod 29
+
+    INC     GUARD_RESURRECT_COL
+    LDA     GUARD_RESURRECT_COL
+    CMP     MAX_GAME_COL+1
+    BCC     .guard_col_incremented
+
+    LDA     #$00
+    STA     GUARD_RESURRECT_COL
+
+.guard_col_incremented:
+    LDX     #$1E        ; 30
+
+.loop:
+    LDA     BRICK_FILL_TIMERS,X
+    STX     TMP_LOOP_CTR
+    BNE     .table_ce0_nonzero
+    JMP     .next
+
+.table_ce0_nonzero:
+    DEC     BRICK_FILL_TIMERS,X
+    BEQ     .brick_fill_timer_expired
+
+    LDA     BRICK_DIG_COLS,X
+    STA     GAME_COLNUM
+    LDA     BRICK_DIG_ROWS,X
+    STA     GAME_ROWNUM
+
+    LDA     BRICK_FILL_TIMERS,X
+    CMP     #$14            ; 20
+    BNE     .check_for_10
+
+    LDA     #SPRITE_BRICK_FILL0
+
+.draw_sprite:
+    JSR     DRAW_SPRITE_PAGE2
+    LDX     GAME_COLNUM
+    LDY     GAME_ROWNUM
+    JSR     GET_SCREEN_COORDS_FOR
+    LDA     #SPRITE_EMPTY
+    JSR     ERASE_SPRITE_AT_PIXEL_COORDS
+
+.next_:
+    JMP     .next
+
+.check_for_10:
+    CMP     #$0A            ; 10
+    BNE     .next_
+
+    LDA     #SPRITE_BRICK_FILL1
+    BNE     .draw_sprite            ; Unconditional
+
+.brick_fill_timer_expired:
+    LDX     TMP_LOOP_CTR
+    LDY     BRICK_DIG_ROWS,X
+    STY     GAME_ROWNUM
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     BRICK_DIG_COLS,X
+    STY     GAME_COLNUM
+    LDA     (PTR1),Y
+    CMP     #SPRITE_EMPTY
+    BNE     .check_for_brick_fill_player_kill
+    JMP     .draw_brick
+
+.check_for_brick_fill_player_kill:
+    CMP     #SPRITE_PLAYER
+    BNE     .check_for_brick_fill_guard_kill
+    LSR     ALIVE
+
+.check_for_brick_fill_guard_kill:
+    CMP     #SPRITE_GUARD
+    BEQ     .kill_guard
+
+    CMP     #SPRITE_GOLD
+    BNE     .draw_brick_
+    DEC     GOLD_COUNT
+
+.draw_brick_:
+    JMP     .draw_brick
+
+.kill_guard:
+    LDA     #SPRITE_BRICK
+    STA     (PTR1),Y
+    STA     (PTR2),Y
+    JSR     DRAW_SPRITE_PAGE1
+    LDA     #SPRITE_BRICK
+    JSR     DRAW_SPRITE_PAGE2
+    LDX     GUARD_COUNT
+
+.find_killed_guard:
+    LDA     GUARD_LOCS_COL,X
+    CMP     GAME_COLNUM
+    BNE     .next_guard
+    LDA     GUARD_LOCS_ROW,X
+    CMP     GAME_ROWNUM
+    BNE     .next_guard
+
+    LDA     GUARD_GOLD_TIMERS,X
+    BPL     .reset_guard_gold_timer
+    DEC     GOLD_COUNT
+
+.reset_guard_gold_timer:
+    LDA     #$7F
+    STA     GUARD_GOLD_TIMERS,X
+    STX     GUARD_NUM
+    JSR     LOAD_GUARD_DATA
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    JSR     ERASE_SPRITE_AT_PIXEL_COORDS
+    LDX     GUARD_NUM
+    LDY     #$01
+    STY     GAME_ROWNUM
+
+.row_loop:
+    LDY     GAME_ROWNUM
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR2
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
+    STA     PTR2+1
+
+    LDY     GUARD_RESURRECT_COL
+
+.col_loop:
+    LDA     (PTR2),Y
+    CMP     #$00
+    BEQ     .found_good_resurrect_loc
+
+    INC     GUARD_RESURRECT_COL
+    LDY     GUARD_RESURRECT_COL
+    CPY     MAX_GAME_COL+1
+    BCC     .col_loop
+
+    INC     GAME_ROWNUM
+    LDA     #$00
+    STA     GUARD_RESURRECT_COL
+    BEQ     .row_loop               ; unconditional
+
+.found_good_resurrect_loc:
+    TYA
+    STA     GUARD_LOCS_COL,X
+    LDA     GAME_ROWNUM
+    STA     GUARD_LOCS_ROW,X
+    LDA     #$14            ; 20
+    STA     GUARD_RESURRECTION_TIMERS,X
+    LDA     #$02
+    STA     GUARD_Y_ADJS,X
+    STA     GUARD_X_ADJS,X
+    LDA     #$00
+    STA     GUARD_ANIM_STATES,X
+    LDY     #$00
+    LDA     #$75
+    JSR     ADD_AND_UPDATE_SCORE        ; SCORE += 75
+    JMP     .next
+
+.next_guard:
+    DEX
+    BNE     .find_killed_guard
+
+    ; This should never fall through
+
+.draw_brick:
+    LDA     #SPRITE_BRICK
+    STA     (PTR1),Y
+    JSR     DRAW_SPRITE_PAGE1
+    LDA     #SPRITE_BRICK
+    JSR     DRAW_SPRITE_PAGE2
+
+.next:
+    LDX     TMP_LOOP_CTR
+    DEX
+    BMI     HANDLE_TIMERS_COMMON_RETURN
+    JMP     .loop
+
+HANDLE_TIMERS_COMMON_RETURN:
+    RTS
+
+    ORG    $7716
+GUARD_RESURRECTIONS:
+    SUBROUTINE
+
+    LDX     GUARD_COUNT
+    BEQ     HANDLE_TIMERS_COMMON_RETURN
+
+    LDA     GUARD_NUM
+    PHA
+
+.loop:
+    LDA     GUARD_RESURRECTION_TIMERS,X
+    BEQ     .next
+
+    STX     GUARD_NUM
+    JSR     LOAD_GUARD_DATA
+    LDA     #$7F
+    STA     GUARD_GOLD_TIMERS,X
+    LDA     GUARD_LOCS_COL,X
+    STA     GAME_COLNUM
+    LDA     GUARD_LOCS_ROW,X
+    STA     GAME_ROWNUM
+
+    DEC     GUARD_RESURRECTION_TIMERS,X
+    BEQ     .resurrect
+
+    LDA     GUARD_RESURRECTION_TIMERS,X
+    CMP     #$13                ; 19
+    BNE     .check_guard_flag_5_is_10
+
+    ; GUARD_RESURRECTION_TIMER is 19
+
+    LDA     #SPRITE_GUARD_EGG0
+    JSR     DRAW_SPRITE_PAGE2
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    LDA     #SPRITE_GUARD_EGG0
+    JSR     DRAW_SPRITE_AT_PIXEL_COORDS
+    JMP     .next2
+
+.check_guard_flag_5_is_10:
+    CMP     #$0A                ; 10
+    BNE     .next
+
+    ; GUARD_RESURRECTION_TIMER is 10
+    LDA     #SPRITE_GUARD_EGG1
+    JSR     DRAW_SPRITE_PAGE2
+    JSR     GET_GUARD_SPRITE_AND_COORDS
+    LDA     #SPRITE_GUARD_EGG1
+    JSR     DRAW_SPRITE_AT_PIXEL_COORDS
+
+.next2:
+    ; Restores the counter
+    LDX     GUARD_NUM
+
+.next:
+    DEX
+    BNE     .loop
+
+    PLA
+    STA     GUARD_NUM
+    RTS
+
+.resurrect:
+    LDY     GAME_ROWNUM
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+
+    LDX     GUARD_NUM
+    INC     GUARD_RESURRECTION_TIMERS,X
+    LDY     GAME_COLNUM
+    LDA     (PTR1),Y
+    BNE     .next
+
+    ; empty
+    LDA     #SPRITE_GUARD
+    STA     (PTR1),Y
+    LDA     #SPRITE_EMPTY
+    JSR     DRAW_SPRITE_PAGE2
+    LDA     #$00
+    LDX     GUARD_NUM
+    STA     GUARD_GOLD_TIMERS,X
+    STA     GUARD_RESURRECTION_TIMERS,X
+    LDA     #SPRITE_GUARD
+    JSR     DRAW_SPRITE_PAGE1
+
+    ; Play the "guard resurrection" sound
+    JSR     LOAD_SOUND_DATA
+    HEX     02 7C 03 78 04 74 05 70 00
+
+    LDX     GUARD_NUM
+    JMP     .next
 
     ORG    $77AC
 RETURN_HANDLER:
@@ -2710,7 +4066,7 @@ RETURN_HANDLER:
 
 .loop:
     LDA     INPUT_MODE
-    CMP     KEYBOARD_MODE                ; Keyboard mode
+    CMP     #KEYBOARD_MODE                ; Keyboard mode
     BEQ     .check_keyboard
 
     LDA     BUTN1
@@ -2733,7 +4089,7 @@ RETURN_HANDLER:
     STA     KBDSTRB
     STA     TXTPAGE1
     JSR     CLEAR_HGR2
-    LDY     #$0F
+    LDY     MAX_GAME_ROW
     STY     GAME_ROWNUM
 
 .loop2:
@@ -2742,14 +4098,14 @@ RETURN_HANDLER:
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES2,Y
     STA     PTR2+1
 
-    LDY     #$1B
+    LDY     MAX_GAME_COL
     STY     GAME_COLNUM
 
 .loop3:
     LDA     (PTR2),Y
-    CMP     #$05
+    CMP     #SPRITE_T_THING
     BNE     .draw_sprite
-    LDA     #$01                ; draw brick in place of T-thing
+    LDA     #SPRITE_BRICK
 .draw_sprite:
     JSR     DRAW_SPRITE_PAGE2
 
@@ -2763,18 +4119,18 @@ RETURN_HANDLER:
 
     LDX     #$1E
 .loop4:
-    STX     SCRATCH_88
-    LDA     TABLE_0CE0,X
+    STX     TMP_LOOP_CTR
+    LDA     BRICK_FILL_TIMERS,X
     BEQ     .next4
 
-    LDY     TABLE_0CC0,X
+    LDY     BRICK_DIG_ROWS,X
     STY     GAME_ROWNUM
-    LDY     TABLE_0CA0,X
+    LDY     BRICK_DIG_COLS,X
     STY     GAME_COLNUM
     CMP     #$15
     BCC     .check_b
 
-    LDA     #$00
+    LDA     #SPRITE_EMPTY
     JSR     DRAW_SPRITE_PAGE2
     JMP     .next4
 
@@ -2790,7 +4146,7 @@ RETURN_HANDLER:
     JSR     DRAW_SPRITE_PAGE2
 
 .next4:
-    LDX     SCRATCH_88
+    LDX     TMP_LOOP_CTR
     DEX
     BPL     .next4
 
@@ -2798,8 +4154,8 @@ RETURN_HANDLER:
     BEQ     .check_for_input
 
 .loop5:
-    STA     GUARD_FLAGS_5,X
-    STX     SCRATCH_88
+    STA     GUARD_RESURRECTION_TIMERS,X
+    STX     TMP_LOOP_CTR
     BEQ     .next5
 
     LDY     GUARD_LOCS_COL
@@ -2821,7 +4177,7 @@ RETURN_HANDLER:
     JSR     DRAW_SPRITE_PAGE2
 
 .next5:
-    LDX     SCRATCH_88
+    LDX     TMP_LOOP_CTR
     DEX
     BNE     .loop5
 
@@ -2854,7 +4210,7 @@ HI_SCORE_SCREEN:
     HEX     AD AD AD 8D 00
 
     LDA     #$01
-    STA     $55             ; Used for row number
+    STA     HI_SCORE_INDEX             ; Used for row number
 .loop:
     CMP     #$0A
     BNE     .display_0_to_9
@@ -2867,7 +4223,7 @@ HI_SCORE_SCREEN:
 .display_0_to_9:
     LDA     #$A0
     JSR     PUT_CHAR        ; space
-    LDA     $55
+    LDA     HI_SCORE_INDEX
     JSR     PUT_DIGIT
 
 .rest_of_row_number:
@@ -2875,20 +4231,20 @@ HI_SCORE_SCREEN:
     JSR     PUT_STRING
     HEX     AE A0 A0 A0 A0 00
 
-    LDX     $55
+    LDX     HI_SCORE_INDEX
     LDY     HI_SCORE_TABLE_OFFSETS,X
-    STY     $56
+    STY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA+3,Y
     BNE     .draw_initials
     JMP     .next_high_score_row
 .draw_initials:
-    LDY     $56
+    LDY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA,Y
     JSR     PUT_CHAR
-    LDY     $56
+    LDY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA+1,Y
     JSR     PUT_CHAR
-    LDY     $56
+    LDY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA+2,Y
     JSR     PUT_CHAR
 
@@ -2896,7 +4252,7 @@ HI_SCORE_SCREEN:
     JSR     PUT_STRING
     HEX     A0 A0 A0 A0 00
 
-    LDY     $56
+    LDY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA+3,Y
     JSR     TO_DECIMAL3
     LDA     HUNDREDS
@@ -2910,7 +4266,7 @@ HI_SCORE_SCREEN:
     JSR     PUT_STRING
     HEX     A0 A0 00
 
-    LDY     $56
+    LDY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA+4,Y
     JSR     BCD_TO_DECIMAL2
     LDA     TENS
@@ -2918,7 +4274,7 @@ HI_SCORE_SCREEN:
     LDA     UNITS
     JSR     PUT_DIGIT
 
-    LDY     $56
+    LDY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA+5,Y
     JSR     BCD_TO_DECIMAL2
     LDA     TENS
@@ -2926,7 +4282,7 @@ HI_SCORE_SCREEN:
     LDA     UNITS
     JSR     PUT_DIGIT
 
-    LDY     $56
+    LDY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA+6,Y
     JSR     BCD_TO_DECIMAL2
     LDA     TENS
@@ -2934,7 +4290,7 @@ HI_SCORE_SCREEN:
     LDA     UNITS
     JSR     PUT_DIGIT
 
-    LDY     $56
+    LDY     HI_SCORE_OFFSET
     LDA     HI_SCORE_DATA+7,Y
     JSR     BCD_TO_DECIMAL2
     LDA     TENS
@@ -2944,8 +4300,8 @@ HI_SCORE_SCREEN:
 
 .next_high_score_row:
     JSR     NEWLINE
-    INC     $55
-    LDA     $55
+    INC     HI_SCORE_INDEX
+    LDA     HI_SCORE_INDEX
     CMP     #11
     BCS     .end
     JMP     .loop
@@ -3326,7 +4682,7 @@ LEVEL_EDITOR:
 
     LDA     #$05
     STA     LIVES
-    STA     PREGAME_MODE
+    STA     GAME_MODE
     LDA     INPUT_MODE
     STA     SAVED_INPUT_MODE
 
@@ -3386,9 +4742,9 @@ EDITOR_COMMAND_LOOP:
     TXA
     ASL
     TAX
-    LDA     EDITOR_RETURN_ADDRESS+1,X
+    LDA     EDITOR_ROUTINE_ADDRESS+1,X
     PHA
-    LDA     EDITOR_RETURN_ADDRESS,X
+    LDA     EDITOR_ROUTINE_ADDRESS,X
     PHA
     RTS
 
@@ -3410,13 +4766,13 @@ EDITOR_ROUTINE_ADDRESS:
     WORD    EDITOR_INITIALIZE_DISK-1
     WORD    EDITOR_CLEAR_HIGH_SCORES-1
 
-    ORG    $7C54
-EDITOR_RETURN_ADDRESS:
-    HEX     5F 7C
+    ORG    $7C60
+EDITOR_PLAY_LEVEL:
+    SUBROUTINE
+
     ORG    $7C77
 SAVED_INPUT_MODE:
     HEX     00    
-
     ORG    $7C8E
 EDITOR_CLEAR_LEVEL:
     SUBROUTINE
@@ -3443,6 +4799,11 @@ EDITOR_CLEAR_LEVEL:
 
 .beep:
     JMP     BEEP
+
+    ORG    $7CBC
+EDITOR_EDIT_LEVEL:
+    SUBROUTINE
+
 
     ORG    $7CD8
 EDITOR_MOVE_LEVEL:
@@ -3494,7 +4855,6 @@ EDITOR_MOVE_LEVEL:
 
 .beep:
     JMP     .beep
-
 
     ORG    $7D5D
 EDITOR_INITIALIZE_DISK:
@@ -3775,7 +5135,7 @@ GET_LEVEL_FROM_KEYBOARD:
     LDA     HUNDREDS,X
     CLC
     ADC     #$3B            ; sprite = '0' + X
-    JSR     WAIT_FOR_KEY_PAGE_1
+    JSR     WAIT_FOR_KEY_WITH_CURSOR_PAGE_1
     STA     KBDSTRB
     CMP     #$8D            ; return
     BEQ     .return_pressed
@@ -3881,7 +5241,7 @@ EDITOR_WAIT_FOR_KEY:
     SUBROUTINE
 
     LDA     #$00
-    JSR     WAIT_FOR_KEY_PAGE_1
+    JSR     WAIT_FOR_KEY_WITH_CURSOR_PAGE_1
     STA     KBDSTRB
     CMP     #$9B        ; ESC
     BNE     .return
@@ -3890,13 +5250,15 @@ EDITOR_WAIT_FOR_KEY:
 .return
     RTS
 
-    ORG    $824C
+    ORG    $824D
 KBD_ENTRY_INDEX:
     HEX     60
 
     ORG    $824F
 EDITOR_LEVEL_ENTRY:
     HEX     0F
+SRC_PTR     EQU     $3C     ; 2 bytes
+DEST_PTR    EQU     $3E     ; 2 bytes
 
     ORG    $8250
 SAVED_VTOC_DATA:
@@ -4367,9 +5729,9 @@ RECORD_HI_SCORE_DATA_TO_DISK:
 .record_it:
     CPY     #$0A
     BEQ     .write_here
-    STY     $56
+    STY     HI_SCORE_TARGET_INDEX
 
-    ; Move the table rows to make room at index $56
+    ; Move the table rows to make room at index HI_SCORE_TARGET_INDEX
     LDY     #$09
 .loop2:
     LDX     HI_SCORE_TABLE_OFFSETS,Y
@@ -4384,7 +5746,7 @@ RECORD_HI_SCORE_DATA_TO_DISK:
     DEC     ROW_COUNT
     BNE     .loop3
 
-    CPY     $56
+    CPY     HI_SCORE_TARGET_INDEX
     BEQ     .write_here
     DEY
     BNE     .loop2
@@ -4497,7 +5859,7 @@ WAIT_FOR_KEY:
     STA     SCRATCH_A1
     LDA     CURSOR_SPRITE
     BNE     .draw_sprite
-    LDA     #$0A            ; all-white sprite
+    LDA     #SPRITE_ALLWHITE
 .draw_sprite:
     JSR     DRAW_SPRITE_PAGE2
 
@@ -4531,7 +5893,7 @@ WAIT_FOR_KEY:
     RTS
 
     ORG    $8631
-DO_LADDERS:
+ENABLE_NEXT_LEVEL_LADDERS:
     SUBROUTINE
 
     LDA     #$00
@@ -4562,22 +5924,22 @@ DO_LADDERS:
     LDA     (PTR2),Y            ; A = sprite at ladder loc
     BNE     .set_col_to_1
 
-    LDA     #$03
+    LDA     #SPRITE_LADDER
     STA     (PTR2),Y            ; Set background sprite to ladder
     LDA     (PTR1),Y
     BNE     .draw_ladder        ; .draw_ladder if active sprite not blank
 
-    LDA     #$03
+    LDA     #SPRITE_LADDER
     STA     (PTR1),Y            ; Set active sprite to ladder
 
 .draw_ladder:
-    LDA     #$03
+    LDA     #SPRITE_LADDER
     JSR     DRAW_SPRITE_PAGE2   ; Draw ladder on background page
 
     LDX     GAME_COLNUM
     LDY     GAME_ROWNUM
     JSR     GET_SCREEN_COORDS_FOR
-    LDA     #$03
+    LDA     #SPRITE_LADDER
     JSR     DRAW_SPRITE_AT_PIXEL_COORDS ; Draw ladder on active page
 
     LDX     .count
@@ -4604,14 +5966,24 @@ DO_LADDERS:
 .count:
     BYTE    0
 
-    ORG    $86A8
+    ORG    $869F
 WAIT_KEY:
     SUBROUTINE
 
+    STA     KBDSTRB
     LDA     KBD
-    BPL     WAIT_KEY
+    BMI     WAIT_KEY
+    RTS
+
+    ORG    $86A8
+WAIT_KEY_QUEUED:
+    SUBROUTINE
+
+    LDA     KBD
+    BPL     WAIT_KEY_QUEUED
     STA     KBDSTRB
     RTS
+
     ORG    $86B5
 SOUND_DELAY:
     SUBROUTINE
@@ -4678,7 +6050,7 @@ PUT_STRING:
     RTS
 
     ORG    $8700
-WAIT_FOR_KEY_PAGE_1:
+WAIT_FOR_KEY_WITH_CURSOR_PAGE_1:
     SUBROUTINE
     ; Enter routine with A set to cursor sprite. If zero, sprite 10 (all white)
     ; will be used.
@@ -4691,7 +6063,7 @@ WAIT_FOR_KEY_PAGE_1:
     LDA     #$00
     LDX     CURSOR_SPRITE
     BNE     .draw_sprite
-    LDA     #$0A            ; all-white sprite
+    LDA     #SPRITE_ALLWHITE
 .draw_sprite:
     JSR     DRAW_SPRITE_PAGE1
 
@@ -4749,8 +6121,6 @@ WIPE_MODE           EQU     $A5     ; 0 for open, 1 for close.
 WIPE_DIR            EQU     $72     ; 0 for close, 1 for open.
 WIPE_CENTER_X       EQU     $77
 WIPE_CENTER_Y       EQU     $73
-MATH_TMPL     EQU     $6F
-MATH_TMPH     EQU     $70
 WIPE0       EQU     $69     ; 16-bit value
 WIPE1       EQU     $67     ; 16-bit value
 WIPE2       EQU     $6B     ; 16-bit value
@@ -4770,49 +6140,75 @@ WIPE7R      EQU     $81     ; Remainders
 WIPE8R      EQU     $82
 WIPE9R      EQU     $83
 WIPE10R     EQU     $84
-PREGAME_MODE            EQU     $A7
-DISK_BUFFER   EQU     $0D00       ; 256 bytes
+GAME_MODE               EQU     $A7
+
+GAME_MODE_SPLASH_SCREEN         EQU     #$00
+GAME_MODE_ATTRACT_MODE          EQU     #$01
+GAME_MODE_PLAY_MODE             EQU     #$02
+GAME_MODE_PLAY_IN_EDITOR        EQU     #$03
+GAME_MODE_4                     EQU     #$04
+GAME_MODE_LEVEL_EDITOR          EQU     #$05
+
+DISK_BUFFER             EQU     $0D00       ; 256 bytes
 RWTS_ADDR               EQU     $24         ; 2 bytes
 DISK_LEVEL_LOC          EQU     $96
 ALIVE       EQU     $9A
-TMP                     EQU     $1A
 LEVEL_DATA_INDEX        EQU     $92
-HI_SCORE_DATA    EQU     $1F00      ; 256 bytes
+HI_SCORE_INDEX      EQU     $55     ; aliased with TMP_GUARD_COL
+HI_SCORE_OFFSET     EQU     $56     ; aliased with TMP_GUARD_ROW
 TXTPAGE2                EQU     $C055
 ROMIN_RDROM_WRRAM2      EQU     $C081
 TXTCLR                  EQU     $C050
 MIXCLR                  EQU     $C052
 TXTPAGE1                EQU     $C054
 HIRES                   EQU     $C057
-KBDSTRB     EQU     $C010
-KBD         EQU     $C000
 DIDNT_PICK_UP_GOLD      EQU     $94
 KEY_COMMAND     EQU     $9E
-SCRATCH_88      EQU     $88
-TABLE_0CA0      EQU     $0CA0       ; 31 bytes
-TABLE_0CC0      EQU     $0CC0       ; 31 bytes
+BRICK_DIG_COLS      EQU     $0CA0       ; 31 bytes of col nums
+BRICK_DIG_ROWS      EQU     $0CC0       ; 31 bytes of row nums
+BRICK_FILL_TIMERS   EQU     $0CE0       ; 31 bytes of fill timers
 DIG_DIRECTION       EQU     $9C     ; 0xFF = left, 0x00 = not digging, 0x01 = right
 DIG_ANIM_STATE      EQU     $A0     ; 00-0C
 GUARD_LOCS_COL      EQU     $0C60       ; 8 bytes
 GUARD_LOCS_ROW      EQU     $0C68       ; 8 bytes
-GUARD_FLAGS_0       EQU     $0C70       ; 8 bytes
+GUARD_GOLD_TIMERS   EQU     $0C70       ; 8 bytes
 GUARD_X_ADJS        EQU     $0C78       ; 8 bytes
 GUARD_Y_ADJS        EQU     $0C80       ; 8 bytes
 GUARD_ANIM_STATES   EQU     $0C88       ; 8 bytes
-GUARD_FLAGS_4       EQU     $0C90       ; 8 bytes
-GUARD_FLAGS_5       EQU     $0C98       ; 8 bytes
+GUARD_FACING_DIRECTIONS     EQU     $0C90       ; 8 bytes
+GUARD_RESURRECTION_TIMERS   EQU     $0C98       ; 8 bytes
 
 GUARD_LOC_COL       EQU     $12
 GUARD_LOC_ROW       EQU     $13
 GUARD_ANIM_STATE    EQU     $14
-GUARD_FLAG_4        EQU     $15
-GUARD_FLAG_0        EQU     $16
+GUARD_FACING_DIRECTION      EQU     $15     ; Hi bit set: facing left, otherwise facing right
+GUARD_GOLD_TIMER    EQU     $16
 GUARD_X_ADJ         EQU     $17
 GUARD_Y_ADJ         EQU     $18
 GUARD_NUM           EQU     $19
 
 GUARD_PATTERN       EQU     $63
 GUARD_PHASE         EQU     $64
+
+GUARD_RESURRECT_COL EQU     $53
+TMP_GUARD_COL       EQU     $55
+TMP_GUARD_ROW       EQU     $56
+GUARD_GOLD_TIMER_START_VALUE        EQU     $5F
+    ; Init with:
+    ; BYTE    %10000110
+    ; BYTE    %00111110
+    ; BYTE    %10000101
+GUARD_PATTERNS  EQU     $60     ; 3 bytes
+GUARD_ACTION    EQU     $58     ; Index into GUARD_FN_TABLE
+
+GUARD_ACTION_DO_NOTHING     EQU     #$00
+GUARD_ACTION_MOVE_LEFT      EQU     #$01
+GUARD_ACTION_MOVE_RIGHT     EQU     #$02
+GUARD_ACTION_MOVE_UP        EQU     #$03
+GUARD_ACTION_MOVE_DOWN      EQU     #$04
+CHECK_CURR_TMP_ROW  EQU     $5C
+CHECK_TMP_COL       EQU     $5D
+CHECK_TMP_ROW       EQU     $5E
 DOS_IOB                     EQU     $B7E8
 IOB_SLOTNUMx16              EQU     $B7E9
 IOB_DRIVE_NUM               EQU     $B7EA
@@ -4833,8 +6229,7 @@ DCT_DEVICE_TYPE             EQU     $B7FB
 DCT_PHASES_PER_TRACK        EQU     $B7FC
 DCT_MOTOR_ON_TIME_COUNT     EQU     $B7FD   ; 2 bytes
 HIGH_SCORE_INITIALS_INDEX       EQU     $824D
-DISK_BOOT_SECTOR_DATA   EQU     $1DB2       ; 256 bytes
-GUARD_PATTERN_OFFSET        EQU     $97
+HI_SCORE_TARGET_INDEX           EQU     $56     ; aliased with TMP_GUARD_ROW
     ORG    $8746
 READ_PADDLES:
     SUBROUTINE
@@ -4875,7 +6270,7 @@ CHECK_JOYSTICK_OR_DELAY:
     SUBROUTINE
 
     LDA     INPUT_MODE
-    CMP     KEYBOARD_MODE
+    CMP     #KEYBOARD_MODE
     BEQ     .delay_and_return       ; Keyboard mode, so just delay and return
 
     JSR     READ_PADDLES
@@ -5446,9 +6841,9 @@ DIV_BY_7:
     ; and A contains the remainder.
 
     STX     MATH_TMPL
-    LDY     8
+    LDY     #$08
     SEC
-    SBC     7
+    SBC     #$07
 
 .loop:
     PHP
@@ -5457,26 +6852,25 @@ DIV_BY_7:
     ROL
     PLP
     BCC     .adjust_up
-    SBC     7
+    SBC     #$07
     JMP     .next
 
 .adjust_up
-    ADC     7
+    ADC     #$07
 
 .next
     DEY
     BNE     .loop
 
     BCS     .no_adjust
-    ADC     7
+    ADC     #$07
     CLC
 
 .no_adjust
     ROL     MATH_TMPH
     LDY     MATH_TMPH
     RTS
-
-    ; Sprite routines
+    ; Initialized "uninitialized" data
 
     ORG    $8A69
 DRAW_WIPE_STEP:
@@ -5485,14 +6879,14 @@ DRAW_WIPE_STEP:
     LDY     WIPE6H
     BNE     .draw_north
     LDY     WIPE6L
-    CPY     176
+    CPY     #176
     BCS     .draw_north        ; Skip if WIPE6 >= 176
 
     JSR     ROW_TO_ADDR_FOR_BOTH_PAGES
 
     ; East side
     LDY     WIPE9D
-    CPY     40
+    CPY     #40
     BCS     .draw_south_west
     LDX     WIPE9R
     JSR     DRAW_WIPE_BLOCK
@@ -5500,7 +6894,7 @@ DRAW_WIPE_STEP:
 .draw_south_west
     ; West side
     LDY     WIPE8D
-    CPY     40
+    CPY     #40
     BCS     .draw_north
     LDX     WIPE9R
     JSR     DRAW_WIPE_BLOCK
@@ -5509,14 +6903,14 @@ DRAW_WIPE_STEP:
     LDY     WIPE3H
     BNE     .draw_north2
     LDY     WIPE3L
-    CPY     176
+    CPY     #176
     BCS     .draw_north2        ; Skip if WIPE3 >= 176
 
     JSR     ROW_TO_ADDR_FOR_BOTH_PAGES
 
     ; East side
     LDY     WIPE9D
-    CPY     40
+    CPY     #40
     BCS     .draw_north_west
     LDX     WIPE9R
     JSR     DRAW_WIPE_BLOCK
@@ -5524,7 +6918,7 @@ DRAW_WIPE_STEP:
 .draw_north_west
     ; West side
     LDY     WIPE8D
-    CPY     40
+    CPY     #40
     BCS     .draw_north2
     LDX     WIPE9R
     JSR     DRAW_WIPE_BLOCK
@@ -5533,14 +6927,14 @@ DRAW_WIPE_STEP:
     LDY     WIPE5H
     BNE     .draw_south2
     LDY     WIPE5L
-    CPY     176
+    CPY     #176
     BCS     .draw_south2        ; Skip if WIPE5 >= 176
 
     JSR     ROW_TO_ADDR_FOR_BOTH_PAGES
 
     ; East side
     LDY     WIPE10D
-    CPY     40
+    CPY     #40
     BCS     .draw_north2_west
     LDX     WIPE10R
     JSR     DRAW_WIPE_BLOCK
@@ -5548,7 +6942,7 @@ DRAW_WIPE_STEP:
 .draw_north2_west
     ; West side
     LDY     WIPE7D
-    CPY     40
+    CPY     #40
     BCS     .draw_south2
     LDX     WIPE7R
     JSR     DRAW_WIPE_BLOCK
@@ -5557,14 +6951,14 @@ DRAW_WIPE_STEP:
     LDY     WIPE4H
     BNE     .end
     LDY     WIPE4L
-    CPY     176
+    CPY     #176
     BCS     .end        ; Skip if WIPE4 >= 176
 
     JSR     ROW_TO_ADDR_FOR_BOTH_PAGES
 
     ; East side
     LDY     WIPE10D
-    CPY     40
+    CPY     #40
     BCS     .draw_south2_west
     LDX     WIPE10R
     JSR     DRAW_WIPE_BLOCK
@@ -5572,7 +6966,7 @@ DRAW_WIPE_STEP:
 .draw_south2_west
     ; West side
     LDY     WIPE7D
-    CPY     40
+    CPY     #40
     BCS     .draw_south2
     LDX     WIPE7R
     JMP     DRAW_WIPE_BLOCK           ; tail call
@@ -5786,7 +7180,7 @@ SHOW_ANIM_LINE:
     INC     ANIM_COUNT
 
     LDA     INPUT_MODE
-    CMP     KEYBOARD_MODE
+    CMP     #KEYBOARD_MODE
     BEQ     .check_for_keypress
     LDA     BUTN1
     BMI     .input_detected
