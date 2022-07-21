@@ -11,8 +11,8 @@ SPRITE_BRICK        EQU     #$01
 SPRITE_STONE        EQU     #$02
 SPRITE_LADDER       EQU     #$03
 SPRITE_ROPE         EQU     #$04
-SPRITE_T_THING      EQU     #$05
-SPRITE_STAPLE       EQU     #$06
+SPRITE_TRAP         EQU     #$05
+SPRITE_INVISIBLE_LADDER       EQU     #$06
 SPRITE_GOLD         EQU     #$07
 SPRITE_GUARD        EQU     #$08
 SPRITE_PLAYER       EQU     #$09
@@ -1038,7 +1038,7 @@ DRAW_LEVEL_PAGE2:
     BEQ     .draw_sprite1       ; This will then unconditionally jump to
                                 ; .draw_sprite2. We have to do that because of
                                 ; relative jump amount limitations.
-    CMP     #SPRITE_STAPLE
+    CMP     #SPRITE_INVISIBLE_LADDER
     BNE     .check_for_gold
 
     LDX     LADDER_COUNT
@@ -1121,7 +1121,7 @@ DRAW_LEVEL_PAGE2:
     LDA     #SPRITE_PLAYER
     BNE     .draw_sprite            ; Unconditional jump.
 .check_for_t_thing:
-    CMP     #SPRITE_T_THING
+    CMP     #SPRITE_TRAP
     BNE     .draw_sprite
     LDA     #SPRITE_BRICK
 
@@ -1413,8 +1413,8 @@ TRY_MOVING_LEFT:
     BEQ     .cannot_move
     CMP     #SPRITE_BRICK
     BEQ     .cannot_move
-    CMP     #SPRITE_T_THING
-    BNE     .move_player_left       ; brick, stone, or T-thing to left, so cannot move.
+    CMP     #SPRITE_TRAP
+    BNE     .move_player_left       ; brick, stone, or trap to left, so cannot move.
 
 .cannot_move:
     RTS
@@ -1493,8 +1493,8 @@ TRY_MOVING_RIGHT:
     BEQ     .cannot_move
     CMP     #SPRITE_BRICK
     BEQ     .cannot_move
-    CMP     #SPRITE_T_THING
-    BNE     .move_player_right      ; brick, stone, or T-thing to right, so cannot move.
+    CMP     #SPRITE_TRAP
+    BNE     .move_player_right      ; brick, stone, or trap to right, so cannot move.
 
 .cannot_move:
     RTS
@@ -1594,7 +1594,7 @@ TRY_MOVING_UP:
     LDY     PLAYER_ROW
     BEQ     .cannot_move       ; if PLAYER_ROW == 0, set carry and return
 
-    ; You can't move up if there's a brick, stone, or T-thing above.
+    ; You can't move up if there's a brick, stone, or trap above.
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS-1,Y
     STA     PTR1
     LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES-1,Y
@@ -1606,8 +1606,8 @@ TRY_MOVING_UP:
     BEQ     .cannot_move
     CMP     #SPRITE_STONE
     BEQ     .cannot_move
-    CMP     #SPRITE_T_THING
-    BEQ     .cannot_move       ; If brick, stone, or T-thing, set carry and return
+    CMP     #SPRITE_TRAP
+    BEQ     .cannot_move       ; If brick, stone, or trap, set carry and return
 
 .move_player_up:
     JSR     GET_SPRITE_AND_SCREEN_COORD_AT_PLAYER
@@ -2965,7 +2965,7 @@ TRY_GUARD_MOVE_UP:
     BEQ     GUARD_DO_NOTHING
     CMP     #SPRITE_STONE
     BEQ     GUARD_DO_NOTHING
-    CMP     #SPRITE_T_THING
+    CMP     #SPRITE_TRAP
     BEQ     GUARD_DO_NOTHING
     CMP     #SPRITE_GUARD
     BEQ     GUARD_DO_NOTHING
@@ -3149,7 +3149,7 @@ TRY_GUARD_MOVE_LEFT:
     BEQ     .store_guard_data
 
     LDA     (PTR2),Y
-    CMP     #SPRITE_T_THING
+    CMP     #SPRITE_TRAP
     BNE     .move_left
 
 .store_guard_data:
@@ -3247,7 +3247,7 @@ TRY_GUARD_MOVE_RIGHT:
     BEQ     .store_guard_data
 
     LDA     (PTR2),Y
-    CMP     #SPRITE_T_THING
+    CMP     #SPRITE_TRAP
     BNE     .move_right
 
 .store_guard_data:
@@ -3379,7 +3379,7 @@ DETERMINE_GUARD_MOVE:
     LDA     (PTR2),Y
     CMP     #SPRITE_EMPTY
     BEQ     .end
-    CMP     #SPRITE_T_THING
+    CMP     #SPRITE_TRAP
     BEQ     .end
 
 .is_ladder_or_rope:
@@ -3420,7 +3420,7 @@ DETERMINE_GUARD_MOVE:
     LDA     (PTR2),Y
     CMP     #SPRITE_EMPTY
     BEQ     .end
-    CMP     #SPRITE_T_THING
+    CMP     #SPRITE_TRAP
     BEQ     .end
 
 .is_ladder_or_rope2:
@@ -4640,7 +4640,7 @@ RETURN_HANDLER:
 
 .loop3:
     LDA     (PTR2),Y
-    CMP     #SPRITE_T_THING
+    CMP     #SPRITE_TRAP
     BNE     .draw_sprite
     LDA     #SPRITE_BRICK
 .draw_sprite:
@@ -4862,6 +4862,8 @@ PUT_STATUS:
 
     JSR     CLEAR_HGR1
     JSR     CLEAR_HGR2
+
+PUT_STATUS_DRAW:
     LDY     #$27
     LDA     DRAW_PAGE
     CMP     #$40
@@ -5223,7 +5225,7 @@ LEVEL_EDITOR:
     STA     LIVES
     STA     GAME_MODE
     LDA     INPUT_MODE
-    STA     SAVED_INPUT_MODE
+    STA     READ_SAVED_INPUT_MODE+1
 
     LDA     #KEYBOARD_MODE
     STA     INPUT_MODE
@@ -5270,13 +5272,13 @@ EDITOR_COMMAND_LOOP:
 
 .loop2:
     LDY     EDITOR_KEYS,X
-    BEQ     .beep
+    BEQ     EDITOR_COMMAND_LOOP_BEEP
     CMP     EDITOR_KEYS,X
     BEQ     .end
     INX
     BNE     .loop2
 
-.beep:
+EDITOR_COMMAND_LOOP_BEEP:
     JSR     BEEP
     JMP     EDITOR_COMMAND_LOOP
 
@@ -5307,14 +5309,35 @@ EDITOR_ROUTINE_ADDRESS:
     WORD    EDITOR_MOVE_LEVEL-1
     WORD    EDITOR_INITIALIZE_DISK-1
     WORD    EDITOR_CLEAR_HIGH_SCORES-1
-
     ORG    $7C60
 EDITOR_PLAY_LEVEL:
     SUBROUTINE
 
-    ORG    $7C77
-SAVED_INPUT_MODE:
-    HEX     00    
+    ; "\r"
+    ; ">>PLAY LEVEL"
+    JSR     PUT_STRING
+    HEX     8D BE BE D0 CC C1 D9 A0 CC C5 D6 C5 CC 00
+
+    JSR     GET_LEVEL_FROM_KEYBOARD
+    BCS     .beep
+
+READ_SAVED_INPUT_MODE:
+    LDA     #$00
+    STA     INPUT_MODE
+    LDA     #GAME_MODE_PLAY_IN_EDITOR
+    STA     GAME_MODE
+    LDA     #$01
+    STA     $9D
+    LDA     DISK_LEVEL_LOC
+    BEQ     .init_game_data_
+    LSR     $9D
+
+.init_game_data_:
+    JMP     INIT_GAME_DATA
+
+.beep:
+    JMP     EDITOR_COMMAND_LOOP_BEEP
+
     ORG    $7C8E
 EDITOR_CLEAR_LEVEL:
     SUBROUTINE
@@ -5340,13 +5363,23 @@ EDITOR_CLEAR_LEVEL:
     JMP     EDITOR_COMMAND_LOOP
 
 .beep:
-    JMP     BEEP
+    JMP     EDITOR_COMMAND_LOOP_BEEP
 
     ORG    $7CBC
 EDITOR_EDIT_LEVEL:
     SUBROUTINE
 
+    ; "\r"
+    ; ">>EDIT LEVEL"
+    JSR     PUT_STRING
+    HEX     8D BE BE C5 C4 C9 D4 A0 CC C5 D6 C5 CC 00
 
+    JSR     GET_LEVEL_FROM_KEYBOARD
+    BCS     .beep
+    JMP     EDIT_LEVEL
+
+.beep:
+    JMP     EDITOR_COMMAND_LOOP_BEEP
     ORG    $7CD8
 EDITOR_MOVE_LEVEL:
     SUBROUTINE
@@ -5396,7 +5429,7 @@ EDITOR_MOVE_LEVEL:
     JMP     EDITOR_COMMAND_LOOP
 
 .beep:
-    JMP     .beep
+    JMP     EDITOR_COMMAND_LOOP_BEEP
 
     ORG    $7D5D
 EDITOR_INITIALIZE_DISK:
@@ -5454,8 +5487,8 @@ EDITOR_INITIALIZE_DISK:
     LDA     #>DISK_BOOT_SECTOR_DATA
     STA     IOB_READ_WRITE_BUFFER_PTR+1
     LDA     #$00
-    STA     IOB_TRACK_NUMBER
     STA     IOB_SECTOR_NUMBER
+    STA     IOB_TRACK_NUMBER
     LDA     #$02
     STA     IOB_COMMAND_CODE            
     JSR     ACCESS_DISK_OR_RESET_GAME   ; write T0S0 with DISK_BOOT_SECTOR_DATA.
@@ -5510,7 +5543,7 @@ EDITOR_INITIALIZE_DISK:
 
     ; Write it back
     LDA     #$02
-    JSR     ACCESS_COMPRESSED_LEVEL_DATA
+    JSR     ACCESS_HI_SCORE_DATA_FROM_DISK
 
     PLA
     STA     DISK_LEVEL_LOC
@@ -5561,10 +5594,244 @@ EDITOR_CLEAR_HIGH_SCORES:
     JSR     ACCESS_HI_SCORE_DATA_FROM_DISK      ; write table
 
 .end:
-    JMP     EDITOR_WAIT_FOR_KEY
+    JMP     EDITOR_COMMAND_LOOP
 
 
     ; Startup code
+
+    ORG    $7F01
+EDIT_LEVEL:
+    SUBROUTINE
+
+    JSR     CLEAR_HGR2
+    LDA     #$40
+    STA     DRAW_PAGE
+    JSR     PUT_STATUS_DRAW
+    LDA     #$20
+    STA     DRAW_PAGE
+
+    JSR     CHECK_FOR_VALID_DATA_DISK
+    LDX     #$01
+    STX     $AD
+    DEX
+    JSR     LOAD_LEVEL
+    BCC     .start_editing
+    JMP     EDITOR_COMMAND_LOOP_BEEP
+
+.start_editing:
+    LDA     #$00
+    STA     GAME_COLNUM
+    STA     GAME_ROWNUM
+
+EDIT_LEVEL_KEY_LOOP:
+    JSR     GET_KEY_FOR_EDIT_LEVEL
+    CMP     #$BA
+    BCS     .store_sprite_num       ; key >= '9'+1
+    CMP     #$B0
+    BCC     .store_sprite_num       ; key < '0'
+    ; key is digit
+
+    AND     #$0F
+    STA     SPRITE_NUM
+    LDY     GAME_ROWNUM
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+
+    LDY     GAME_COLNUM
+    LDA     SPRITE_NUM
+    EOR     (PTR1),Y
+    BEQ     .store_sprite
+    LSR     $AD
+
+.store_sprite:
+    LDA     SPRITE_NUM
+    STA     (PTR1),Y
+    JSR     DRAW_SPRITE_PAGE1
+    JMP     EDIT_LEVEL_KEY_LOOP
+
+.store_sprite_num:
+    STA     SPRITE_NUM
+    LDY     #$FF
+
+.loop2:
+    INY
+    LDA     LEVEL_EDIT_KEY_TABLE,Y
+    BEQ     EDIT_LEVEL_BEEP
+
+    CMP     SPRITE_NUM
+    BNE     .loop2
+
+    TYA
+    ASL
+    TAY
+    LDA     LEVEL_EDIT_KEY_FUNCTIONS+1,Y
+    PHA
+    LDA     LEVEL_EDIT_KEY_FUNCTIONS,Y
+    PHA 
+    RTS
+
+EDIT_LEVEL_BEEP:
+    JSR     BEEP
+    JMP     EDIT_LEVEL_KEY_LOOP
+
+    ORG    $7F74
+LEVEL_EDIT_UP:
+    SUBROUTINE
+
+    LDA     GAME_ROWNUM
+    BEQ     EDIT_LEVEL_BEEP         ; nope!
+
+    DEC     GAME_ROWNUM
+    BPL     EDIT_LEVEL_KEY_LOOP     ; unconditional
+
+LEVEL_EDIT_LEFT:
+    SUBROUTINE
+
+    LDA     GAME_COLNUM
+    BEQ     EDIT_LEVEL_BEEP         ; nope!
+
+    DEC     GAME_COLNUM
+    BPL     EDIT_LEVEL_KEY_LOOP     ; unconditional
+
+LEVEL_EDIT_RIGHT:
+    SUBROUTINE
+
+    LDA     GAME_COLNUM
+    CMP     #MAX_GAME_COL
+    BCS     EDIT_LEVEL_BEEP         ; nope!
+
+    INC     GAME_COLNUM
+    BNE     EDIT_LEVEL_KEY_LOOP     ; unconditional
+
+LEVEL_EDIT_DOWN:
+    SUBROUTINE
+
+    LDA     GAME_ROWNUM
+    CMP     #MAX_GAME_ROW
+    BCS     EDIT_LEVEL_BEEP         ; nope!
+
+    INC     GAME_ROWNUM
+    BNE     EDIT_LEVEL_KEY_LOOP     ; unconditional
+
+LEVEL_EDIT_SAVE1:
+    SUBROUTINE
+
+    LDA     GAME_ROWNUM
+    PHA
+    LDA     GAME_COLNUM
+    PHA
+    LDA     #$01
+    JSR     ACCESS_HI_SCORE_DATA_FROM_DISK
+    CMP     #$00
+    BNE     .check_for_master_disk
+
+    JSR     BAD_DATA_DISK
+    JMP     .end
+
+.check_for_master_disk:
+    CMP     #$01
+    BNE     .save_data
+
+    JSR     DONT_MANIPULATE_MASTER_DISK
+    JMP     .end
+
+.save_data:
+    JSR     COMPRESS_AND_SAVE_LEVEL_DATA
+    PLA
+    STA     GAME_COLNUM
+    PLA
+    STA     GAME_ROWNUM
+    LDA     #$01
+    STA     $AD
+    RTS
+
+.end:
+    LDA     #$00
+    STA     GAME_COLNUM
+    STA     GAME_ROWNUM
+    JMP     EDIT_LEVEL_KEY_LOOP
+
+LEVEL_EDIT_SAVE:
+    SUBROUTINE
+
+    JSR     LEVEL_EDIT_SAVE1
+    JMP     EDIT_LEVEL_KEY_LOOP
+
+LEVEL_EDIT_RIGHT_ARROW:
+    SUBROUTINE
+
+    LDA     DISK_LEVEL_LOC
+    CMP     #$95
+
+LEVEL_EDIT_RIGHT_ARROW_CHECK:
+    BEQ     EDIT_LEVEL_BEEP
+    JSR     LEVEL_EDIT_CHANGE_LEVEL
+    INC     DISK_LEVEL_LOC
+    INC     LEVELNUM
+    JMP     EDIT_LEVEL
+
+LEVEL_EDIT_LEFT_ARROW:
+    SUBROUTINE
+
+    LDA     DISK_LEVEL_LOC
+    BEQ     LEVEL_EDIT_RIGHT_ARROW_CHECK
+    JSR     LEVEL_EDIT_CHANGE_LEVEL
+    DEC     LEVELNUM
+    DEC     DISK_LEVEL_LOC
+    JMP     EDIT_LEVEL
+
+LEVEL_EDIT_Q:
+    SUBROUTINE
+
+    JSR     LEVEL_EDIT_CHANGE_LEVEL
+    JMP     START_LEVEL_EDITOR
+
+LEVEL_EDIT_CHANGE_LEVEL:
+    SUBROUTINE
+
+    LDA     $AD
+    BNE     .end
+    JSR     CLEAR_HGR2
+    LDA     #$40
+    STA     DRAW_PAGE
+    LDA     #$00
+    STA     GAME_COLNUM
+    STA     GAME_ROWNUM
+
+    ; "LEVEL HAS BEEN CHANGED BUT\r"
+    ; "NOT SAVED. DO YOU WISH TO\r"
+    ; "SAVE MODIFIED LEVEL (Y/N) "
+    JSR     PUT_STRING
+    HEX     CC C5 D6 C5 CC A0 C8 C1 D3 A0 C2 C5 C5 CE A0 C3
+    HEX     C8 C1 CE C7 C5 C4 A0 C2 D5 D4 8D CE CF D4 A0 D3
+    HEX     C1 D6 C5 C4 AE A0 C4 CF A0 D9 CF D5 A0 D7 C9 D3
+    HEX     C8 A0 D4 CF 8D D3 C1 D6 C5 A0 CD CF C4 C9 C6 C9
+    HEX     C5 C4 A0 CC C5 D6 C5 CC A0 A8 D9 AF CE A9 A0 00
+
+    JSR     BEEP
+    STA     TXTPAGE2
+
+.loop:
+    LDA     #$00
+    JSR     WAIT_FOR_KEY
+    STA     KBDSTRB
+    CMP     #$CE        ; 'N'
+    BEQ     .end
+
+    CMP     #$D9        ; 'Y'
+    BNE     .loop
+
+    JSR     LEVEL_EDIT_SAVE1
+
+.end:
+    STA     TXTPAGE1
+    LDA     #$00
+    STA     GAME_COLNUM
+    STA     GAME_ROWNUM
+    RTS
+
 
     ORG    $807F
 CHECK_FOR_VALID_DATA_DISK:
@@ -5646,6 +5913,43 @@ BAD_DATA_DISK:
 
     JMP     HIT_KEY_TO_CONTINUE
 
+    ORG    $814B
+GET_KEY_FOR_EDIT_LEVEL:
+    SUBROUTINE
+
+    LDY     GAME_ROWNUM
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_OFFSETS,Y
+    STA     PTR1
+    LDA     CURR_LEVEL_ROW_SPRITES_PTR_PAGES,Y
+    STA     PTR1+1
+
+    LDY     GAME_COLNUM
+    LDA     (PTR1),Y
+    JSR     WAIT_FOR_KEY_WITH_CURSOR_PAGE_1
+    STA     KBDSTRB
+    RTS
+
+    ORG    $8162
+LEVEL_EDIT_KEY_TABLE:
+    ; J (left)
+    ; I (up)
+    ; K (right)
+    ; M (down)
+    ; ctrl-S (save)
+    ; right arrow
+    ; left arrow
+    ; ctrl-Q
+    HEX     CA C9 CB CD 93 95 88 91 00
+LEVEL_EDIT_KEY_FUNCTIONS:
+    WORD    LEVEL_EDIT_LEFT-1
+    WORD    LEVEL_EDIT_UP-1
+    WORD    LEVEL_EDIT_RIGHT-1
+    WORD    LEVEL_EDIT_DOWN-1
+    WORD    LEVEL_EDIT_SAVE-1
+    WORD    LEVEL_EDIT_RIGHT_ARROW-1
+    WORD    LEVEL_EDIT_LEFT_ARROW-1
+    WORD    LEVEL_EDIT_Q-1
+
     ORG    $817B
 GET_LEVEL_FROM_KEYBOARD:
     SUBROUTINE
@@ -5656,6 +5960,7 @@ GET_LEVEL_FROM_KEYBOARD:
     JSR     TO_DECIMAL3     ; make 1-based
     LDA     GAME_COLNUM
     STA     SAVED_GAME_COLNUM
+    LDY     #$00
 
     ; Print current level
 .loop:
@@ -5796,6 +6101,9 @@ EDITOR_WAIT_FOR_KEY:
 KBD_ENTRY_INDEX:
     HEX     60
 
+    ORG    $824E
+SAVED_GAME_COLNUM:
+    HEX     85
     ORG    $824F
 EDITOR_LEVEL_ENTRY:
     HEX     0F
@@ -5807,7 +6115,7 @@ SAVED_VTOC_DATA:
     HEX     60 02 11 0F 04 00 00 FE 00 00 00 00 00 00 00 00
     HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     HEX     00 00 00 00 00 00 00 00 7A 00 00 00 00 00 00 00
-    HEX     00 FF FF 00 00 23 0F 00
+    HEX     00 FF FF 00 00 23 0F 00 01
 
     ORG    $8289
 SAVED_FILE_DESCRIPTIVE_ENTRY_DATA:
@@ -5944,8 +6252,8 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
     STX     COL_SHIFT_AMT
     JSR     COMPUTE_SHIFTED_SPRITE
 
-    LDA     #$0B
-    STA     ROW_COUNT
+    LDX     #$0B
+    STX     ROW_COUNT
     LDX     #$00
     LDA     COL_SHIFT_AMT
     CMP     #$05
@@ -5965,7 +6273,7 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
 
     INX                             ; X++
     INY                             ; Y++
-    LDA     BLOCK_DATA+1,X
+    LDA     BLOCK_DATA,X
     EOR     #$7F
     AND     (ROW_ADDR),Y
     ORA     (ROW_ADDR2),Y
@@ -5992,7 +6300,7 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
 
     INX                             ; X++
     INY                             ; Y++
-    LDA     BLOCK_DATA+1,X
+    LDA     BLOCK_DATA,X
     EOR     #$7F
     AND     (ROW_ADDR),Y
     ORA     (ROW_ADDR2),Y
@@ -6001,7 +6309,7 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
 
     INX                             ; X++
     INY                             ; Y++
-    LDA     BLOCK_DATA+2,X
+    LDA     BLOCK_DATA,X
     EOR     #$7F
     AND     (ROW_ADDR),Y
     ORA     (ROW_ADDR2),Y
@@ -6055,11 +6363,11 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     INY                             ; Y++
     LDA     (ROW_ADDR),Y
     EOR     (ROW_ADDR2),Y
-    AND     BLOCK_DATA+1,X
+    AND     BLOCK_DATA,X
     ORA     SCREENS_DIFFER
     STA     SCREENS_DIFFER          ; SCREENS_DIFFER |= 
                                     ;   ( (screen[COLNUM+1] ^ screen2[COLNUM+1]) & BLOCK_DATA[i+1])
-    LDA     BLOCK_DATA+1,X            
+    LDA     BLOCK_DATA,X            
     ORA     (ROW_ADDR),Y            
     STA     (ROW_ADDR),Y            ; screen[COLNUM+1] |= BLOCK_DATA[i+1]
 
@@ -6088,11 +6396,11 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     INY                             ; Y++
     LDA     (ROW_ADDR),Y
     EOR     (ROW_ADDR2),Y
-    AND     BLOCK_DATA+1,X
+    AND     BLOCK_DATA,X
     ORA     SCREENS_DIFFER
     STA     SCREENS_DIFFER          ; SCREENS_DIFFER |= 
                                     ;   ( (screen[COLNUM+1] ^ screen2[COLNUM+1]) & BLOCK_DATA[i+1])
-    LDA     BLOCK_DATA+1,X            
+    LDA     BLOCK_DATA,X            
     ORA     (ROW_ADDR),Y            
     STA     (ROW_ADDR),Y            ; screen[COLNUM+1] |= BLOCK_DATA[i+1]
 
@@ -6100,18 +6408,18 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     INY                             ; Y++
     LDA     (ROW_ADDR),Y
     EOR     (ROW_ADDR2),Y
-    AND     BLOCK_DATA+2,X
+    AND     BLOCK_DATA,X
     ORA     SCREENS_DIFFER
     STA     SCREENS_DIFFER          ; SCREENS_DIFFER |= 
                                     ;   ( (screen[COLNUM+2] ^ screen2[COLNUM+2]) & BLOCK_DATA[i+2])
-    LDA     BLOCK_DATA+2,X            
+    LDA     BLOCK_DATA,X            
     ORA     (ROW_ADDR),Y            
     STA     (ROW_ADDR),Y            ; screen[COLNUM+2] |= BLOCK_DATA[i+2]
 
     INX                             ; X++
     INC     ROWNUM
     DEC     ROW_COUNT
-    BNE     .loop1
+    BNE     .need_3_bytes
     RTS
 
     ORG    $8438
@@ -6241,22 +6549,22 @@ RECORD_HI_SCORE_DATA_TO_DISK:
     BNE     .record_it
 
     LDA     SCORE+3
-    CMP     HI_SCORE_DATA+4
+    CMP     HI_SCORE_DATA+4,X
     BCC     .next
     BNE     .record_it
 
     LDA     SCORE+2
-    CMP     HI_SCORE_DATA+5
+    CMP     HI_SCORE_DATA+5,X
     BCC     .next
     BNE     .record_it
 
     LDA     SCORE+1
-    CMP     HI_SCORE_DATA+6
+    CMP     HI_SCORE_DATA+6,X
     BCC     .next
     BNE     .record_it
 
     LDA     SCORE
-    CMP     HI_SCORE_DATA+7
+    CMP     HI_SCORE_DATA+7,X
     BCC     .next
     BNE     .record_it
 
@@ -6376,6 +6684,10 @@ RECORD_HI_SCORE_DATA_TO_DISK:
     LDA     KBD_ENTRY_INDEX
     CMP     #$03
     BCC     .get_initial_from_player
+
+    DEC     KBD_ENTRY_INDEX
+    DEC     GAME_COLNUM
+    JMP     .get_initial_from_player
 
 .beep:
     JSR     BEEP
@@ -6526,18 +6838,25 @@ WAIT_KEY_QUEUED:
     STA     KBDSTRB
     RTS
 
-    ORG    $86B5
+    ORG    $86B1
 SOUND_DELAY:
     SUBROUTINE
 
-    LDY     #$B4        ; 180
+    LDA     SOUND_DELAY_AMOUNTS,X
+    TAX
+
+SOUND_DELAY1:
+    LDY     #$B4         ; 180
 .loop:
-    DEY                 ; 2 cycles
-    BNE     .loop       ; 3 cycles
-    DEX                 ; 2 cycles
-    BNE     .loop       ; 3 cycles
+    DEY                  ; 2 cycles
+    BNE     .loop        ; 3 cycles
+    DEX                  ; 2 cycles
+    BNE     SOUND_DELAY1 ; 3 cycles
     RTS
 
+    ORG    $86BE
+SOUND_DELAY_AMOUNTS:
+    HEX     02 04 06 08 0A 0C 0E 10 12 14 16 18 1A 1C 1E 20
     ORG    $86CE
 BEEP:
     SUBROUTINE
@@ -6645,7 +6964,6 @@ WAIT_FOR_KEY_WITH_CURSOR_PAGE_1:
     ORG    $8745
 CURSOR_SPRITE:
     HEX     06
-SAVED_GAME_COLNUM       EQU     $824E
 PTR1        EQU     $06     ; 2 bytes
 PTR2        EQU     $08     ; 2 bytes
 PLAYER_COL      EQU     $00
@@ -6661,7 +6979,7 @@ PLAYER_FACING_DIRECTION     EQU     $05     ; Hi bit set: facing left, otherwise
 WIPE_COUNTER        EQU     $6D
 WIPE_MODE           EQU     $A5     ; 0 for open, 1 for close.
 WIPE_DIR            EQU     $72     ; 0 for close, 1 for open.
-WIPE_CENTER_X       EQU     $77
+WIPE_CENTER_X       EQU     $74
 WIPE_CENTER_Y       EQU     $73
 WIPE0       EQU     $69     ; 16-bit value
 WIPE1       EQU     $67     ; 16-bit value
@@ -6975,7 +7293,7 @@ PLAY_SOUND:
     BEQ     .done
     BCC     .done                   ; If A <= 0, done.
     TAX
-    JSR     SOUND_DELAY
+    JSR     SOUND_DELAY1
 
 .done:
     SEC
@@ -7465,7 +7783,7 @@ DRAW_WIPE_STEP:
     LDY     WIPE8D
     CPY     #40
     BCS     .draw_north
-    LDX     WIPE9R
+    LDX     WIPE8R
     JSR     DRAW_WIPE_BLOCK
 
 .draw_north:
@@ -7489,7 +7807,7 @@ DRAW_WIPE_STEP:
     LDY     WIPE8D
     CPY     #40
     BCS     .draw_north2
-    LDX     WIPE9R
+    LDX     WIPE8R
     JSR     DRAW_WIPE_BLOCK
 
 .draw_north2:
@@ -7536,7 +7854,7 @@ DRAW_WIPE_STEP:
     ; West side
     LDY     WIPE7D
     CPY     #40
-    BCS     .draw_south2
+    BCS     .end
     LDX     WIPE7R
     JMP     DRAW_WIPE_BLOCK           ; tail call
 
@@ -7554,9 +7872,11 @@ DRAW_WIPE_BLOCK:
 
     LDA     WIPE_DIR
     BNE     .open
+    
     LDA     (ROW_ADDR),Y
     AND     WIPE_BLOCK_CLOSE_MASK,X
     STA     (ROW_ADDR),Y
+    RTS
 
 .open:
     LDA     (ROW_ADDR2),Y
@@ -7686,17 +8006,17 @@ TABLE10:
 
     ORG    $8CCF
 ADDRESS_TABLE:
-    WORD    TABLE0-14
-    WORD    TABLE1-14
-    WORD    TABLE2-14
-    WORD    TABLE3-14
-    WORD    TABLE4-14
-    WORD    TABLE5-14
-    WORD    TABLE6-14
-    WORD    TABLE7-14
-    WORD    TABLE8-14
-    WORD    TABLE9-14
-    WORD    TABLE10-14
+    WORD    TABLE0-13
+    WORD    TABLE1-13
+    WORD    TABLE2-13
+    WORD    TABLE3-13
+    WORD    TABLE4-13
+    WORD    TABLE5-13
+    WORD    TABLE6-13
+    WORD    TABLE7-13
+    WORD    TABLE8-13
+    WORD    TABLE9-13
+    WORD    TABLE10-13
     ORG    $8CE5
 SHOW_ANIM_LINE:
     SUBROUTINE
@@ -7716,6 +8036,7 @@ SHOW_ANIM_LINE:
     LDY     #$00
     LDA     (TMP_PTR),Y
     ASL
+    TAX
     LDA     ADDRESS_TABLE,X
     STA     .loop2+1
     LDA     ADDRESS_TABLE+1,X   ; groups of 14 bytes
@@ -7770,6 +8091,7 @@ SHOW_ANIM_LINE:
     STA     KBDSTRB
     RTS
 
+    ORG    $8D4B
 ANIM_COUNT:
     HEX     9D
 
@@ -7785,6 +8107,19 @@ INCREMENT_TMP_PTR:
 
 
     ; Editor routines
+
+    ORG    $8D53
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00
 
     ORG    $8E50
 DEFAULT_INDIRECT_TARGET:
