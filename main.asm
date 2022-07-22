@@ -1,5 +1,5 @@
     PROCESSOR 6502
-TMP_PTR         EQU     $0A     ; 2 bytes
+TMP_PTR             EQU     $0A     ; 2 bytes
 TMP                 EQU     $1A
 SCRATCH_5C          EQU     $5C
 MATH_TMPL           EQU     $6F
@@ -403,7 +403,7 @@ RESET_GAME:
     STA     HIRES
     STA     MIXCLR
     STA     TXTCLR
-    JMP     .long_delay
+    JMP     LONG_DELAY
 
     ORG    $6056
 
@@ -586,7 +586,7 @@ INIT_GAME_DATA:
 
     ORG    $618E
 
-.long_delay:
+LONG_DELAY:
     JSR     WAIT_KEY
     LDX     #$FF
     LDY     #$FF
@@ -650,7 +650,7 @@ CHECK_FOR_BUTTON_DOWN:
     LDA     KBD
     LDX     $AC
     BEQ     .key_pressed
-    JMP     .long_delay
+    JMP     LONG_DELAY
 
     ORG    $61DE
 
@@ -675,7 +675,7 @@ CHECK_FOR_BUTTON_DOWN:
     JSR     HI_SCORE_SCREEN
     LDA     #$02
     STA     GAME_MODE            ; GAME_MODE = 2
-    JMP     .long_delay
+    JMP     LONG_DELAY
 
     ORG    $61F3
 
@@ -768,6 +768,7 @@ LOAD_LEVEL:
 
     LDA     #$01
     STA     ALIVE       ; Set player live
+    ; A happens to also be DISK_ACCESS_READ.
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     LDY     GAME_ROWNUM
@@ -895,7 +896,7 @@ COMPRESS_AND_SAVE_LEVEL_DATA:
     CMP     #MAX_GAME_ROW+1
     BCC     .loop
 
-    LDA     #$02
+    LDA     #DISK_ACCESS_WRITE
     JMP     ACCESS_COMPRESSED_LEVEL_DATA    ; tailcall
     ORG    $630E
 ACCESS_COMPRESSED_LEVEL_DATA:
@@ -905,9 +906,10 @@ ACCESS_COMPRESSED_LEVEL_DATA:
     STA     IOB_COMMAND_CODE
     LDA     GAME_MODE
     LSR
-    BEQ     .copy_level_data        ; If GAME_MODE is 0 or 1, copy level data
+    ; If GAME_MODE is 0 or 1, copy level data from image
+    BEQ     .copy_level_data_from_image
 
-    ; Read/write/format level on disk
+    ; Otherwise, read/write/format level on disk
     LDA     DISK_LEVEL_LOC
     LSR
     LSR
@@ -936,7 +938,7 @@ ACCESS_DISK_OR_RESET_GAME:
 .end:
     RTS
 
-.copy_level_data:
+.copy_level_data_from_image:
     LDA     LEVELNUM        ; 1-based
     CLC
     ADC     #$9E
@@ -2684,17 +2686,19 @@ MOVE_GUARD
     DEC     GUARD_GOLD_TIMER
     LDY     GUARD_GOLD_TIMER
     CPY     #$0D
-    BCS     .guard_flag_0_gt_12
-    JMP     $6e65
+    BCS     .guard_gold_timer_expired
 
-.guard_flag_0_gt_12:
+    ; GUARD_GOLD_TIMER < 12
+    JMP     .check_gold_timer
+
+.guard_gold_timer_expired:
     LDX     GUARD_NUM
     LDA     GUARD_RESURRECTION_TIMERS,X
-    BEQ     .guard_flag_5_zero
+    BEQ     .resurrect_guard_
     JMP     STORE_GUARD_DATA            ; tailcall
 
-.guard_flag_5_zero:
-    JMP     $6db7                       
+.resurrect_guard_:
+    JMP     .resurrect_guard                       
 
 .check_sprite_at_guard_pos:
     LDY     GUARD_LOC_ROW
@@ -2751,9 +2755,9 @@ MOVE_GUARD
     JMP     .ladder
 
 .blank_or_player:
-    JSR     $74DF
+    JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
-    JSR     $7582
+    JSR     NUDGE_GUARD_TOWARDS_EXACT_COLUMN
     LDA     #$06
     LDY     GUARD_FACING_DIRECTION
     BMI     .set_guard_anim_state
@@ -2768,7 +2772,7 @@ MOVE_GUARD
 
     LDA     GUARD_Y_ADJ
     CMP     #$02
-    BNE     $6db7           ; If GUARD_Y_ADJ != 2
+    BNE     .resurrect_guard
 
     JSR     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
     LDY     GUARD_LOC_ROW
@@ -2781,12 +2785,12 @@ MOVE_GUARD
     LDA     (PTR2),Y
 
     CMP     #SPRITE_BRICK
-    BNE     $6db7           ; If background screen has brick
+    BNE     .resurrect_guard
 
     LDA     GUARD_GOLD_TIMER
-    BPL     .6da2
+    BPL     .reset_gold_timer
     DEC     GOLD_COUNT
-.6da2:
+.reset_gold_timer:
     LDA     GUARD_GOLD_TIMER_START_VALUE
     STA     GUARD_GOLD_TIMER
     LDY     #$00
@@ -2797,6 +2801,7 @@ MOVE_GUARD
     JSR     LOAD_SOUND_DATA
     HEX     06 20 04 30 02 40 00
 
+.resurrect_guard:
     JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     DRAW_SPRITE_AT_PIXEL_COORDS
     JMP     STORE_GUARD_DATA            ; tailcall
@@ -2893,13 +2898,14 @@ MOVE_GUARD
     JSR     DRAW_SPRITE_AT_PIXEL_COORDS
     JMP     STORE_GUARD_DATA            ; tailcall
 
-.6e65:
+.check_gold_timer:
     CPY     #$07
     BCC     .ladder
+
     JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
     LDY     GUARD_GOLD_TIMER
-    LDA     GUARD_X_ADJ_TABLE-7,Y
+    LDA     GUARD_X_ADJ_TABLE-7,Y       ; GUARD_X_ADJ_TABLE[GUARD_GOLD_TIMER-7]
     STA     GUARD_X_ADJ
     JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     DRAW_SPRITE_AT_PIXEL_COORDS
@@ -5358,7 +5364,7 @@ EDITOR_CLEAR_LEVEL:
     INY
     BNE     .loop
 
-    LDA     #$02
+    LDA     #DISK_ACCESS_WRITE
     JSR     ACCESS_COMPRESSED_LEVEL_DATA      ; write level
     JMP     EDITOR_COMMAND_LOOP
 
@@ -5411,7 +5417,7 @@ EDITOR_MOVE_LEVEL:
     JSR     CHECK_FOR_VALID_DATA_DISK
     LDA     EDITOR_LEVEL_ENTRY              ; source level
     STA     DISK_LEVEL_LOC
-    LDA     #$01
+    LDA     #DISK_ACCESS_READ
     JSR     ACCESS_COMPRESSED_LEVEL_DATA      ; read source level
 
     ; "\r"
@@ -5424,7 +5430,7 @@ EDITOR_MOVE_LEVEL:
     JSR     CHECK_FOR_VALID_DATA_DISK
     LDA     SAVED_VTOC_DATA                 ; target level
     STA     DISK_LEVEL_LOC
-    LDA     #$02
+    LDA     #DISK_ACCESS_WRITE
     JSR     ACCESS_COMPRESSED_LEVEL_DATA      ; write target level
     JMP     EDITOR_COMMAND_LOOP
 
@@ -5478,7 +5484,7 @@ EDITOR_INITIALIZE_DISK:
     PHA
 
     ; Format the disk
-    LDA     #$04
+    LDA     #DISK_ACCESS_FORMAT
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     ; Write the boot sector (T0S0)
@@ -5496,7 +5502,7 @@ EDITOR_INITIALIZE_DISK:
     ; Read the VTOC (T17S0)
     LDA     #$E0
     STA     DISK_LEVEL_LOC              ; ends up being T17S0 (the VTOC)
-    LDA     #$01
+    LDA     #DISK_ACCESS_READ
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     ; Copy from SAVED_VTOC_DATA to DISK_BUFFER and write it.
@@ -5513,7 +5519,7 @@ EDITOR_INITIALIZE_DISK:
     ; Read the first catalog sector (T17S15)
     LDA     #$EF
     STA     DISK_LEVEL_LOC
-    LDA     #$01
+    LDA     #DISK_ACCESS_READ
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     ; Copy from SAVED_FILE_DESCRIPTIVE_ENTRY_DATA the first file descriptive
@@ -5526,7 +5532,7 @@ EDITOR_INITIALIZE_DISK:
     BPL     .loop2
 
     ; Write it back
-    LDA     #$02
+    LDA     #DISK_ACCESS_WRITE
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     ; Read the high score sector
@@ -5595,9 +5601,6 @@ EDITOR_CLEAR_HIGH_SCORES:
 
 .end:
     JMP     EDITOR_COMMAND_LOOP
-
-
-    ; Startup code
 
     ORG    $7F01
 EDIT_LEVEL:
@@ -5949,6 +5952,7 @@ LEVEL_EDIT_KEY_FUNCTIONS:
     WORD    LEVEL_EDIT_RIGHT_ARROW-1
     WORD    LEVEL_EDIT_LEFT_ARROW-1
     WORD    LEVEL_EDIT_Q-1
+
 
     ORG    $817B
 GET_LEVEL_FROM_KEYBOARD:
@@ -6698,7 +6702,7 @@ RECORD_HI_SCORE_DATA_TO_DISK:
     STA     DRAW_PAGE
     LDA     #$02
     JSR     ACCESS_HI_SCORE_DATA_FROM_DISK      ; write hi score table
-    JMP     $618E
+    JMP     LONG_DELAY
 
     ORG    $85F3
 WAIT_FOR_KEY:
@@ -7012,6 +7016,9 @@ GAME_MODE_LEVEL_EDITOR          EQU     #$05
 DISK_BUFFER             EQU     $0D00       ; 256 bytes
 RWTS_ADDR               EQU     $24         ; 2 bytes
 DISK_LEVEL_LOC          EQU     $96
+DISK_ACCESS_READ        EQU     #$01
+DISK_ACCESS_WRITE       EQU     #$02
+DISK_ACCESS_FORMAT      EQU     #$04
 ALIVE       EQU     $9A
 LEVEL_DATA_INDEX        EQU     $92
 HI_SCORE_INDEX      EQU     $55     ; aliased with TMP_GUARD_COL
@@ -7073,6 +7080,8 @@ GUARD_RIGHT_COL_LIMIT     EQU     $5B
 CHECK_CURR_TMP_ROW  EQU     $5C
 CHECK_TMP_COL       EQU     $5D
 CHECK_TMP_ROW       EQU     $5E
+SEEKABS     EQU     $B9A0
+DSKFORM     EQU     $BEAF
 DOS_IOB                     EQU     $B7E8
 IOB_SLOTNUMx16              EQU     $B7E9
 IOB_DRIVE_NUM               EQU     $B7EA
@@ -8121,11 +8130,135 @@ INCREMENT_TMP_PTR:
     HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     HEX     00 00 00 00 00 00 00 00 00 00 00 00 00
 
+    ORG    $8E00
+FORMAT_PATCH:
+    LDA     #$44
+    STA     $0478       ; Used by DOS as current track.
+    LDA     #$00
+    JSR     SEEKABS     ; DOS routine to move disk to track in A.
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    LDA     #$20
+    STA     $4F
+
+.await_D4_D5_D6:
+    DEY
+    BNE     .read_byte1
+    DEC     $4F
+    BNE     .read_byte1
+    JMP     DSKFORM     ; DOS routine to format disk
+
+    HEX     EA EA
+
+.read_byte1:
+    LDA     $C08C,X
+    BPL     .read_byte1
+
+.check_for_D4:
+    CMP     #$D4
+    BNE     .await_D4_D5_D6
+    NOP
+
+.read_byte2:
+    LDA     $C08C,X
+    BPL     .read_byte2
+
+.check_for_D5:
+    CMP     #$D5
+    BNE     .check_for_D4
+    NOP
+
+.read_byte3:
+    LDA     $C08C,X
+    BPL     .read_byte3
+
+    CMP     #$D6
+    BNE     .check_for_D5
+
+    LDA     $C088,X         ; Turn motor off
+    JSR     DONT_MANIPULATE_MASTER_DISK
+    JMP     START_LEVEL_EDITOR
+
+
+    ; Startup code
+
+    ORG    $8E46
+    HEX     00 00 00 00 00 00 00 00 00 00
+
     ORG    $8E50
 DEFAULT_INDIRECT_TARGET:
     SUBROUTINE
     JMP     DISABLE_INTS_CALL_RWTS
 
+    ORG    $8E53
+    ; through to $8FFF.
+    DS      $1AD
+
+    ORG    $9000
+    INCLUDE "garbage.asm"
+
+    ORG    $9F00
+LEVEL1_DATA:
+    HEX     06 00 00 07 00 00 07 00 00 06 00 00 03 06
+    HEX     13 11 11 11 11 11 11 11 11 03 00 00 03 06
+    HEX     03 00 00 00 00 00 00 07 00 43 44 44 03 76
+    HEX     11 11 11 11 31 11 11 11 11 01 00 00 13 11
+    HEX     11 11 11 11 33 00 00 00 00 00 00 00 03 00
+    HEX     11 11 11 31 43 44 44 44 03 00 00 00 03 00
+    HEX     71 70 11 33 00 00 00 08 03 70 00 08 03 70
+    HEX     11 11 31 03 00 00 13 11 21 22 11 11 13 11 
+    HEX     00 00 30 00 00 00 03 00 00 00 00 00 03 00
+    HEX     00 00 30 00 00 00 03 00 00 00 00 00 03 00
+    HEX     00 00 38 00 70 00 43 44 44 44 44 44 03 70
+    HEX     13 11 11 11 11 11 03 70 00 00 70 00 13 11
+    HEX     03 00 00 00 00 00 03 11 11 11 11 01 03 00
+    HEX     03 00 00 00 00 00 03 00 00 00 00 00 03 00
+    HEX     03 00 00 70 00 00 03 00 90 70 00 00 03 00 
+    HEX     11 11 11 11 11 11 11 11 11 11 11 11 11 11 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+LEVEL2_DATA:
+    HEX     11 11 61 11 11 11 11 11 11 11 11 01 11 11
+    HEX     06 00 61 01 44 44 44 04 00 00 00 00 00 10
+    HEX     16 61 60 01 71 00 10 13 00 00 00 00 80 10
+    HEX     06 11 11 01 11 11 11 13 11 11 07 31 11 11
+    HEX     61 00 00 47 44 11 11 13 11 11 11 31 01 11
+    HEX     11 11 11 01 00 01 10 13 11 10 11 31 01 11
+    HEX     00 00 00 80 00 00 10 13 11 10 01 31 71 10
+    HEX     13 11 11 11 13 73 10 13 11 10 01 31 11 11 
+    HEX     03 00 00 00 13 11 11 13 11 07 01 31 11 10
+    HEX     03 00 00 00 00 11 11 13 11 11 01 31 11 17
+    HEX     03 00 00 00 01 00 00 03 00 00 00 30 00 10
+    HEX     13 11 13 11 31 21 21 21 21 21 21 31 21 21
+    HEX     13 11 13 11 31 11 11 11 00 11 11 31 21 21
+    HEX     03 00 03 00 30 11 11 11 01 10 11 31 00 00
+    HEX     13 11 11 11 31 11 11 11 11 07 11 11 11 31
+    HEX     93 00 00 00 30 70 10 11 11 01 80 00 00 30 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+LEVEL3_DATA:
+    HEX     00 00 00 30 00 00 00 00 00 00 00 00 00 00
+    HEX     80 07 00 30 00 00 00 00 00 00 00 00 70 08
+    HEX     13 81 07 30 00 00 00 00 00 00 00 70 18 31
+    HEX     03 10 01 30 11 11 36 11 11 31 00 10 01 30
+    HEX     03 00 00 00 00 00 33 07 00 30 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 30 00 00 00 30
+    HEX     03 00 00 00 00 00 33 07 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 00 00 00 00 30 
+    HEX     03 00 00 00 00 00 33 07 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 33 07 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 33 07 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 00 00 00 00 30
+    HEX     03 00 00 00 09 00 33 07 00 00 00 00 00 30
+    HEX     03 00 30 11 11 11 11 11 11 11 11 03 00 30 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     ORG    $A200
 PIXEL_SHIFT_TABLE:
     INCLUDE "pixel_shift_table.asm"
@@ -8135,3 +8268,9 @@ PIXEL_PATTERN_TABLE:
     ORG    $AD00
 SPRITE_DATA:
     INCLUDE "sprite_data.asm"
+    ORG    $B5F0
+    HEX     C5 A2 D4 A2 00 D0 8A 94 80 80 80 80 80 80 80 80
+
+    ORG    $B600
+    INCLUDE "dos.asm"
+

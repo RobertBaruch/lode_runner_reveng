@@ -35,6 +35,8 @@
 
 @ \chapter{Lode Runner}
 
+\section{Introduction}
+
 Lode Runner was a game originally written in 1982 by Douglas E. Smith (1960--2014) for
 the Apple II series of computers, and published by Broderbund.
 
@@ -62,22 +64,71 @@ gets you to the next level, and play continues.
 
 Lode Runner included 150 levels and also a level editor.
 
+\section{About this document}
+
+This is a literate programming document. This means the explanatory text is
+interspersed with source code. The source code can be extracted from the document
+and compiled.
+
+The goal is to provide all the source code necessary to reproduce a binary
+identical to the one found on the Internet Archive's [[Lode_Runner_1983_Broderbund_cr_Reset_Vector.do]]
+disk image.
+
+The assembly code is assembled using [[dasm]].
+
+This document doesn't explain every last detail. It's assumed that the reader can
+find enough details on the 6502 processor and the Apple II series of computers
+to fill in the gaps.
+
 \chapter{Programming techniques}
 
 \section{Zero page temporaries}
 
+Zero-page consists essentially of global variables. Sometimes we need local
+temporaries, and Lode Runner mostly doesn't use the stack for those. Rather,
+some "global" variables are reserved for temporaries. You might see multiple
+symbols equated to a single zero-page location. The names of such symbols are
+used to make sense within their context.
+
 \section{Tail calls}
 
-\section{Unconditional conditional branches}
+Rather than a [[JSR]] immediately followed by an [[RTS]], instead a [[JMP]]
+can be used to save stack space, code space, and time. This is known as a
+tail call, because it is a call that happens at the tail of a function.
+
+\section{Unconditional branches}
+
+The 6502 doesn't have an unconditional short jump. However, if you can find
+a condition that is always true, this can serve as an unconditional short
+jump, which saves space and time.
 
 \section{Stretchy branches}
 
+6502 branches have a limit to how far they can jump. If they really need to
+jump farther than that, you have to put a [[JMP]] or an unconditional branch
+within reach.
+
+\section{Shared code}
+
+To save space, sometimes code at the end of one function is also useful to
+the next function, as long as it is within reach. This can save space, at
+the expense of functions being completely independent.
+
 \section{DOS}
+
+Since programs generally come on disk, and such disks are genrally bootable,
+the only thing the disk card does is load the data of the disk on track 0
+sector 0 to location [[0800]] and then jump to it. Thus, any additional
+services need to be supplied by the disk as a disk operating system. The most
+popular ones were DOS 3.3 and ProDOS.
+
+Lode Runner contains just the parts of DOS 3.3 it needs. See the section on
+Disk routines for more information.
 
 \section{Temporaries and scratch space}
 
 <<defines>>=
-TMP_PTR         EQU     $0A     ; 2 bytes
+TMP_PTR             EQU     $0A     ; 2 bytes
 TMP                 EQU     $1A
 SCRATCH_5C          EQU     $5C
 MATH_TMPL           EQU     $6F
@@ -3373,9 +3424,13 @@ There's one switch here, [[GAME_MODE]], which dictates whether we're going to
 display the high-score screen, attract-mode game play, the splash screen,
 or an actual level for playing.
 
+Also, if we're in attract mode, instead of loading the level from disk, we load
+the level from the game image, which contains the first three "standard" levels.
+
 One additional feature is that you can start the routine with [[A]] being [[1]]
 to read a level, [[2]] to write a level, and [[4]] to format the entire disk. Writing
-and formatting is used by the level editor.
+and formatting is used by the level editor. But see also [[FORMAT_PATCH]] for
+prevention of formatting Lode Runner itself.
 
 <<defines>>=
 GAME_MODE               EQU     $A7
@@ -3396,6 +3451,12 @@ DISK_LEVEL_LOC          EQU     $96
 JMP_RWTS        EQU     $23     ; JMP $0000, gets loaded with RWTS address later
 @ %def JMP_RWTS
 
+<<defines>>=
+DISK_ACCESS_READ        EQU     #$01
+DISK_ACCESS_WRITE       EQU     #$02
+DISK_ACCESS_FORMAT      EQU     #$04
+@ %def DISK_ACCESS_READ DISK_ACCESS_WRITE DISK_ACCESS_FORMAT
+
 <<load compressed level data>>=
     ORG     $630E
 ACCESS_COMPRESSED_LEVEL_DATA:
@@ -3405,9 +3466,10 @@ ACCESS_COMPRESSED_LEVEL_DATA:
     STA     IOB_COMMAND_CODE
     LDA     GAME_MODE
     LSR
-    BEQ     .copy_level_data        ; If GAME_MODE is 0 or 1, copy level data
+    ; If GAME_MODE is 0 or 1, copy level data from image
+    BEQ     .copy_level_data_from_image
 
-    ; Read/write/format level on disk
+    ; Otherwise, read/write/format level on disk
     LDA     DISK_LEVEL_LOC
     LSR
     LSR
@@ -3436,13 +3498,13 @@ ACCESS_DISK_OR_RESET_GAME:
 .end:
     RTS
 
-.copy_level_data:
+.copy_level_data_from_image:
     <<Copy level data>>
 @
 
 We're not really using [[ROW_ADDR]] here as a row address, just as
 a convenient place to store a pointer. Also, we can see that
-level data is stored in 256-byte pages at [[9F00]], [[A000]], and so on.
+the attract-mode level data is stored in 256-byte pages at [[9F00]], [[A000]], and [[A100]].
 Level numbers start from 1, so [[9E00]] doesn't actually contain level data.
 
 Since the game is supposed to come with 150 levels, there is not enough room
@@ -3472,6 +3534,71 @@ few levels are in memory.
     RTS
 @
 
+Since levels are 28 sprites across with two sprites per byte,
+we'll show the hex data as 14 bytes per line. There is no level
+data past the 16th line.
+
+<<tables>>=
+    ORG     $9F00
+LEVEL1_DATA:
+    HEX     06 00 00 07 00 00 07 00 00 06 00 00 03 06
+    HEX     13 11 11 11 11 11 11 11 11 03 00 00 03 06
+    HEX     03 00 00 00 00 00 00 07 00 43 44 44 03 76
+    HEX     11 11 11 11 31 11 11 11 11 01 00 00 13 11
+    HEX     11 11 11 11 33 00 00 00 00 00 00 00 03 00
+    HEX     11 11 11 31 43 44 44 44 03 00 00 00 03 00
+    HEX     71 70 11 33 00 00 00 08 03 70 00 08 03 70
+    HEX     11 11 31 03 00 00 13 11 21 22 11 11 13 11 
+    HEX     00 00 30 00 00 00 03 00 00 00 00 00 03 00
+    HEX     00 00 30 00 00 00 03 00 00 00 00 00 03 00
+    HEX     00 00 38 00 70 00 43 44 44 44 44 44 03 70
+    HEX     13 11 11 11 11 11 03 70 00 00 70 00 13 11
+    HEX     03 00 00 00 00 00 03 11 11 11 11 01 03 00
+    HEX     03 00 00 00 00 00 03 00 00 00 00 00 03 00
+    HEX     03 00 00 70 00 00 03 00 90 70 00 00 03 00 
+    HEX     11 11 11 11 11 11 11 11 11 11 11 11 11 11 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+LEVEL2_DATA:
+    HEX     11 11 61 11 11 11 11 11 11 11 11 01 11 11
+    HEX     06 00 61 01 44 44 44 04 00 00 00 00 00 10
+    HEX     16 61 60 01 71 00 10 13 00 00 00 00 80 10
+    HEX     06 11 11 01 11 11 11 13 11 11 07 31 11 11
+    HEX     61 00 00 47 44 11 11 13 11 11 11 31 01 11
+    HEX     11 11 11 01 00 01 10 13 11 10 11 31 01 11
+    HEX     00 00 00 80 00 00 10 13 11 10 01 31 71 10
+    HEX     13 11 11 11 13 73 10 13 11 10 01 31 11 11 
+    HEX     03 00 00 00 13 11 11 13 11 07 01 31 11 10
+    HEX     03 00 00 00 00 11 11 13 11 11 01 31 11 17
+    HEX     03 00 00 00 01 00 00 03 00 00 00 30 00 10
+    HEX     13 11 13 11 31 21 21 21 21 21 21 31 21 21
+    HEX     13 11 13 11 31 11 11 11 00 11 11 31 21 21
+    HEX     03 00 03 00 30 11 11 11 01 10 11 31 00 00
+    HEX     13 11 11 11 31 11 11 11 11 07 11 11 11 31
+    HEX     93 00 00 00 30 70 10 11 11 01 80 00 00 30 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+LEVEL3_DATA:
+    HEX     00 00 00 30 00 00 00 00 00 00 00 00 00 00
+    HEX     80 07 00 30 00 00 00 00 00 00 00 00 70 08
+    HEX     13 81 07 30 00 00 00 00 00 00 00 70 18 31
+    HEX     03 10 01 30 11 11 36 11 11 31 00 10 01 30
+    HEX     03 00 00 00 00 00 33 07 00 30 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 30 00 00 00 30
+    HEX     03 00 00 00 00 00 33 07 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 00 00 00 00 30 
+    HEX     03 00 00 00 00 00 33 07 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 33 07 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 33 07 00 00 00 00 00 30
+    HEX     03 00 00 00 00 00 37 03 00 00 00 00 00 30
+    HEX     03 00 00 00 09 00 33 07 00 00 00 00 00 30
+    HEX     03 00 30 11 11 11 11 11 11 11 11 03 00 30 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+@ %def LEVEL1_DATA LEVEL2_DATA LEVEL3_DATA
+
 \subsection{Uncompressing and displaying the level}
 
 Loading the level also sets the player [[ALIVE]] flag to [[1]] (alive). Throughout
@@ -3494,6 +3621,7 @@ LOAD_LEVEL:
 
     LDA     #$01
     STA     ALIVE       ; Set player live
+    ; A happens to also be DISK_ACCESS_READ.
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     <<uncompress level data>>
@@ -3683,7 +3811,7 @@ COMPRESS_AND_SAVE_LEVEL_DATA:
     CMP     #MAX_GAME_ROW+1
     BCC     .loop
 
-    LDA     #$02
+    LDA     #DISK_ACCESS_WRITE
     JMP     ACCESS_COMPRESSED_LEVEL_DATA    ; tailcall
 @ %def COMPRESS_AND_SAVE_LEVEL_DATA
 
@@ -3920,7 +4048,7 @@ RESET_GAME:
     STA     HIRES
     STA     MIXCLR
     STA     TXTCLR
-    JMP     .long_delay
+    JMP     LONG_DELAY
 @
 
 This loop writes a screen of graphics by reading from the table starting at [[$0F00]].
@@ -4339,7 +4467,7 @@ through the loop:
     LDA     KBD
     LDX     $AC
     BEQ     .key_pressed
-    JMP     .long_delay
+    JMP     LONG_DELAY
 @
 
 <<check game mode>>=
@@ -4369,7 +4497,7 @@ Game mode 2 displays the high score screen.
     JSR     HI_SCORE_SCREEN
     LDA     #$02
     STA     GAME_MODE            ; GAME_MODE = 2
-    JMP     .long_delay
+    JMP     LONG_DELAY
 @
 
 When we change over to the high score screen or attract mode, we set the delay
@@ -4378,7 +4506,7 @@ to the next mode very large: 195075 times around the loop.
 <<long delay attract mode>>=
     ORG     $618E
 
-.long_delay:
+LONG_DELAY:
     JSR     WAIT_KEY
     LDX     #$FF
     LDY     #$FF
@@ -4993,6 +5121,11 @@ state. If a paddle button is pressed, it translates to the dig left or dig right
 keyboard command. Otherwise, the joystick state is read and compared to the
 thresholds [[0x12]] and [[0x2E]], which can be reversed through the ctrl-X key,
 and translated to left, right, up, or down keyboard commands.
+
+\begin{center}
+\includegraphics[width=\columnwidth]{read_joystick_for_command}
+\end{center}
+
 
 <<tables>>=
     ORG     $6B81
@@ -6622,17 +6755,19 @@ MOVE_GUARD
     DEC     GUARD_GOLD_TIMER
     LDY     GUARD_GOLD_TIMER
     CPY     #$0D
-    BCS     .guard_flag_0_gt_12
-    JMP     $6e65
+    BCS     .guard_gold_timer_expired
 
-.guard_flag_0_gt_12:
+    ; GUARD_GOLD_TIMER < 12
+    JMP     .check_gold_timer
+
+.guard_gold_timer_expired:
     LDX     GUARD_NUM
     LDA     GUARD_RESURRECTION_TIMERS,X
-    BEQ     .guard_flag_5_zero
+    BEQ     .resurrect_guard_
     JMP     STORE_GUARD_DATA            ; tailcall
 
-.guard_flag_5_zero:
-    JMP     $6db7                       
+.resurrect_guard_:
+    JMP     .resurrect_guard                       
 
 .check_sprite_at_guard_pos:
     LDY     GUARD_LOC_ROW
@@ -6678,9 +6813,9 @@ MOVE_GUARD
     JMP     .ladder
 
 .blank_or_player:
-    JSR     $74DF
+    JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
-    JSR     $7582
+    JSR     NUDGE_GUARD_TOWARDS_EXACT_COLUMN
     LDA     #$06
     LDY     GUARD_FACING_DIRECTION
     BMI     .set_guard_anim_state
@@ -6695,7 +6830,7 @@ MOVE_GUARD
 
     LDA     GUARD_Y_ADJ
     CMP     #$02
-    BNE     $6db7           ; If GUARD_Y_ADJ != 2
+    BNE     .resurrect_guard
 
     JSR     CHECK_FOR_GOLD_PICKED_UP_BY_GUARD
     LDY     GUARD_LOC_ROW
@@ -6704,12 +6839,12 @@ MOVE_GUARD
     LDA     (PTR2),Y
 
     CMP     #SPRITE_BRICK
-    BNE     $6db7           ; If background screen has brick
+    BNE     .resurrect_guard
 
     LDA     GUARD_GOLD_TIMER
-    BPL     .6da2
+    BPL     .reset_gold_timer
     DEC     GOLD_COUNT
-.6da2:
+.reset_gold_timer:
     LDA     GUARD_GOLD_TIMER_START_VALUE
     STA     GUARD_GOLD_TIMER
     LDY     #$00
@@ -6720,6 +6855,7 @@ MOVE_GUARD
     JSR     LOAD_SOUND_DATA
     HEX     06 20 04 30 02 40 00
 
+.resurrect_guard:
     JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     DRAW_SPRITE_AT_PIXEL_COORDS
     JMP     STORE_GUARD_DATA            ; tailcall
@@ -6791,13 +6927,14 @@ MOVE_GUARD
     JSR     DRAW_SPRITE_AT_PIXEL_COORDS
     JMP     STORE_GUARD_DATA            ; tailcall
 
-.6e65:
+.check_gold_timer:
     CPY     #$07
     BCC     .ladder
+
     JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     ERASE_SPRITE_AT_PIXEL_COORDS
     LDY     GUARD_GOLD_TIMER
-    LDA     GUARD_X_ADJ_TABLE-7,Y
+    LDA     GUARD_X_ADJ_TABLE-7,Y       ; GUARD_X_ADJ_TABLE[GUARD_GOLD_TIMER-7]
     STA     GUARD_X_ADJ
     JSR     GET_GUARD_SPRITE_AND_COORDS
     JSR     DRAW_SPRITE_AT_PIXEL_COORDS
@@ -7974,6 +8111,81 @@ of DOS. So, the area [[B600-BFFF]] is taken by DOS routines.
 The standard DOS I/O Control Block (IOB) and Device Characteristics Table (DCT) are used.
 Further details can be read in Beneath Apple DOS.
 
+There is one patch that seems to have been applied. DOS has a routine called [[FORMDSK]]
+located at [[BE0D]] which is supposed to jump to [[DSKFORM]] at [[BE46]], which
+formats a disk. Lode Runner's copy of DOS changes the jump target to [[8E00]],
+Lode Runner's [[FORMAT_PATCH]] routine.
+
+The reason for this is to prevent formatting the Load Runner master disk via the
+level editor.
+
+The routine moves to track 0, and keeps reading bytes off the disk until either
+it finds a sequence of [[D4 D5 D6]], or times out. If it finds the sequence, we've
+detected that this disk we're trying to format is the Lode Runner master disk, and
+we should error out and go back to the level editor.
+
+Otherwise we're OK to proceed with disk formatting.
+
+<<defines>>=
+SEEKABS     EQU     $B9A0
+DSKFORM     EQU     $BEAF
+@
+
+<<format patch>>=
+    ORG     $8E00
+FORMAT_PATCH:
+    LDA     #$44
+    STA     $0478       ; Used by DOS as current track.
+    LDA     #$00
+    JSR     SEEKABS     ; DOS routine to move disk to track in A.
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    LDA     #$20
+    STA     $4F
+
+.await_D4_D5_D6:
+    DEY
+    BNE     .read_byte1
+    DEC     $4F
+    BNE     .read_byte1
+    JMP     DSKFORM     ; DOS routine to format disk
+
+    HEX     EA EA
+
+.read_byte1:
+    LDA     $C08C,X
+    BPL     .read_byte1
+
+.check_for_D4:
+    CMP     #$D4
+    BNE     .await_D4_D5_D6
+    NOP
+
+.read_byte2:
+    LDA     $C08C,X
+    BPL     .read_byte2
+
+.check_for_D5:
+    CMP     #$D5
+    BNE     .check_for_D4
+    NOP
+
+.read_byte3:
+    LDA     $C08C,X
+    BPL     .read_byte3
+
+    CMP     #$D6
+    BNE     .check_for_D5
+
+    LDA     $C088,X         ; Turn motor off
+    JSR     DONT_MANIPULATE_MASTER_DISK
+    JMP     START_LEVEL_EDITOR
+@ %def FORMAT_PATCH
+
 <<defines>>=
 DOS_IOB                     EQU     $B7E8
 IOB_SLOTNUMx16              EQU     $B7E9
@@ -8252,7 +8464,7 @@ RECORD_HI_SCORE_DATA_TO_DISK:
     STA     DRAW_PAGE
     LDA     #$02
     JSR     ACCESS_HI_SCORE_DATA_FROM_DISK      ; write hi score table
-    JMP     $618E
+    JMP     LONG_DELAY
 
     ORG     $824D
 KBD_ENTRY_INDEX:
@@ -8430,7 +8642,7 @@ EDITOR_INITIALIZE_DISK:
     PHA
 
     ; Format the disk
-    LDA     #$04
+    LDA     #DISK_ACCESS_FORMAT
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     ; Write the boot sector (T0S0)
@@ -8448,7 +8660,7 @@ EDITOR_INITIALIZE_DISK:
     ; Read the VTOC (T17S0)
     LDA     #$E0
     STA     DISK_LEVEL_LOC              ; ends up being T17S0 (the VTOC)
-    LDA     #$01
+    LDA     #DISK_ACCESS_READ
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     ; Copy from SAVED_VTOC_DATA to DISK_BUFFER and write it.
@@ -8465,7 +8677,7 @@ EDITOR_INITIALIZE_DISK:
     ; Read the first catalog sector (T17S15)
     LDA     #$EF
     STA     DISK_LEVEL_LOC
-    LDA     #$01
+    LDA     #DISK_ACCESS_READ
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     ; Copy from SAVED_FILE_DESCRIPTIVE_ENTRY_DATA the first file descriptive
@@ -8478,7 +8690,7 @@ EDITOR_INITIALIZE_DISK:
     BPL     .loop2
 
     ; Write it back
-    LDA     #$02
+    LDA     #DISK_ACCESS_WRITE
     JSR     ACCESS_COMPRESSED_LEVEL_DATA
 
     ; Read the high score sector
@@ -9140,7 +9352,7 @@ EDITOR_CLEAR_LEVEL:
     INY
     BNE     .loop
 
-    LDA     #$02
+    LDA     #DISK_ACCESS_WRITE
     JSR     ACCESS_COMPRESSED_LEVEL_DATA      ; write level
     JMP     EDITOR_COMMAND_LOOP
 
@@ -9191,7 +9403,7 @@ EDITOR_MOVE_LEVEL:
     JSR     CHECK_FOR_VALID_DATA_DISK
     LDA     EDITOR_LEVEL_ENTRY              ; source level
     STA     DISK_LEVEL_LOC
-    LDA     #$01
+    LDA     #DISK_ACCESS_READ
     JSR     ACCESS_COMPRESSED_LEVEL_DATA      ; read source level
 
     ; "\r"
@@ -9204,7 +9416,7 @@ EDITOR_MOVE_LEVEL:
     JSR     CHECK_FOR_VALID_DATA_DISK
     LDA     SAVED_VTOC_DATA                 ; target level
     STA     DISK_LEVEL_LOC
-    LDA     #$02
+    LDA     #DISK_ACCESS_WRITE
     JSR     ACCESS_COMPRESSED_LEVEL_DATA      ; write target level
     JMP     EDITOR_COMMAND_LOOP
 
@@ -9532,6 +9744,30 @@ LEVEL_EDIT_CHANGE_LEVEL:
     RTS
 @
 
+\chapter{Extra data}
+
+From [[9000]] through [[9EFF]] appears to be unused data. [[9E00-9EFF]] is interesting
+because it seems to contain a fragment of source code:
+
+[[
+QU $1C35
+ytable EQU $1C51
+bytable EQU $1C62
+bitable EQU $1C7E
+xbytable EQU $1C9A
+xbitable EQU $1D26
+boot EQU $1DB2
+scorebuf EQU $1F00
+chardata EQU $AD00
+
+rwtsparm EQU $B7E8
+rwtsvolm EQU $B7EB
+rwtstrck EQU $B7EC
+rwtssect EQU $B7ED
+rwtsbuff EQU $B7F0
+rwtscmn
+]]
+
 \chapter{The whole thing}
 
 We then put together the entire assembly file, including all the data that happened
@@ -9730,7 +9966,7 @@ Dead code is code that disassembles, but doesn't seem to be called.
     ; Fallthrough to RESET_GAME
 @
 
-<<tables>>=
+<<zeroed areas>>=
     ORG     $8D53
     HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -9743,6 +9979,26 @@ Dead code is code that disassembles, but doesn't seem to be called.
     HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     HEX     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     HEX     00 00 00 00 00 00 00 00 00 00 00 00 00
+
+    ORG     $8E46
+    HEX     00 00 00 00 00 00 00 00 00 00
+
+    ORG     $8E53
+    ; through to $8FFF.
+    DS      $1AD
+@
+
+<<garbage area>>=
+    ORG     $9000
+    INCLUDE "garbage.asm"
+
+    ORG     $B5F0
+    HEX     C5 A2 D4 A2 00 D0 8A 94 80 80 80 80 80 80 80 80
+@
+
+<<dos>>=
+    ORG     $B600
+    INCLUDE "dos.asm"
 @
 
 <<routines>>=
@@ -9860,6 +10116,7 @@ Dead code is code that disassembles, but doesn't seem to be called.
     <<check for valid data disk>>
     <<editor initialize disk>>
     <<editor clear high scores>>
+    <<format patch>>
 
     ; Startup code
 
@@ -9903,6 +10160,9 @@ Dead code is code that disassembles, but doesn't seem to be called.
     <<routines>>
     <<relocation routine>>
     <<dead code>>
+    <<zeroed areas>>
+    <<garbage area>>
+    <<dos>>
 @
 
 \chapter{Defined Chunks}\par\noindent
