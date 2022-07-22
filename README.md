@@ -1,7 +1,7 @@
 # lode_runner_reveng
 Reverse engineering of Lode Runner for the Apple II series.
 
-main.pdf is the literate programming document for this project. This means the explanatory text is interspersed with source code. The source code can be extracted from the document and compiled.
+[main.pdf](main.pdf) is the literate programming document for this project. This means the explanatory text is interspersed with source code. The source code can be extracted from the document and compiled.
 
 The goal is to provide all the source code necessary to reproduce a binary identical to the one found on the Internet Archive's [Lode_Runner_1983_Broderbund_cr_Reset_Vector.do](https://archive.org/details/a2_Lode_Runner_1983_Broderbund_cr_Reset_Vector) disk image.
 
