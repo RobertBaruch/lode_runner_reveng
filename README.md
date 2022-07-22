@@ -1,12 +1,21 @@
 # lode_runner_reveng
 Reverse engineering of Lode Runner for the Apple II series.
 
-NOTE: This is a work in progress. One issue is that `dasm` doesn't seem to want to assemble a file that has
-out-of-order ORG fragments. Eventually once I add all code blocks in the source document, I hope to order them
-properly in the root code block so that the generated binary exactly matches the binary I started with for
-reverse engineering.
+main.pdf is the literate programming document for this project. This means the explanatory text is interspersed with source code. The source code can be extracted from the document and compiled.
 
-For now, you can track progress in the main.pdf file.
+The goal is to provide all the source code necessary to reproduce a binary identical to the one found on the Internet Archive's [Lode_Runner_1983_Broderbund_cr_Reset_Vector.do](https://archive.org/details/a2_Lode_Runner_1983_Broderbund_cr_Reset_Vector) disk image.
+
+The assembly code is assembled using [`dasm`](https://dasm-assembler.github.io/).
+
+This document doesn't explain every last detail. It's assumed that the reader can find enough details on the 6502 processor and the Apple II series of computers to fill in the gaps.
+
+## Useful 6502 and Apple II resources:
+
+* [Beneath Apple DOS](https://archive.org/details/beneath-apple-dos), by Don Worth and Pieter Lechner, 1982.
+* [Apple II Computer Graphics](https://archive.org/details/williams-et-al-1983-apple-ii-computer-graphics), by Ken Williams, Bob Kernaghan, and Lisa Kernaghan, 1983.
+* [6502 Assembly Language Programming](https://archive.org/details/6502alp), by Lance A. Leventhal, 1979.
+* [Beagle Bros Apple Colors and ASCII Values](https://archive.org/details/Beagle_Bros-Poster_1), Beagle Bros Micro Software Inc, 1984.
+* [Hi-Res Graphics and Animation Using Assembly Language, The Guide for Apple II Programmers](https://archive.org/details/hi-res-graphics-and-animation-using-assembly-language), by Leanard I. Malkin, 1985.
 
 ## Compilation
 
