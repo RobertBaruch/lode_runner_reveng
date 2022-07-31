@@ -848,8 +848,8 @@ DRAW_SPRITE:
     LDX     #$00
     LDA     \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7}
     CMP     #$05
-    BCS     .need_3_bytes       ; If \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7} >= 5, we need to alter three screen bytes,
-                                ; otherwise just two bytes.
+    BCS     .need_3_bytes       ; If \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7} >= 5, we need to alter three
+                                ; screen bytes, otherwise just two bytes.
 
 .loop1:
     LDY     \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-7}
@@ -858,14 +858,16 @@ DRAW_SPRITE:
     LDA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y 
     AND     \nwlinkedidentc{MASK0}{NW1Xx3lK-10jlgu-7}
     ORA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X 
-    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y        ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] = screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] & \nwlinkedidentc{MASK0}{NW1Xx3lK-10jlgu-7} | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i]
+    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y        ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] =
+                                ;   screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] & \nwlinkedidentc{MASK0}{NW1Xx3lK-10jlgu-7} | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i]
 
     INX                         ; X++
     INY                         ; Y++
     LDA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y 
     AND     \nwlinkedidentc{MASK1}{NW1Xx3lK-10jlgu-7}
     ORA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X 
-    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y        ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] = screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] & \nwlinkedidentc{MASK1}{NW1Xx3lK-10jlgu-7} | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1]
+    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y        ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] =
+                                ;   screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] & \nwlinkedidentc{MASK1}{NW1Xx3lK-10jlgu-7} | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1]
 
     INX
     INX                         ; X += 2
@@ -881,7 +883,8 @@ DRAW_SPRITE:
     LDA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y 
     AND     \nwlinkedidentc{MASK0}{NW1Xx3lK-10jlgu-7}
     ORA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X 
-    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y        ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] = screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] & \nwlinkedidentc{MASK0}{NW1Xx3lK-10jlgu-7} | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i]
+    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y        ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] =
+                                ;   screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] & \nwlinkedidentc{MASK0}{NW1Xx3lK-10jlgu-7} | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i]
 
     INX                         ; X++
     INY                         ; Y++
@@ -893,7 +896,8 @@ DRAW_SPRITE:
     LDA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y 
     AND     \nwlinkedidentc{MASK1}{NW1Xx3lK-10jlgu-7}
     ORA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X 
-    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y        ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] = screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] & \nwlinkedidentc{MASK1}{NW1Xx3lK-10jlgu-7} | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+2]
+    STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y        ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] =
+                                ;   screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] & \nwlinkedidentc{MASK1}{NW1Xx3lK-10jlgu-7} | \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+2]
 
     INX                         ; X++
     INC     \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-7}              ; \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-7}++
@@ -930,8 +934,8 @@ the maximum coordinate (279) wouldn't fit in a register.
     LDX     #$00
     LDA     \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7}
     CMP     #$05
-    BCS     .need_3_bytes       ; If \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7} >= 5, we need to alter three screen bytes,
-                                ; otherwise just two bytes.
+    BCS     .need_3_bytes       ; If \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7} >= 5, we need to alter three
+                                ; screen bytes, otherwise just two bytes.
 
 .loop1:
     LDY     \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-7}
@@ -942,7 +946,8 @@ the maximum coordinate (279) wouldn't fit in a register.
     AND     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y
     ORA     (\nwlinkedidentc{ROW_ADDR2}{NW1Xx3lK-10jlgu-5}),Y
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] =
-                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i] ^ 0x7F)) | screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}]
+                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i] ^ 0x7F)) |
+                                    ;   screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}]
 
     INX                             ; X++
     INY                             ; Y++
@@ -951,7 +956,8 @@ the maximum coordinate (279) wouldn't fit in a register.
     AND     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y
     ORA     (\nwlinkedidentc{ROW_ADDR2}{NW1Xx3lK-10jlgu-5}),Y
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] =
-                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1] ^ 0x7F)) | screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1]
+                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1] ^ 0x7F)) |
+                                    ;   screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1]
 
     INX                             ; X++
     INX                             ; X++
@@ -969,7 +975,8 @@ the maximum coordinate (279) wouldn't fit in a register.
     AND     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y
     ORA     (\nwlinkedidentc{ROW_ADDR2}{NW1Xx3lK-10jlgu-5}),Y
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] =
-                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i] ^ 0x7F)) | screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}]
+                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i] ^ 0x7F)) |
+                                    ;   screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}]
 
     INX                             ; X++
     INY                             ; Y++
@@ -978,7 +985,8 @@ the maximum coordinate (279) wouldn't fit in a register.
     AND     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y
     ORA     (\nwlinkedidentc{ROW_ADDR2}{NW1Xx3lK-10jlgu-5}),Y
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] =
-                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1] ^ 0x7F)) | screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1]
+                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1] ^ 0x7F)) |
+                                    ;   screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1]
 
     INX                             ; X++
     INY                             ; Y++
@@ -987,7 +995,8 @@ the maximum coordinate (279) wouldn't fit in a register.
     AND     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y
     ORA     (\nwlinkedidentc{ROW_ADDR2}{NW1Xx3lK-10jlgu-5}),Y
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] =
-                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+2] ^ 0x7F)) | screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2]
+                                    ;   (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] & (\nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+2] ^ 0x7F)) |
+                                    ;   screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2]
 
     INX                             ; X++
     INC     \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-7}
@@ -1024,8 +1033,8 @@ routine also sets whether the active and the background screens differ in {\Tt{}
     STX     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}      ; \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8} = 0
     LDA     \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7}
     CMP     #$05
-    BCS     .need_3_bytes       ; If \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7} >= 5, we need to alter three screen bytes,
-                                ; otherwise just two bytes.
+    BCS     .need_3_bytes       ; If \nwlinkedidentc{COL_SHIFT_AMT}{NW1Xx3lK-10jlgu-7} >= 5, we need to alter three
+                                ; screen bytes, otherwise just two bytes.
 
 .loop1:
     LDY     \nwlinkedidentc{ROWNUM}{NW1Xx3lK-10jlgu-7}
@@ -1036,7 +1045,8 @@ routine also sets whether the active and the background screens differ in {\Tt{}
     AND     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X
     ORA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}
     STA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}          ; \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8} |= 
-                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}]) & \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i])
+                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}]) &
+                                    ;     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i])
     LDA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X            
     ORA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] |= \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i]
@@ -1048,7 +1058,8 @@ routine also sets whether the active and the background screens differ in {\Tt{}
     AND     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X
     ORA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}
     STA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}          ; \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8} |= 
-                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1]) & \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1])
+                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1]) &
+                                    ;     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1])
     LDA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X            
     ORA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] |= \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1]
@@ -1069,7 +1080,8 @@ routine also sets whether the active and the background screens differ in {\Tt{}
     AND     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X
     ORA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}
     STA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}          ; \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8} |= 
-                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}]) & \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i])
+                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}]) &
+                                    ;     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i])
     LDA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X            
     ORA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}] |= \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i]
@@ -1081,7 +1093,8 @@ routine also sets whether the active and the background screens differ in {\Tt{}
     AND     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X
     ORA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}
     STA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}          ; \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8} |= 
-                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1]) & \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1])
+                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1]) &
+                                    ;     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1])
     LDA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X            
     ORA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+1] |= \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+1]
@@ -1093,7 +1106,8 @@ routine also sets whether the active and the background screens differ in {\Tt{}
     AND     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X
     ORA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}
     STA     \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8}          ; \nwlinkedidentc{SCREENS_DIFFER}{NW1Xx3lK-10jlgu-8} |= 
-                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2]) & \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+2])
+                                    ;   ( (screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] ^ screen2[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2]) &
+                                    ;     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+2])
     LDA     \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3},X            
     ORA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            
     STA     (\nwlinkedidentc{ROW_ADDR}{NW1Xx3lK-10jlgu-5}),Y            ; screen[\nwlinkedidentc{COLNUM}{NW1Xx3lK-10jlgu-7}+2] |= \nwlinkedidentc{BLOCK_DATA}{NW1Xx3lK-10jlgu-3}[i+2]

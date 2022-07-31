@@ -6173,8 +6173,8 @@ DRAW_SPRITE:
     LDX     #$00
     LDA     COL_SHIFT_AMT
     CMP     #$05
-    BCS     .need_3_bytes       ; If COL_SHIFT_AMT >= 5, we need to alter three screen bytes,
-                                ; otherwise just two bytes.
+    BCS     .need_3_bytes       ; If COL_SHIFT_AMT >= 5, we need to alter three
+                                ; screen bytes, otherwise just two bytes.
 
 .loop1:
     LDY     ROWNUM
@@ -6183,14 +6183,16 @@ DRAW_SPRITE:
     LDA     (ROW_ADDR),Y 
     AND     MASK0
     ORA     BLOCK_DATA,X 
-    STA     (ROW_ADDR),Y        ; screen[COLNUM] = screen[COLNUM] & MASK0 | BLOCK_DATA[i]
+    STA     (ROW_ADDR),Y        ; screen[COLNUM] =
+                                ;   screen[COLNUM] & MASK0 | BLOCK_DATA[i]
 
     INX                         ; X++
     INY                         ; Y++
     LDA     (ROW_ADDR),Y 
     AND     MASK1
     ORA     BLOCK_DATA,X 
-    STA     (ROW_ADDR),Y        ; screen[COLNUM+1] = screen[COLNUM+1] & MASK1 | BLOCK_DATA[i+1]
+    STA     (ROW_ADDR),Y        ; screen[COLNUM+1] =
+                                ;   screen[COLNUM+1] & MASK1 | BLOCK_DATA[i+1]
 
     INX
     INX                         ; X += 2
@@ -6206,7 +6208,8 @@ DRAW_SPRITE:
     LDA     (ROW_ADDR),Y 
     AND     MASK0
     ORA     BLOCK_DATA,X 
-    STA     (ROW_ADDR),Y        ; screen[COLNUM] = screen[COLNUM] & MASK0 | BLOCK_DATA[i]
+    STA     (ROW_ADDR),Y        ; screen[COLNUM] =
+                                ;   screen[COLNUM] & MASK0 | BLOCK_DATA[i]
 
     INX                         ; X++
     INY                         ; Y++
@@ -6218,7 +6221,8 @@ DRAW_SPRITE:
     LDA     (ROW_ADDR),Y 
     AND     MASK1
     ORA     BLOCK_DATA,X 
-    STA     (ROW_ADDR),Y        ; screen[COLNUM+2] = screen[COLNUM+2] & MASK1 | BLOCK_DATA[i+2]
+    STA     (ROW_ADDR),Y        ; screen[COLNUM+2] =
+                                ;   screen[COLNUM+2] & MASK1 | BLOCK_DATA[i+2]
 
     INX                         ; X++
     INC     ROWNUM              ; ROWNUM++
@@ -6261,8 +6265,8 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
     LDX     #$00
     LDA     COL_SHIFT_AMT
     CMP     #$05
-    BCS     .need_3_bytes       ; If COL_SHIFT_AMT >= 5, we need to alter three screen bytes,
-                                ; otherwise just two bytes.
+    BCS     .need_3_bytes       ; If COL_SHIFT_AMT >= 5, we need to alter three
+                                ; screen bytes, otherwise just two bytes.
 
 .loop1:
     LDY     ROWNUM
@@ -6273,7 +6277,8 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
     AND     (ROW_ADDR),Y
     ORA     (ROW_ADDR2),Y
     STA     (ROW_ADDR),Y            ; screen[COLNUM] =
-                                    ;   (screen[COLNUM] & (BLOCK_DATA[i] ^ 0x7F)) | screen2[COLNUM]
+                                    ;   (screen[COLNUM] & (BLOCK_DATA[i] ^ 0x7F)) |
+                                    ;   screen2[COLNUM]
 
     INX                             ; X++
     INY                             ; Y++
@@ -6282,7 +6287,8 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
     AND     (ROW_ADDR),Y
     ORA     (ROW_ADDR2),Y
     STA     (ROW_ADDR),Y            ; screen[COLNUM+1] =
-                                    ;   (screen[COLNUM+1] & (BLOCK_DATA[i+1] ^ 0x7F)) | screen2[COLNUM+1]
+                                    ;   (screen[COLNUM+1] & (BLOCK_DATA[i+1] ^ 0x7F)) |
+                                    ;   screen2[COLNUM+1]
 
     INX                             ; X++
     INX                             ; X++
@@ -6300,7 +6306,8 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
     AND     (ROW_ADDR),Y
     ORA     (ROW_ADDR2),Y
     STA     (ROW_ADDR),Y            ; screen[COLNUM] =
-                                    ;   (screen[COLNUM] & (BLOCK_DATA[i] ^ 0x7F)) | screen2[COLNUM]
+                                    ;   (screen[COLNUM] & (BLOCK_DATA[i] ^ 0x7F)) |
+                                    ;   screen2[COLNUM]
 
     INX                             ; X++
     INY                             ; Y++
@@ -6309,7 +6316,8 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
     AND     (ROW_ADDR),Y
     ORA     (ROW_ADDR2),Y
     STA     (ROW_ADDR),Y            ; screen[COLNUM+1] =
-                                    ;   (screen[COLNUM+1] & (BLOCK_DATA[i+1] ^ 0x7F)) | screen2[COLNUM+1]
+                                    ;   (screen[COLNUM+1] & (BLOCK_DATA[i+1] ^ 0x7F)) |
+                                    ;   screen2[COLNUM+1]
 
     INX                             ; X++
     INY                             ; Y++
@@ -6318,7 +6326,8 @@ ERASE_SPRITE_AT_PIXEL_COORDS:
     AND     (ROW_ADDR),Y
     ORA     (ROW_ADDR2),Y
     STA     (ROW_ADDR),Y            ; screen[COLNUM+2] =
-                                    ;   (screen[COLNUM+2] & (BLOCK_DATA[i+2] ^ 0x7F)) | screen2[COLNUM+2]
+                                    ;   (screen[COLNUM+2] & (BLOCK_DATA[i+2] ^ 0x7F)) |
+                                    ;   screen2[COLNUM+2]
 
     INX                             ; X++
     INC     ROWNUM
@@ -6346,8 +6355,8 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     STX     SCREENS_DIFFER      ; SCREENS_DIFFER = 0
     LDA     COL_SHIFT_AMT
     CMP     #$05
-    BCS     .need_3_bytes       ; If COL_SHIFT_AMT >= 5, we need to alter three screen bytes,
-                                ; otherwise just two bytes.
+    BCS     .need_3_bytes       ; If COL_SHIFT_AMT >= 5, we need to alter three
+                                ; screen bytes, otherwise just two bytes.
 
 .loop1:
     LDY     ROWNUM
@@ -6358,7 +6367,8 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     AND     BLOCK_DATA,X
     ORA     SCREENS_DIFFER
     STA     SCREENS_DIFFER          ; SCREENS_DIFFER |= 
-                                    ;   ( (screen[COLNUM] ^ screen2[COLNUM]) & BLOCK_DATA[i])
+                                    ;   ( (screen[COLNUM] ^ screen2[COLNUM]) &
+                                    ;     BLOCK_DATA[i])
     LDA     BLOCK_DATA,X            
     ORA     (ROW_ADDR),Y            
     STA     (ROW_ADDR),Y            ; screen[COLNUM] |= BLOCK_DATA[i]
@@ -6370,7 +6380,8 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     AND     BLOCK_DATA,X
     ORA     SCREENS_DIFFER
     STA     SCREENS_DIFFER          ; SCREENS_DIFFER |= 
-                                    ;   ( (screen[COLNUM+1] ^ screen2[COLNUM+1]) & BLOCK_DATA[i+1])
+                                    ;   ( (screen[COLNUM+1] ^ screen2[COLNUM+1]) &
+                                    ;     BLOCK_DATA[i+1])
     LDA     BLOCK_DATA,X            
     ORA     (ROW_ADDR),Y            
     STA     (ROW_ADDR),Y            ; screen[COLNUM+1] |= BLOCK_DATA[i+1]
@@ -6391,7 +6402,8 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     AND     BLOCK_DATA,X
     ORA     SCREENS_DIFFER
     STA     SCREENS_DIFFER          ; SCREENS_DIFFER |= 
-                                    ;   ( (screen[COLNUM] ^ screen2[COLNUM]) & BLOCK_DATA[i])
+                                    ;   ( (screen[COLNUM] ^ screen2[COLNUM]) &
+                                    ;     BLOCK_DATA[i])
     LDA     BLOCK_DATA,X            
     ORA     (ROW_ADDR),Y            
     STA     (ROW_ADDR),Y            ; screen[COLNUM] |= BLOCK_DATA[i]
@@ -6403,7 +6415,8 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     AND     BLOCK_DATA,X
     ORA     SCREENS_DIFFER
     STA     SCREENS_DIFFER          ; SCREENS_DIFFER |= 
-                                    ;   ( (screen[COLNUM+1] ^ screen2[COLNUM+1]) & BLOCK_DATA[i+1])
+                                    ;   ( (screen[COLNUM+1] ^ screen2[COLNUM+1]) &
+                                    ;     BLOCK_DATA[i+1])
     LDA     BLOCK_DATA,X            
     ORA     (ROW_ADDR),Y            
     STA     (ROW_ADDR),Y            ; screen[COLNUM+1] |= BLOCK_DATA[i+1]
@@ -6415,7 +6428,8 @@ DRAW_SPRITE_AT_PIXEL_COORDS:
     AND     BLOCK_DATA,X
     ORA     SCREENS_DIFFER
     STA     SCREENS_DIFFER          ; SCREENS_DIFFER |= 
-                                    ;   ( (screen[COLNUM+2] ^ screen2[COLNUM+2]) & BLOCK_DATA[i+2])
+                                    ;   ( (screen[COLNUM+2] ^ screen2[COLNUM+2]) &
+                                    ;     BLOCK_DATA[i+2])
     LDA     BLOCK_DATA,X            
     ORA     (ROW_ADDR),Y            
     STA     (ROW_ADDR),Y            ; screen[COLNUM+2] |= BLOCK_DATA[i+2]
